@@ -104,7 +104,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ theme, setTheme }) => {
   return (
     <button
       onClick={cycleTheme}
-      className="fixed top-4 right-4 md:top-6 md:right-8 z-50 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group"
+      className="fixed top-2 right-2 md:top-6 md:right-8 z-50 w-8 h-8 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group"
       aria-label="Toggle Theme"
     >
       <div className="text-[var(--text-primary)] transition-colors">
@@ -129,11 +129,11 @@ const LanguageToggle: React.FC<LanguageToggleProps> = ({ lang, setLang }) => {
   return (
     <button
       onClick={toggleLang}
-      className="fixed top-4 right-16 md:top-6 md:right-24 z-50 w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group overflow-hidden"
+      className="fixed top-2 right-12 md:top-6 md:right-24 z-50 w-8 h-8 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group overflow-hidden"
       aria-label="Switch Language"
     >
       <div className="w-full h-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
-        {lang === 'en' ? <Icons.FlagUS className="w-5 h-5 md:w-6 md:h-6 rounded-full" /> : <Icons.FlagMX className="w-5 h-5 md:w-6 md:h-6 rounded-full" />}
+        {lang === 'en' ? <Icons.FlagUS className="w-4 h-4 md:w-6 md:h-6 rounded-full" /> : <Icons.FlagMX className="w-4 h-4 md:w-6 md:h-6 rounded-full" />}
       </div>
     </button>
   );
@@ -149,13 +149,13 @@ const Header = ({ setView }: { setView: (v: string) => void }) => {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 flex justify-center pt-4 md:pt-6 pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-40 flex justify-center pt-2 md:pt-6 pointer-events-none">
       <button 
         onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView('home'); }}
         className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-full backdrop-blur-xl border border-[var(--card-border)]
           ${scrolled 
-            ? 'w-[150px] h-[38px] md:w-[180px] md:h-[44px] bg-[var(--bg-primary)]/80 shadow-2xl' 
-            : 'w-full max-w-[80rem] h-[64px] bg-transparent px-8 border-transparent'}`}
+            ? 'w-[120px] h-[34px] md:w-[180px] md:h-[44px] bg-[var(--bg-primary)]/80 shadow-2xl' 
+            : 'w-full max-w-[80rem] h-[64px] bg-transparent px-4 md:px-8 border-transparent'}`}
         aria-label="Go to Homepage"
       >
         <div className={`transition-all duration-700 flex items-center gap-2 ${scrolled ? 'scale-90' : 'scale-100'}`}>
@@ -163,7 +163,7 @@ const Header = ({ setView }: { setView: (v: string) => void }) => {
              <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"></div>
              <div className="absolute inset-0 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-ping opacity-20"></div>
           </div>
-          <span className="text-base md:text-lg font-bold tracking-tight text-[var(--text-primary)]">
+          <span className="text-sm md:text-lg font-bold tracking-tight text-[var(--text-primary)]">
             Tech<span className="text-[var(--text-secondary)]">Solutions</span>
           </span>
         </div>
@@ -182,8 +182,8 @@ const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v
   ];
 
   return (
-    <nav className="fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[400px] md:w-auto md:max-w-none px-0 md:px-6" aria-label="Main Navigation">
-      <div className="flex items-center justify-between md:justify-center gap-1 md:gap-3 p-2 md:p-2.5 rounded-[2rem] md:rounded-[2.5rem] bg-[var(--dock-bg)] border border-[var(--card-border)] shadow-[var(--button-shadow)] ring-1 ring-[var(--card-border)] backdrop-blur-2xl transition-transform duration-300 hover:scale-[1.02]">
+    <nav className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[400px] md:w-auto md:max-w-none px-0 md:px-6" aria-label="Main Navigation">
+      <div className="flex items-center justify-between md:justify-center gap-0 md:gap-3 p-1.5 md:p-2.5 rounded-[2rem] md:rounded-[2.5rem] bg-[var(--dock-bg)] border border-[var(--card-border)] shadow-[var(--button-shadow)] ring-1 ring-[var(--card-border)] backdrop-blur-2xl transition-transform duration-300 hover:scale-[1.02]">
         
         {navItems.map((item) => (
           <button
@@ -191,9 +191,9 @@ const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v
             onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView(item.id); }}
             aria-current={currentView === item.id ? 'page' : undefined}
             aria-label={item.label}
-            className={`dock-item relative group flex flex-col items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-2xl md:rounded-[1.5rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500
+            className={`dock-item relative group flex flex-col items-center justify-center w-12 h-10 md:w-12 md:h-12 rounded-2xl md:rounded-[1.5rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500
               ${currentView === item.id 
-                ? 'bg-[var(--dock-item-bg-active)] text-[var(--button-text)] shadow-lg scale-110 z-10' 
+                ? 'bg-[var(--dock-item-bg-active)] text-[var(--button-text)] shadow-lg scale-100 md:scale-110 z-10' 
                 : 'text-[var(--dock-text)] hover:bg-[var(--dock-item-bg)] hover:text-[var(--text-primary)] hover:scale-110'}`}
           >
             <item.Icon className="w-5 h-5 md:w-[22px] md:h-[22px]" />
@@ -207,9 +207,9 @@ const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v
 
         <LiquidButton 
           onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView('contact'); }}
-          className={`rounded-2xl md:rounded-[1.5rem] px-4 py-2.5 md:px-6 md:py-3 text-xs md:text-sm whitespace-nowrap font-semibold focus-visible:ring-2 focus-visible:ring-emerald-500 flex-grow md:flex-grow-0
+          className={`rounded-2xl md:rounded-[1.5rem] px-3 py-2 md:px-6 md:py-3 text-[11px] md:text-sm whitespace-nowrap font-semibold focus-visible:ring-2 focus-visible:ring-emerald-500 flex-grow md:flex-grow-0
             ${currentView === 'contact' 
-              ? 'scale-105' 
+              ? 'scale-100 md:scale-105' 
               : 'border-transparent hover:bg-[var(--dock-item-bg)]'}`}
           style={{
              '--card-bg': currentView === 'contact' ? 'var(--dock-item-bg-active)' : 'transparent',
@@ -244,7 +244,7 @@ const ScrollToTop = () => {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className={`fixed bottom-24 md:bottom-8 right-6 md:right-8 z-40 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[var(--button-shadow)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50
+      className={`fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[var(--button-shadow)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12 pointer-events-none'}`}
       aria-label="Scroll to top"
     >
@@ -268,131 +268,156 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
     let h = window.innerHeight;
     let dpr = window.devicePixelRatio || 1;
     let animationFrameId: number;
-    const gridSize = 40; 
     
-    // Improved theme detection for styles
-    const getThemeColors = () => {
-       const style = getComputedStyle(document.documentElement);
-       const c1 = style.getPropertyValue('--circuit-color-1').trim();
-       const c2 = style.getPropertyValue('--circuit-color-2').trim();
-       
-       if (theme === 'light') {
-         // Fallback to strict values if vars are missing or delay causes empty string
-         return {
-           c1: c1 && c1 !== '' ? c1 : 'rgba(6, 78, 59, 0.9)',
-           c2: c2 && c2 !== '' ? c2 : 'rgba(2, 44, 34, 0.9)'
-         };
-       }
-       
-       return {
-         c1: c1 && c1 !== '' ? c1 : 'rgba(52, 211, 153, 0.4)',
-         c2: c2 && c2 !== '' ? c2 : 'rgba(34, 211, 238, 0.4)'
-       };
-    };
+    // Configuration for "Communication Network"
+    const nodeCount = Math.min(Math.floor((w * h) / 20000), 50); 
+    const connectionDistance = Math.min(w, h) * 0.3;
+    const signalSpeed = 0.015;
 
-    class CircuitNode {
-      x: number = 0;
-      y: number = 0;
-      vx: number = 0;
-      vy: number = 0;
-      history: {x: number, y: number}[] = [];
-      maxHistory: number = 0;
-      speed: number = 1.5;
-      color: string = '#34d399';
-      width: number = 1;
+    class NetworkNode {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      r: number;
 
       constructor() {
-        this.reset();
-      }
-
-      reset() {
-        this.x = Math.floor(Math.random() * (w / gridSize)) * gridSize;
-        this.y = Math.floor(Math.random() * (h / gridSize)) * gridSize;
-        this.vx = 0;
-        this.vy = 0;
-        this.history = [];
-        this.maxHistory = Math.floor(Math.random() * 20) + 10;
-        
-        const colors = getThemeColors();
-        this.color = Math.random() > 0.5 ? colors.c1 : colors.c2;
-        this.width = Math.random() > 0.8 ? 2.5 : 1.5;
-        
-        const dir = Math.floor(Math.random() * 4);
-        if(dir === 0) this.vy = -this.speed;
-        if(dir === 1) this.vx = this.speed;
-        if(dir === 2) this.vy = this.speed;
-        if(dir === 3) this.vx = -this.speed;
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+        // Slower movement for a background
+        this.vx = (Math.random() - 0.5) * 0.3; 
+        this.vy = (Math.random() - 0.5) * 0.3;
+        this.r = Math.random() * 2 + 1.5;
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
-        
-        this.history.push({x: this.x, y: this.y});
-        if(this.history.length > this.maxHistory) this.history.shift();
-        
-        if(this.x % gridSize === 0 && this.y % gridSize === 0) {
-          if(Math.random() < 0.2) { 
-            const turn = Math.random() > 0.5 ? 1 : -1;
-            if(this.vx !== 0) {
-              this.vy = this.vx * turn;
-              this.vx = 0;
-            } else {
-              this.vx = this.vy * turn;
-              this.vy = 0;
-            }
-          }
-        }
-        
-        if(this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset();
-      }
 
-      draw() {
-        if(this.history.length < 2) return;
+        // Bounce
+        if (this.x < 0 || this.x > w) this.vx *= -1;
+        if (this.y < 0 || this.y > h) this.vy *= -1;
+      }
+      
+      draw(color: string) {
         ctx!.beginPath();
-        ctx!.moveTo(this.history[0].x, this.history[0].y);
-        for(let i=1; i<this.history.length; i++) {
-            ctx!.lineTo(this.history[i].x, this.history[i].y);
-        }
-        ctx!.strokeStyle = this.color;
-        ctx!.lineWidth = this.width;
-        ctx!.lineCap = 'round';
-        ctx!.stroke();
-        
-        ctx!.fillStyle = this.color;
-        ctx!.globalAlpha = 0.8;
-        ctx!.beginPath();
-        ctx!.arc(this.x, this.y, 2, 0, Math.PI * 2); 
+        ctx!.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx!.fillStyle = color;
         ctx!.fill();
-        ctx!.globalAlpha = 1;
       }
     }
 
-    let particles: CircuitNode[] = [];
-    
-    const initParticles = () => {
-      particles = [];
-      const count = Math.min(Math.floor((w * h) / 30000), 40); 
-      for(let i=0; i<count; i++) particles.push(new CircuitNode());
+    class DataPacket {
+      start: NetworkNode;
+      end: NetworkNode;
+      progress: number;
+      isDead: boolean;
+
+      constructor(n1: NetworkNode, n2: NetworkNode) {
+        this.start = n1;
+        this.end = n2;
+        this.progress = 0;
+        this.isDead = false;
+      }
+
+      update() {
+        this.progress += signalSpeed;
+        if (this.progress >= 1) this.isDead = true;
+      }
+
+      draw(color: string, glowColor: string) {
+        const cx = this.start.x + (this.end.x - this.start.x) * this.progress;
+        const cy = this.start.y + (this.end.y - this.start.y) * this.progress;
+        
+        // Glow
+        ctx!.beginPath();
+        ctx!.arc(cx, cy, 4, 0, Math.PI * 2);
+        ctx!.fillStyle = glowColor;
+        ctx!.fill();
+
+        // Core
+        ctx!.beginPath();
+        ctx!.arc(cx, cy, 2, 0, Math.PI * 2);
+        ctx!.fillStyle = color;
+        ctx!.fill();
+      }
+    }
+
+    let nodes: NetworkNode[] = [];
+    let packets: DataPacket[] = [];
+
+    const init = () => {
+      nodes = [];
+      packets = [];
+      for(let i=0; i<nodeCount; i++) nodes.push(new NetworkNode());
     };
 
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
       dpr = window.devicePixelRatio || 1;
-      
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
-      
       ctx.scale(dpr, dpr);
-      initParticles();
+      init();
     };
 
     const animate = () => {
       ctx.clearRect(0, 0, w, h);
-      particles.forEach(p => { p.update(); p.draw(); });
+      
+      const isDark = theme === 'dark';
+      // Colors adapted for communication theme
+      const nodeColor = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.1)';
+      const lineColor = isDark ? '255,255,255' : '15,23,42'; // base rgb for interpolation
+      const packetColor = isDark ? '#34d399' : '#059669'; // Emerald
+      const packetGlow = isDark ? 'rgba(52, 211, 153, 0.3)' : 'rgba(5, 150, 105, 0.15)';
+
+      // Update Nodes
+      nodes.forEach(n => {
+        n.update();
+        n.draw(nodeColor);
+      });
+
+      // Connections & Packets
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            const n1 = nodes[i];
+            const n2 = nodes[j];
+            const dx = n1.x - n2.x;
+            const dy = n1.y - n2.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+
+            if (dist < connectionDistance) {
+                // Draw Line
+                const alpha = 1 - (dist / connectionDistance);
+                ctx.beginPath();
+                ctx.moveTo(n1.x, n1.y);
+                ctx.lineTo(n2.x, n2.y);
+                ctx.strokeStyle = `rgba(${lineColor}, ${alpha * 0.15})`; // Low opacity lines
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Spawn Packet randomly
+                if (Math.random() < 0.003) { // rare chance per frame per connection
+                    packets.push(new DataPacket(n1, n2));
+                }
+            }
+        }
+      }
+
+      // Update Packets
+      for (let i = packets.length - 1; i >= 0; i--) {
+        const p = packets[i];
+        p.update();
+        if (p.isDead) {
+            packets.splice(i, 1);
+        } else {
+            p.draw(packetColor, packetGlow);
+        }
+      }
+
       animationFrameId = requestAnimationFrame(animate);
     };
 
@@ -411,7 +436,7 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
       <canvas 
         ref={canvasRef} 
         className="fixed top-0 left-0 w-full h-full z-0 opacity-100 pointer-events-none transition-opacity duration-700"
-        style={{ mixBlendMode: theme === 'light' ? 'multiply' : 'screen' }} 
+        style={{ mixBlendMode: 'normal' }} 
       />
       <div className="bg-noise" />
     </>
@@ -457,7 +482,7 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         </LiquidButton>
       </div>
 
-      <div className="mt-20 md:mt-32 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-5xl">
+      <div className="mt-16 md:mt-32 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-5xl">
         {[
           { val: "<50ms", label: t.stats.latency },
           { val: "99.9%", label: t.stats.uptime },
@@ -481,8 +506,8 @@ const ServicesView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].services;
   return (
-    <div className="max-w-7xl mx-auto pt-8 md:pt-12 px-4 md:px-6 animate-slide-up">
-      <div className="flex items-end justify-between mb-10 md:mb-16">
+    <div className="max-w-7xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
+      <div className="flex items-end justify-between mb-8 md:mb-16">
         <div>
           <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
           <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
@@ -553,8 +578,8 @@ const PortfolioView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].portfolio;
   return (
-    <div className="max-w-7xl mx-auto pt-8 md:pt-12 px-4 md:px-6 animate-slide-up">
-      <div className="mb-10 md:mb-16">
+    <div className="max-w-7xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
+      <div className="mb-8 md:mb-16">
         <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
         <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
       </div>
@@ -597,8 +622,8 @@ const BlogView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].blog;
   return (
-    <div className="max-w-5xl mx-auto pt-8 md:pt-12 px-4 md:px-6 animate-slide-up">
-      <div className="mb-10 md:mb-16 text-center">
+    <div className="max-w-5xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
+      <div className="mb-8 md:mb-16 text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
         <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
       </div>
@@ -701,7 +726,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
 
   if (status === 'success') {
       return (
-        <div className="max-w-3xl mx-auto pt-8 md:pt-12 px-4 md:px-6 animate-slide-up">
+        <div className="max-w-3xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
           <div onMouseMove={handleMouseMove} className="bento-card p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px]">
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none"></div>
@@ -732,7 +757,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto pt-8 md:pt-12 px-4 md:px-6 animate-slide-up">
+    <div className="max-w-3xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
       <div onMouseMove={handleMouseMove} className="bento-card p-6 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] text-center relative overflow-hidden">
         
         <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-[2rem] mx-auto mb-6 md:mb-10 shadow-[0_20px_50px_-10px_rgba(16,185,129,0.5)] flex items-center justify-center relative z-10 transform -rotate-6 group-hover:rotate-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
