@@ -642,6 +642,8 @@
             
             let w, h;
             let particles = [];
+            const connectDist = 120;
+            const connectDistSq = connectDist * connectDist; // Optimization: Precalculate square
             
             const resize = () => {
                 w = window.innerWidth;
@@ -655,12 +657,13 @@
                 constructor() {
                     this.x = Math.random() * w;
                     this.y = Math.random() * h;
-                    this.vx = (Math.random() - 0.5) * 0.3;
-                    this.vy = (Math.random() - 0.5) * 0.3;
-                    this.size = Math.random() * 1.5 + 1;
+                    this.vx = (Math.random() - 0.5) * 0.5; // Slightly faster for smoother look
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.size = Math.random() * 1.5 + 0.5;
                     // Tech Palette: Emerald, Cyan, Slate
-                    const colors = ['rgba(16, 185, 129, 0.6)', 'rgba(6, 182, 212, 0.6)', 'rgba(148, 163, 184, 0.3)'];
-                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    const colors = ['16, 185, 129', '6, 182, 212', '148, 163, 184']; // RGB
+                    this.colorBase = colors[Math.floor(Math.random() * colors.length)];
+                    this.alpha = Math.random() * 0.5 + 0.2;
                 }
                 
                 update() {
@@ -676,14 +679,17 @@
                 draw() {
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
+                    ctx.fillStyle = `rgba(${this.colorBase}, ${this.alpha})`;
                     ctx.fill();
                 }
             }
 
             function initParticles() {
                 particles = [];
-                const count = Math.floor((w * h) / 10000); // Responsive density
+                // Optimization: Decrease density (was 10000) and Cap max particles
+                let count = Math.floor((w * h) / 13000);
+                if (count > 150) count = 150; // Hard cap for performance on large screens
+
                 for (let i = 0; i < count; i++) {
                     particles.push(new Particle());
                 }
@@ -704,20 +710,24 @@
                         let p2 = particles[j];
                         let dx = p.x - p2.x;
                         let dy = p.y - p2.y;
-                        let dist = Math.sqrt(dx*dx + dy*dy);
+                        let distSq = dx*dx + dy*dy;
                         
-                        if (dist < 120) {
+                        if (distSq < connectDistSq) {
+                            // Only sqrt if necessary
+                            let dist = Math.sqrt(distSq);
+                            let opacity = 1 - dist / connectDist;
+                            
                             // Draw connection line
                             ctx.beginPath();
-                            ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 * (1 - dist/120)})`;
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 * opacity})`;
                             ctx.lineWidth = 1;
                             ctx.moveTo(p.x, p.y);
                             ctx.lineTo(p2.x, p2.y);
                             ctx.stroke();
                             
                             // Moving Data Packet
-                            // Pseudo-random condition to have some active lines
-                            let packetSpeed = 1.5;
+                            // Simplified math
+                            let packetSpeed = 2;
                             let phase = (time * packetSpeed + (i + j)) % 4; // 4s cycle
                             
                             if (phase < 1) {
@@ -725,13 +735,18 @@
                                 let px = p.x + (p2.x - p.x) * t;
                                 let py = p.y + (p2.y - p.y) * t;
                                 
+                                // PERFORMANCE FIX: NO SHADOW BLUR
+                                // Use a larger transparent circle to fake glow
+                                ctx.beginPath();
+                                ctx.arc(px, py, 3, 0, Math.PI * 2);
+                                ctx.fillStyle = `rgba(52, 211, 153, ${0.5 * opacity})`; // Glow
+                                ctx.fill();
+
+                                // Core
                                 ctx.beginPath();
                                 ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-                                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                                ctx.shadowColor = '#34d399'; // Emerald glow
-                                ctx.shadowBlur = 6;
+                                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
                                 ctx.fill();
-                                ctx.shadowBlur = 0;
                             }
                         }
                     }
@@ -741,7 +756,7 @@
 
             window.addEventListener('resize', resize);
             resize();
-            animate();
+            requestAnimationFrame(animate);
         }
 
         // Initialize
