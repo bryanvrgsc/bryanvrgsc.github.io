@@ -149,4 +149,603 @@
         width: 100%;
         max-width: 80rem;
         height: 60px;
-        background-color: transparent
+        background-color: transparent;
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+      
+      #header-content.scrolled {
+        transform: scale(0.9);
+      }
+
+      /* Canvas */
+      #tech-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        opacity: 0.8;
+        mix-blend-mode: screen;
+        pointer-events: none;
+      }
+      
+      .bg-noise {
+        position: fixed;
+        inset: 0;
+        opacity: 0.04;
+        pointer-events: none;
+        z-index: -2;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+    </style>
+</head>
+<body>
+    <!-- Background Layers -->
+    <canvas id="tech-canvas"></canvas>
+    <div class="bg-noise"></div>
+
+    <!-- SVG Filters (Hidden) -->
+    <svg style="display: none; height: 0; width: 0; position: absolute;" xmlns="http://www.w3.org/2000/svg">
+      <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+        <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5" result="turbulence" />
+        <feComponentTransfer in="turbulence" result="mapped">
+          <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+          <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+          <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+        </feComponentTransfer>
+        <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+        <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lighting-color="white" result="specLight">
+          <fePointLight x="-200" y="-200" z="300" />
+        </feSpecularLighting>
+        <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+        <feDisplacementMap in="SourceGraphic" in2="softMap" scale="150" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 flex justify-center pt-6 pointer-events-none">
+        <div id="header-container" class="pointer-events-auto cursor-pointer transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center" onclick="switchView('home')">
+            <div id="header-content" class="transition-all duration-500 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]"></div>
+                <span class="text-lg font-bold tracking-tight text-white">
+                   Tech<span class="text-white/40">Solutions</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-24 min-h-screen pb-32">
+        
+        <!-- VIEW: HOME -->
+        <section id="view-home" class="view-section active animate-slide-up">
+            <div class="relative flex flex-col items-center justify-center min-h-[80vh] text-center px-4 w-full overflow-hidden">
+                
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 border border-white/10 backdrop-blur-md mb-8 shadow-2xl hover:bg-black/60 transition-colors cursor-default">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs font-semibold text-emerald-100/90 tracking-wide uppercase">System Operational</span>
+                </div>
+
+                <h1 class="text-6xl md:text-9xl font-bold tracking-tighter mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 drop-shadow-sm leading-[1.1]">
+                    Future <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-cyan-300">Architects.</span>
+                </h1>
+                
+                <p class="max-w-xl mx-auto text-xl text-slate-300 mb-12 font-light leading-relaxed tracking-wide">
+                    Engineering the next generation of digital experiences.
+                    <br/><span class="text-slate-500">iOS • Web • Intelligence</span>
+                </p>
+                
+                <div class="flex flex-wrap gap-6 justify-center">
+                    <button onclick="switchView('contact')" class="liquid-glass-wrapper relative group inline-flex items-center justify-center font-medium transition-all duration-300 ease-out active:scale-95 px-8 py-4 rounded-full text-lg w-48 bg-white text-black hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.3)] border border-transparent">
+                        <div class="liquid-glass-effect"></div>
+                        <span class="relative z-20 flex items-center justify-center gap-2">Start Project</span>
+                    </button>
+                    
+                    <button onclick="switchView('portfolio')" class="liquid-glass-wrapper relative group inline-flex items-center justify-center font-medium transition-all duration-300 ease-out active:scale-95 px-8 py-4 rounded-full text-lg w-48 bg-slate-800/40 text-white border border-white/10 hover:bg-slate-700/50 hover:border-white/20 backdrop-blur-md">
+                         <div class="liquid-glass-effect"></div>
+                         <span class="relative z-20 flex items-center justify-center gap-2">Explore</span>
+                    </button>
+                </div>
+
+                <div class="mt-24 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl opacity-80 hover:opacity-100 transition-opacity duration-500">
+                    <div class="bento-card p-4 rounded-2xl flex flex-col items-center justify-center h-24 border-white/5 bg-black/40">
+                        <span class="text-xl font-mono font-bold text-emerald-300">&lt;50ms</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-semibold tracking-widest">Latency</span>
+                    </div>
+                    <div class="bento-card p-4 rounded-2xl flex flex-col items-center justify-center h-24 border-white/5 bg-black/40">
+                        <span class="text-xl font-mono font-bold text-emerald-300">99.9%</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-semibold tracking-widest">Uptime</span>
+                    </div>
+                    <div class="bento-card p-4 rounded-2xl flex flex-col items-center justify-center h-24 border-white/5 bg-black/40">
+                        <span class="text-xl font-mono font-bold text-emerald-300">A+</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-semibold tracking-widest">Security</span>
+                    </div>
+                    <div class="bento-card p-4 rounded-2xl flex flex-col items-center justify-center h-24 border-white/5 bg-black/40">
+                        <span class="text-xl font-mono font-bold text-emerald-300">24/7</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-semibold tracking-widest">Global</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: SERVICES -->
+        <section id="view-services" class="view-section">
+            <div class="max-w-6xl mx-auto pt-10 px-4">
+                <div class="flex items-end justify-between mb-12">
+                  <div>
+                    <h2 class="text-4xl font-bold text-white mb-2">Services</h2>
+                    <p class="text-slate-400">High-performance engineering solutions.</p>
+                  </div>
+                </div>
+                
+                <div id="services-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Injected by JS -->
+                </div>
+
+                <div class="mt-12 p-8 bento-card rounded-[2rem]">
+                   <h3 class="text-xl font-bold mb-6">Engagement Models</h3>
+                   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="engagement-grid">
+                       <!-- Injected by JS -->
+                   </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: PORTFOLIO -->
+        <section id="view-portfolio" class="view-section">
+            <div class="max-w-6xl mx-auto pt-10 px-4">
+                <div class="mb-12">
+                  <h2 class="text-4xl font-bold text-white mb-2">Portfolio</h2>
+                  <p class="text-slate-400">Selected works and case studies.</p>
+                </div>
+                <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: BLOG -->
+        <section id="view-blog" class="view-section">
+             <div class="max-w-4xl mx-auto pt-10 px-4">
+                <div class="mb-12 text-center">
+                  <h2 class="text-4xl font-bold text-white mb-2">Insights</h2>
+                  <p class="text-slate-400">Strategic thinking and tech deep dives.</p>
+                </div>
+                <div id="blog-list" class="space-y-6">
+                    <!-- Injected by JS -->
+                </div>
+             </div>
+        </section>
+
+        <!-- VIEW: CONTACT -->
+        <section id="view-contact" class="view-section">
+            <div class="max-w-2xl mx-auto pt-10 px-4">
+                <div class="bento-card p-10 rounded-[3rem] text-center border-white/10 shadow-2xl relative overflow-hidden">
+                  <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+                  
+                  <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-3xl mx-auto mb-8 shadow-lg shadow-emerald-900/50 flex items-center justify-center relative z-10 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </div>
+                  
+                  <h2 class="text-4xl font-bold text-white mb-4 relative z-10">Let's talk business.</h2>
+                  <p class="text-lg text-slate-400 mb-10 leading-relaxed relative z-10">
+                    Schedule a strategic 30-minute call. <br/>
+                    We'll analyze your current architecture and growth opportunities.
+                  </p>
+
+                  <form class="space-y-4 text-left mb-10 relative z-10" onsubmit="event.preventDefault(); alert('Thank you. We will contact you shortly.');">
+                    <div class="grid grid-cols-2 gap-4">
+                      <input type="text" placeholder="Name" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30 focus:bg-black/40 transition-all text-sm" />
+                      <input type="email" placeholder="Email" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30 focus:bg-black/40 transition-all text-sm" />
+                    </div>
+                    <textarea placeholder="Tell us about your project..." rows="4" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-white/30 focus:bg-black/40 transition-all resize-none text-sm"></textarea>
+                    
+                    <button type="submit" class="liquid-glass-wrapper relative group inline-flex items-center justify-center font-medium transition-all duration-300 ease-out active:scale-95 w-full py-4 text-lg rounded-2xl bg-white text-black hover:bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.3)] border border-transparent">
+                        <div class="liquid-glass-effect"></div>
+                        <span class="relative z-20 flex items-center justify-center gap-2">Schedule Call</span>
+                    </button>
+                  </form>
+                  
+                  <p class="mt-6 text-xs text-slate-600 relative z-10">Average response time: 2 hours.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Dock Navigation -->
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-auto px-6">
+        <div class="flex items-center gap-3 p-2.5 rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/5 transition-all hover:scale-[1.02] hover:bg-white/10 hover:border-white/20">
+          
+          <button onclick="switchView('home')" class="dock-item active relative group flex flex-col items-center justify-center w-12 h-12 rounded-[1.2rem] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" data-view="home">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <span class="tooltip absolute -top-12 px-3 py-1.5 rounded-xl bg-black/90 text-white text-[10px] font-bold tracking-wide backdrop-blur-md border border-white/10">Home</span>
+          </button>
+          
+          <div class="w-px h-8 bg-white/10 mx-1"></div>
+
+          <button onclick="switchView('services')" class="dock-item relative group flex flex-col items-center justify-center w-12 h-12 rounded-[1.2rem] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" data-view="services">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            <span class="tooltip absolute -top-12 px-3 py-1.5 rounded-xl bg-black/90 text-white text-[10px] font-bold tracking-wide backdrop-blur-md border border-white/10">Services</span>
+          </button>
+          
+          <button onclick="switchView('portfolio')" class="dock-item relative group flex flex-col items-center justify-center w-12 h-12 rounded-[1.2rem] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" data-view="portfolio">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span class="tooltip absolute -top-12 px-3 py-1.5 rounded-xl bg-black/90 text-white text-[10px] font-bold tracking-wide backdrop-blur-md border border-white/10">Work</span>
+          </button>
+          
+          <button onclick="switchView('blog')" class="dock-item relative group flex flex-col items-center justify-center w-12 h-12 rounded-[1.2rem] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" data-view="blog">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+            <span class="tooltip absolute -top-12 px-3 py-1.5 rounded-xl bg-black/90 text-white text-[10px] font-bold tracking-wide backdrop-blur-md border border-white/10">Blog</span>
+          </button>
+          
+          <div class="w-px h-8 bg-white/10 mx-1"></div>
+
+          <button onclick="switchView('contact')" class="liquid-glass-wrapper relative group inline-flex items-center justify-center font-medium transition-all duration-300 ease-out active:scale-95 rounded-[1.3rem] px-6 py-2.5 text-sm whitespace-nowrap font-semibold text-white border border-white/5 backdrop-blur-xl bg-white/5 hover:bg-white/10 hover:border-white/10" id="dock-contact-btn">
+             <div class="liquid-glass-effect"></div>
+             <span class="relative z-20">Contact</span>
+          </button>
+        </div>
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        // --- 1. DATA ---
+        const ICONS = {
+            Smartphone: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`,
+            ChartBar: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>`,
+            ShieldCheck: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+            CheckCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            ArrowRight: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+            Layers: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
+            Code: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
+            Briefcase: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
+            Rocket: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>`
+        };
+
+        const SERVICES = [
+            {
+                title: "Desarrollo de Aplicaciones",
+                icon: ICONS.Smartphone,
+                items: ["Apps iOS (SwiftUI, Combine)", "Apps Flutter (iOS/Android)", "Web Apps y APIs", "Integraciones (Auth0, Firebase, IoT)"],
+                valueProp: ["Digitalizar procesos", "Reducir costos operativos", "Apps sólidas y escalables"]
+            },
+            {
+                title: "Business Intelligence",
+                icon: ICONS.ChartBar,
+                items: ["Dashboards interactivos", "Modelos de reporte para KPI’s", "Automatización de reportes", "Consultoría de toma de decisiones"],
+                valueProp: ["Decisiones basadas en datos", "Claridad en indicadores clave", "Alertas y análisis predictivo"]
+            },
+            {
+                title: "Consultoría en Tecnología",
+                icon: ICONS.ShieldCheck,
+                items: ["Evaluación de arquitectura", "Optimización de apps o infraestructura", "Migración tecnológica", "Seguridad y autenticación (Auth0, JWT)"],
+                valueProp: ["Evitar errores costosos", "Sistemas confiables y seguros", "Escalabilidad garantizada"]
+            }
+        ];
+
+        const PORTFOLIO = [
+            {
+                title: "App de Gimnasio con QR",
+                problem: "Largas filas en recepción y fraude en accesos compartidos.",
+                solution: "App móvil con generación dinámica de QR y validación en tiempo real.",
+                tech: "Flutter, Firebase, Node.js",
+                result: "Acceso inteligente y reducción de tiempos en 60%",
+                image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop"
+            },
+            {
+                title: "Dashboard de BI",
+                problem: "Falta de visibilidad diaria en ventas e inventario.",
+                solution: "Dashboard automatizado conectado al ERP con alertas predictivas.",
+                tech: "React, Python ETL, PowerBI",
+                result: "Insights automáticos para toma de decisiones",
+                image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop"
+            },
+            {
+                title: "App Flutter + Backend",
+                problem: "Procesos operativos manuales en papel y excel.",
+                solution: "Plataforma completa de digitalización de operaciones en campo.",
+                tech: "Flutter, NestJS, PostgreSQL",
+                result: "Digitalización de operaciones al 100%",
+                image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop"
+            },
+            {
+                title: "Scripts de Análisis Predictivo",
+                problem: "Exceso de stock y compras ineficientes.",
+                solution: "Algoritmos en Python para predicción de demanda estacional.",
+                tech: "Python, Pandas, Scikit-learn",
+                result: "Optimización de inventario en un 25%",
+                image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop"
+            }
+        ];
+
+        const BLOG_POSTS = [
+            {
+                title: "Cómo una app móvil puede automatizar tu negocio",
+                excerpt: "Digitalizar procesos no es un lujo, es una necesidad para reducir costos operativos.",
+                date: "Oct 12, 2023",
+                category: "Automatización"
+            },
+            {
+                title: "Por qué tu empresa necesita un dashboard BI",
+                excerpt: "Dejar de operar por instinto y empezar a decidir con datos reales es el paso definitivo para escalar.",
+                date: "Sep 28, 2023",
+                category: "Business Intelligence"
+            },
+            {
+                title: "SwiftUI o Flutter: qué conviene para tu app",
+                excerpt: "Analizamos costos, tiempos de desarrollo y mantenimiento para tu proyecto.",
+                date: "Ago 15, 2023",
+                category: "Tecnología"
+            }
+        ];
+
+        // --- 2. RENDER FUNCTIONS ---
+        function renderContent() {
+            // Render Services
+            const servicesGrid = document.getElementById('services-grid');
+            servicesGrid.innerHTML = SERVICES.map(s => `
+                <div class="bento-card rounded-[2rem] p-8 flex flex-col h-full group">
+                  <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center mb-8 border border-white/10 text-white group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                    ${s.icon}
+                  </div>
+                  <h3 class="text-2xl font-bold text-white mb-4">${s.title}</h3>
+                  <div class="flex-grow space-y-4">
+                    ${s.items.map(item => `
+                      <div class="flex items-center gap-3 text-slate-300">
+                        <div class="w-1.5 h-1.5 bg-emerald-400/60 rounded-full"></div>
+                        <span class="text-sm font-medium">${item}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                  <div class="mt-8 pt-6 border-t border-white/5">
+                    <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-4">Impact</p>
+                    <div class="space-y-2">
+                      ${s.valueProp.map(vp => `
+                        <div class="flex items-center gap-2 text-xs text-slate-400 bg-white/5 p-2 rounded-lg border border-white/5">
+                          <span class="text-emerald-400">${ICONS.CheckCircle}</span>
+                          ${vp}
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                </div>
+            `).join('');
+
+            // Render Engagement Models
+            const engagementGrid = document.getElementById('engagement-grid');
+            const models = [
+                { icon: ICONS.Layers, label: "Full Project" },
+                { icon: ICONS.Code, label: "Hourly" },
+                { icon: ICONS.Briefcase, label: "Monthly Retainer" },
+                { icon: ICONS.Rocket, label: "Consulting" }
+            ];
+            engagementGrid.innerHTML = models.map(m => `
+                <div class="flex flex-col items-center justify-center p-6 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
+                    <div class="mb-3 text-white/70">${m.icon}</div>
+                    <span class="text-sm font-medium text-slate-200">${m.label}</span>
+                </div>
+            `).join('');
+
+            // Render Portfolio
+            const portfolioGrid = document.getElementById('portfolio-grid');
+            portfolioGrid.innerHTML = PORTFOLIO.map(item => `
+                <div class="bento-card rounded-[2.5rem] overflow-hidden group border-0 ring-1 ring-white/10">
+                  <div class="h-72 overflow-hidden relative">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10 opacity-80"></div>
+                    <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-hover:brightness-110"/>
+                    <div class="absolute top-6 right-6 z-20">
+                       <span class="px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[10px] font-bold uppercase tracking-wider text-white">
+                         ${item.tech.split(',')[0]}
+                       </span>
+                    </div>
+                  </div>
+                  <div class="p-8 relative z-20 -mt-12">
+                    <h3 class="text-3xl font-bold text-white mb-2 drop-shadow-md">${item.title}</h3>
+                    <p class="text-emerald-400 font-medium mb-6 flex items-center gap-2">
+                      ${ICONS.CheckCircle} ${item.result}
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-slate-400">
+                      <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                        <span class="block text-[10px] uppercase tracking-wider text-white/30 mb-2">Challenge</span>
+                        <span class="text-xs leading-relaxed">${item.problem}</span>
+                      </div>
+                      <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                         <span class="block text-[10px] uppercase tracking-wider text-white/30 mb-2">Solution</span>
+                        <span class="text-xs leading-relaxed">${item.solution}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            `).join('');
+
+            // Render Blog
+            const blogList = document.getElementById('blog-list');
+            blogList.innerHTML = BLOG_POSTS.map(post => `
+                <article class="bento-card p-8 rounded-[2rem] flex flex-col md:flex-row items-start md:items-center gap-6 cursor-pointer group hover:bg-white/10 hover:border-white/20">
+                  <div class="h-24 w-24 rounded-2xl bg-white/5 flex-shrink-0 flex flex-col items-center justify-center border border-white/10 group-hover:scale-105 transition-transform">
+                    <span class="text-2xl font-bold text-white font-mono">${post.date.split(' ')[1].replace(',','')}</span>
+                    <span class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">${post.date.split(' ')[0]}</span>
+                  </div>
+                  <div class="flex-grow">
+                    <div class="flex items-center gap-3 mb-2">
+                      <span class="text-[10px] font-bold text-blue-300 uppercase tracking-widest px-2 py-1 rounded bg-blue-500/10">${post.category}</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">${post.title}</h3>
+                    <p class="text-slate-400 leading-relaxed text-sm">${post.excerpt}</p>
+                  </div>
+                  <div class="h-10 w-10 rounded-full bg-white/5 text-white flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
+                    ${ICONS.ArrowRight}
+                  </div>
+                </article>
+            `).join('');
+        }
+
+        // --- 3. INTERACTION LOGIC ---
+        function switchView(viewName) {
+            // 1. Scroll Top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // 2. Update Views
+            document.querySelectorAll('.view-section').forEach(el => {
+                if (el.id === `view-${viewName}`) {
+                    el.classList.remove('hidden');
+                    // Reflow hack to restart animation
+                    void el.offsetWidth;
+                    el.classList.add('active', 'animate-slide-up');
+                } else {
+                    el.classList.remove('active', 'animate-slide-up');
+                    el.classList.add('hidden');
+                }
+            });
+
+            // 3. Update Dock UI
+            document.querySelectorAll('.dock-item').forEach(el => {
+                if(el.dataset.view === viewName) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+            
+            const contactBtn = document.getElementById('dock-contact-btn');
+            if(viewName === 'contact') {
+                contactBtn.classList.add('bg-white/20', 'shadow-[0_0_15px_rgba(255,255,255,0.15)]', 'border-white/20', 'scale-105');
+                contactBtn.classList.remove('bg-white/5');
+            } else {
+                contactBtn.classList.remove('bg-white/20', 'shadow-[0_0_15px_rgba(255,255,255,0.15)]', 'border-white/20', 'scale-105');
+                contactBtn.classList.add('bg-white/5');
+            }
+        }
+
+        // --- 4. SCROLL HEADER LOGIC ---
+        window.addEventListener('scroll', () => {
+            const headerContainer = document.getElementById('header-container');
+            const headerContent = document.getElementById('header-content');
+            if (window.scrollY > 50) {
+                headerContainer.classList.add('scrolled');
+                headerContent.classList.add('scrolled');
+            } else {
+                headerContainer.classList.remove('scrolled');
+                headerContent.classList.remove('scrolled');
+            }
+        });
+
+        // --- 5. TECH CANVAS ANIMATION (CIRCUIT BOARD) ---
+        function initCanvas() {
+            const canvas = document.getElementById('tech-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            
+            const resize = () => {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                // Black background handled by CSS, but can fill here if needed
+            };
+            window.addEventListener('resize', resize);
+            resize();
+
+            const GRID_SIZE = 30;
+            const MAX_ACTIVE_PATHS = 40;
+            const COLORS = ['#10b981', '#06b6d4', '#3b82f6'];
+            
+            let paths = [];
+
+            const snap = (val) => Math.floor(val / GRID_SIZE) * GRID_SIZE;
+
+            const spawnPath = () => {
+                const startX = snap(Math.random() * width);
+                const startY = snap(Math.random() * height);
+                const dir = Math.floor(Math.random() * 4);
+                let dx = 0, dy = 0;
+                if (dir === 0) dy = -1;
+                else if (dir === 1) dx = 1;
+                else if (dir === 2) dy = 1;
+                else dx = -1;
+
+                paths.push({
+                    x: startX,
+                    y: startY,
+                    dx,
+                    dy,
+                    life: Math.random() * 50 + 20,
+                    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                    width: Math.random() > 0.9 ? 2 : 1
+                });
+            };
+
+            for(let i=0; i<10; i++) spawnPath();
+
+            const animate = () => {
+                // Trail effect
+                ctx.fillStyle = 'rgba(5, 5, 10, 0.1)';
+                ctx.fillRect(0, 0, width, height);
+
+                if (paths.length < MAX_ACTIVE_PATHS && Math.random() > 0.9) spawnPath();
+
+                for (let i = paths.length - 1; i >= 0; i--) {
+                    const p = paths[i];
+                    const prevX = p.x;
+                    const prevY = p.y;
+
+                    // Move 3 pixels/frame for speed
+                    p.x += p.dx * 3;
+                    p.y += p.dy * 3;
+
+                    // Random turn at grid intersections
+                    if (Math.abs(p.x % GRID_SIZE) < 3 && Math.abs(p.y % GRID_SIZE) < 3) {
+                       if (Math.random() > 0.8) {
+                         if (p.dx !== 0) {
+                           p.dx = 0;
+                           p.dy = Math.random() > 0.5 ? 1 : -1;
+                         } else {
+                           p.dy = 0;
+                           p.dx = Math.random() > 0.5 ? 1 : -1;
+                         }
+                         p.x = Math.round(p.x / GRID_SIZE) * GRID_SIZE;
+                         p.y = Math.round(p.y / GRID_SIZE) * GRID_SIZE;
+                       }
+                    }
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = p.color;
+                    ctx.lineWidth = p.width;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.moveTo(prevX, prevY);
+                    ctx.lineTo(p.x, p.y);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+
+                    if (Math.random() > 0.95) {
+                       ctx.fillStyle = '#ffffff';
+                       ctx.fillRect(p.x - 1, p.y - 1, 3, 3);
+                    }
+
+                    p.life--;
+                    if (p.life <= 0 || p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
+                      paths.splice(i, 1);
+                    }
+                }
+                requestAnimationFrame(animate);
+            };
+            animate();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContent();
+            initCanvas();
+        });
+
+    </script>
+</body>
+</html>

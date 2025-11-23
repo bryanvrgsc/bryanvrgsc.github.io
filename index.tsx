@@ -1,1 +1,1 @@
-// This file is no longer used. The application has been converted to vanilla HTML/CSS/JS in index.html.
+// File deleted
