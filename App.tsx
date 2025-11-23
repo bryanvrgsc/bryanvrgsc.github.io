@@ -19,42 +19,14 @@ const useMousePosition = () => {
 
 // --- SUB-COMPONENTS ---
 
-const ThemeToggle = () => {
-  // 'system' is the default
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+type Theme = 'light' | 'dark' | 'system';
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+interface ThemeToggleProps {
+  theme: Theme;
+  setTheme: React.Dispatch<React.SetStateAction<Theme>>;
+}
 
-    const applyTheme = (t: 'light' | 'dark' | 'system') => {
-      root.removeAttribute('data-theme');
-      if (t === 'dark') {
-        root.setAttribute('data-theme', 'dark');
-      } else if (t === 'light') {
-        // Default is light in our CSS structure, no attribute needed unless we want explicit light class
-        root.removeAttribute('data-theme');
-      } else {
-        if (mediaQuery.matches) {
-           root.setAttribute('data-theme', 'dark');
-        } else {
-           root.removeAttribute('data-theme');
-        }
-      }
-    };
-
-    applyTheme(theme);
-
-    const handleSystemChange = () => {
-      if (theme === 'system') {
-        applyTheme('system');
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleSystemChange);
-    return () => mediaQuery.removeEventListener('change', handleSystemChange);
-  }, [theme]);
-
+const ThemeToggle: React.FC<ThemeToggleProps> = ({ theme, setTheme }) => {
   const cycleTheme = () => {
     setTheme(prev => {
       if (prev === 'system') return 'dark';
@@ -186,7 +158,7 @@ const ScrollToTop = () => {
   );
 };
 
-const CanvasBackground = () => {
+const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -202,6 +174,18 @@ const CanvasBackground = () => {
     let animationFrameId: number;
     const gridSize = 40; 
     
+    // Get dynamic colors based on CSS variables or specific logic
+    const getThemeColors = () => {
+       const style = getComputedStyle(document.body);
+       const c1 = style.getPropertyValue('--circuit-color-1').trim();
+       const c2 = style.getPropertyValue('--circuit-color-2').trim();
+       // Fallbacks if variables not set immediately
+       return {
+         c1: c1 || (theme === 'light' ? 'rgba(4, 120, 87, 0.8)' : 'rgba(52, 211, 153, 0.4)'),
+         c2: c2 || (theme === 'light' ? 'rgba(8, 145, 178, 0.8)' : 'rgba(34, 211, 238, 0.4)')
+       };
+    };
+
     class CircuitNode {
       x: number = 0;
       y: number = 0;
@@ -224,7 +208,9 @@ const CanvasBackground = () => {
         this.vy = 0;
         this.history = [];
         this.maxHistory = Math.floor(Math.random() * 20) + 10;
-        this.color = Math.random() > 0.5 ? 'rgba(52, 211, 153, 0.4)' : 'rgba(34, 211, 238, 0.4)';
+        
+        const colors = getThemeColors();
+        this.color = Math.random() > 0.5 ? colors.c1 : colors.c2;
         this.width = Math.random() > 0.8 ? 2 : 1;
         
         const dir = Math.floor(Math.random() * 4);
@@ -269,7 +255,7 @@ const CanvasBackground = () => {
         ctx!.lineCap = 'round';
         ctx!.stroke();
         
-        ctx!.fillStyle = '#34d399';
+        ctx!.fillStyle = this.color;
         ctx!.globalAlpha = 0.8;
         ctx!.beginPath();
         ctx!.arc(this.x, this.y, 1.5, 0, Math.PI * 2);
@@ -314,11 +300,11 @@ const CanvasBackground = () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [theme]); // Re-run effect when theme changes to update colors
 
   return (
     <>
-      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-[-1] opacity-30 dark:opacity-40 pointer-events-none mix-blend-normal dark:mix-blend-screen" />
+      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-[-1] opacity-90 dark:opacity-40 pointer-events-none mix-blend-normal dark:mix-blend-screen" />
       <div className="bg-noise" />
     </>
   );
@@ -329,7 +315,7 @@ const CanvasBackground = () => {
 const HomeView = ({ setView }: { setView: (v: string) => void }) => (
   <div className="relative flex flex-col items-center justify-center min-h-[85vh] text-center px-4 w-full overflow-hidden animate-slide-up">
     <h1 className="text-6xl md:text-[7rem] font-bold tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.95]">
-      Future <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 filter drop-shadow-[0_0_30px_rgba(52,211,153,0.2)]">Architects.</span>
+      Future <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 filter drop-shadow-[0_0_30px_rgba(52,211,153,0.3)]">Architects.</span>
     </h1>
     
     <p className="max-w-xl mx-auto text-xl text-[var(--text-secondary)] mb-14 font-normal leading-relaxed tracking-wide">
@@ -534,7 +520,7 @@ const ContactView = () => {
               <textarea id="message" placeholder="Tell us about your project..." rows={4} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all resize-none text-sm focus:ring-1 focus:ring-emerald-500/50"></textarea>
           </div>
           
-          <LiquidButton type="submit" className="w-full py-5 text-lg rounded-2xl bg-[var(--button-bg)] text-[var(--button-text)] hover:scale-[1.02] shadow-[var(--button-shadow)]">
+          <LiquidButton type="submit" className="w-full py-5 text-lg rounded-full bg-[var(--button-bg)] text-[var(--button-text)] hover:scale-[1.02] shadow-[var(--button-shadow)] border border-[var(--card-border)]">
             Schedule Call
           </LiquidButton>
         </form>
@@ -549,11 +535,43 @@ const ContactView = () => {
 
 export default function App() {
   const [view, setView] = useState('home');
+  const [theme, setTheme] = useState<Theme>('system');
+  const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>('light');
+
+  // Handle Theme Logic
+  useEffect(() => {
+    const root = document.documentElement;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const resolveTheme = () => {
+      if (theme === 'system') return mediaQuery.matches ? 'dark' : 'light';
+      return theme;
+    };
+
+    const applyTheme = () => {
+      const resolved = resolveTheme();
+      setEffectiveTheme(resolved);
+
+      root.removeAttribute('data-theme');
+      if (resolved === 'dark') {
+        root.setAttribute('data-theme', 'dark');
+      }
+    };
+
+    applyTheme();
+
+    const handleSystemChange = () => {
+      if (theme === 'system') applyTheme();
+    };
+
+    mediaQuery.addEventListener('change', handleSystemChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemChange);
+  }, [theme]);
 
   return (
     <>
-      <CanvasBackground />
-      <ThemeToggle />
+      <CanvasBackground theme={effectiveTheme} />
+      <ThemeToggle theme={theme} setTheme={setTheme} />
       <Header setView={setView} />
       
       <main className="pt-24 min-h-screen pb-40 flex flex-col">
