@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
@@ -164,7 +163,7 @@ const Header = ({ setView }: { setView: (v: string) => void }) => {
              <div className="absolute inset-0 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-ping opacity-20"></div>
           </div>
           <span className="text-sm md:text-lg font-bold tracking-tight text-[var(--text-primary)]">
-            Tech<span className="text-[var(--text-secondary)]">Solutions</span>
+            bryan<span className="text-emerald-500 dark:text-emerald-400">vrgsc</span>
           </span>
         </div>
       </button>
