@@ -12,11 +12,11 @@
   
   /* Increased contrast for glass on light backgrounds */
   --card-bg: rgba(255, 255, 255, 0.75);
-  --card-border: rgba(15, 23, 42, 0.15); /* Darker border for definition */
+  --card-border: rgba(15, 23, 42, 0.2); /* Darker border for definition in light mode */
   --card-hover-bg: rgba(255, 255, 255, 0.95);
   
-  --glass-glow: rgba(5, 150, 105, 0.2); /* Stronger glow for visibility */
-  --neon-glow: rgba(5, 150, 105, 0.4); 
+  --glass-glow: rgba(5, 150, 105, 0.35); /* Stronger glow for visibility */
+  --neon-glow: rgba(5, 150, 105, 0.3); 
   
   --input-bg: rgba(255, 255, 255, 0.8);
   --input-border: rgba(15, 23, 42, 0.2);
@@ -38,9 +38,9 @@
   --highlight-color: rgba(255, 255, 255, 0.8);
   --sheen-gradient: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.8) 40%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.8) 60%, transparent 100%);
 
-  /* Animation Colors - Light Mode (Requested Dark Green) */
-  --circuit-color-1: rgba(6, 78, 59, 1); /* Emerald 900 - Opaque */
-  --circuit-color-2: rgba(20, 83, 45, 1); /* Green 900 - Opaque */
+  /* Animation Colors - Light Mode (Requested Dark Green - Very Dark for contrast) */
+  --circuit-color-1: rgba(6, 78, 59, 0.9); /* Deep Emerald - nearly opaque */
+  --circuit-color-2: rgba(2, 44, 34, 0.9); /* Black Green - nearly opaque */
 
   /* Subtler Background Gradient for Light Mode so lines pop */
   --bg-gradient: 
@@ -164,6 +164,7 @@ body {
   background: var(--card-bg);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
+  /* Border adaptation: Uses --card-border variable which can be overridden inline */
   border: 1px solid var(--card-border);
   box-shadow: 
     0 8px 32px -4px rgba(0, 0, 0, 0.05), /* Deeper shadow */
@@ -178,8 +179,10 @@ body {
 /* Hover State for Cards */
 .bento-card:hover {
   background: var(--card-hover-bg);
+  /* Liquid adaptation: uses --glass-glow for border hover */
   border-color: var(--glass-glow);
   transform: scale(1.01) translateY(-4px);
+  /* Liquid adaptation: uses --neon-glow and --glass-glow for shadow/glow */
   box-shadow: 
     0 20px 40px -10px rgba(0, 0, 0, 0.08),
     0 0 20px var(--neon-glow),

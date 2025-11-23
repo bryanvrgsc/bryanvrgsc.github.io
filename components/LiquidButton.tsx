@@ -6,14 +6,16 @@ interface LiquidButtonProps {
   onClick?: () => void;
   className?: string;
   type?: "button" | "submit" | "reset";
+  style?: React.CSSProperties;
 }
 
-export const LiquidButton: React.FC<LiquidButtonProps> = ({ children, onClick, className = "", type = "button" }) => {
+export const LiquidButton: React.FC<LiquidButtonProps> = ({ children, onClick, className = "", type = "button", style }) => {
   return (
     <button 
       type={type}
       onClick={onClick} 
-      className={`liquid-glass-wrapper relative group inline-flex items-center justify-center font-medium transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] active:scale-95 overflow-hidden ${className}`}
+      style={style}
+      className={`liquid-glass-wrapper relative group inline-flex items-center justify-center font-medium transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] active:scale-95 overflow-hidden rounded-full border-none outline-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-transparent ${className}`}
     >
       {/* Background Layer with blur */}
       <div className="absolute inset-0 bg-[var(--card-bg)] backdrop-blur-xl group-hover:bg-[var(--card-hover-bg)] transition-colors duration-500"></div>
