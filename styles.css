@@ -4,51 +4,49 @@
   --apple-ease: cubic-bezier(0.25, 1, 0.3, 1); /* Smoother spring feel */
   
   /* Luminous Light Mode (Premium) */
-  --bg-primary: #f0f9ff; /* Brighter, slight cool tint */
+  --bg-primary: #f8fafc; /* Very light slate/white */
   --bg-secondary: #ffffff;
-  --text-primary: #0f172a; /* Darker slate for contrast */
+  --text-primary: #020617; /* Almost black */
   --text-secondary: #334155;
   --text-tertiary: #64748b;
   
   /* Increased contrast for glass on light backgrounds */
-  --card-bg: rgba(255, 255, 255, 0.65);
-  --card-border: rgba(15, 23, 42, 0.12); /* Darker border for better definition on white */
-  --card-hover-bg: rgba(255, 255, 255, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --card-border: rgba(15, 23, 42, 0.15); /* Darker border for definition */
+  --card-hover-bg: rgba(255, 255, 255, 0.95);
   
-  --glass-glow: rgba(5, 150, 105, 0.15); /* Stronger/Darker glow for light mode */
-  --neon-glow: rgba(5, 150, 105, 0.3); /* Darker glow for light mode */
+  --glass-glow: rgba(5, 150, 105, 0.2); /* Stronger glow for visibility */
+  --neon-glow: rgba(5, 150, 105, 0.4); 
   
-  --input-bg: rgba(255, 255, 255, 0.6);
-  --input-border: rgba(15, 23, 42, 0.15);
+  --input-bg: rgba(255, 255, 255, 0.8);
+  --input-border: rgba(15, 23, 42, 0.2);
   
-  --dock-bg: rgba(255, 255, 255, 0.8);
-  --dock-item-bg: rgba(15, 23, 42, 0.04);
+  --dock-bg: rgba(255, 255, 255, 0.85);
+  --dock-item-bg: rgba(15, 23, 42, 0.05);
   --dock-item-bg-active: #ffffff;
   --dock-text: #475569;
   
   /* Liquid Button Specifics - Light Mode */
   --button-text: #0f172a;
   --button-bg: #ffffff;
-  /* Deep, colorful shadow for lift on white */
+  /* High contrast shadow for lift */
   --button-shadow: 
-      0 10px 30px -5px rgba(15, 23, 42, 0.15), 
-      0 8px 12px -6px rgba(16, 185, 129, 0.25), 
-      inset 0 0 0 1px rgba(255,255,255, 0.9);
+      0 10px 25px -5px rgba(15, 23, 42, 0.15), 
+      0 4px 10px -3px rgba(16, 185, 129, 0.2), 
+      inset 0 0 0 1px rgba(255,255,255, 1);
       
   --highlight-color: rgba(255, 255, 255, 0.8);
   --sheen-gradient: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.8) 40%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.8) 60%, transparent 100%);
 
-  /* Animation Colors - Light Mode (Darker for visibility on white) */
-  --circuit-color-1: rgba(4, 120, 87, 0.7); /* Deep Emerald */
-  --circuit-color-2: rgba(8, 145, 178, 0.7); /* Deep Cyan */
+  /* Animation Colors - Light Mode (Dark Green as requested) */
+  --circuit-color-1: rgba(2, 44, 34, 0.95); /* Very Dark Emerald */
+  --circuit-color-2: rgba(21, 94, 117, 0.95); /* Dark Cyan */
 
-  /* Vibrant Background Gradient for Light Mode */
+  /* Subtler Background Gradient for Light Mode so lines pop */
   --bg-gradient: 
-    radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(52, 211, 153, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.8) 0%, transparent 100%),
-    radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
-    radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+    radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(52, 211, 153, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.9) 0%, transparent 100%);
 }
 
 [data-theme='dark'] {

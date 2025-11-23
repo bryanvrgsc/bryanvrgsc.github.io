@@ -181,8 +181,8 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
        const c2 = style.getPropertyValue('--circuit-color-2').trim();
        // Fallbacks if variables not set immediately
        return {
-         c1: c1 || (theme === 'light' ? 'rgba(4, 120, 87, 0.8)' : 'rgba(52, 211, 153, 0.4)'),
-         c2: c2 || (theme === 'light' ? 'rgba(8, 145, 178, 0.8)' : 'rgba(34, 211, 238, 0.4)')
+         c1: c1 || (theme === 'light' ? 'rgba(2, 44, 34, 0.9)' : 'rgba(52, 211, 153, 0.4)'),
+         c2: c2 || (theme === 'light' ? 'rgba(21, 94, 117, 0.9)' : 'rgba(34, 211, 238, 0.4)')
        };
     };
 
@@ -520,7 +520,7 @@ const ContactView = () => {
               <textarea id="message" placeholder="Tell us about your project..." rows={4} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all resize-none text-sm focus:ring-1 focus:ring-emerald-500/50"></textarea>
           </div>
           
-          <LiquidButton type="submit" className="w-full py-5 text-lg rounded-full bg-[var(--button-bg)] text-[var(--button-text)] hover:scale-[1.02] shadow-[var(--button-shadow)] border border-[var(--card-border)]">
+          <LiquidButton type="submit" className="w-full py-5 text-lg rounded-full bg-[var(--button-bg)] text-[var(--button-text)] shadow-[var(--button-shadow)] border border-[var(--card-border)]">
             Schedule Call
           </LiquidButton>
         </form>
