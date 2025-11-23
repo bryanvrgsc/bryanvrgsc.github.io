@@ -242,14 +242,6 @@ const CanvasBackground = () => {
 
 const HomeView = ({ setView }: { setView: (v: string) => void }) => (
   <div className="relative flex flex-col items-center justify-center min-h-[85vh] text-center px-4 w-full overflow-hidden animate-slide-up">
-    <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 mb-10 shadow-lg hover:bg-white/10 transition-all duration-500 cursor-default backdrop-blur-md group">
-      <span className="relative flex h-2.5 w-2.5">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_10px_#34d399]"></span>
-      </span>
-      <span className="text-xs font-bold text-emerald-100/90 tracking-widest uppercase group-hover:text-white transition-colors">System Operational</span>
-    </div>
-
     <h1 className="text-6xl md:text-[7rem] font-bold tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/20 drop-shadow-sm leading-[0.95]">
       Future <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 filter drop-shadow-[0_0_30px_rgba(52,211,153,0.2)]">Architects.</span>
     </h1>
