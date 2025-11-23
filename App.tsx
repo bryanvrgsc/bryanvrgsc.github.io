@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
@@ -104,13 +103,13 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ theme, setTheme }) => {
   return (
     <button
       onClick={cycleTheme}
-      className="fixed top-2 right-2 md:top-6 md:right-8 z-50 w-8 h-8 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group"
+      className="fixed top-3 right-3 md:top-6 md:right-8 z-50 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group"
       aria-label="Toggle Theme"
     >
       <div className="text-[var(--text-primary)] transition-colors">
-        {theme === 'system' && <Icons.Monitor className="w-4 h-4 md:w-5 md:h-5 opacity-70 group-hover:opacity-100" />}
-        {theme === 'dark' && <Icons.Moon className="w-4 h-4 md:w-5 md:h-5 opacity-70 group-hover:opacity-100" />}
-        {theme === 'light' && <Icons.Sun className="w-4 h-4 md:w-5 md:h-5 opacity-70 group-hover:opacity-100" />}
+        {theme === 'system' && <Icons.Monitor className="w-5 h-5 md:w-6 md:h-6 opacity-70 group-hover:opacity-100" />}
+        {theme === 'dark' && <Icons.Moon className="w-5 h-5 md:w-6 md:h-6 opacity-70 group-hover:opacity-100" />}
+        {theme === 'light' && <Icons.Sun className="w-5 h-5 md:w-6 md:h-6 opacity-70 group-hover:opacity-100" />}
       </div>
     </button>
   );
@@ -129,11 +128,11 @@ const LanguageToggle: React.FC<LanguageToggleProps> = ({ lang, setLang }) => {
   return (
     <button
       onClick={toggleLang}
-      className="fixed top-2 right-12 md:top-6 md:right-24 z-50 w-8 h-8 md:w-11 md:h-11 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group overflow-hidden"
+      className="fixed top-3 right-16 md:top-6 md:right-24 z-50 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group overflow-hidden"
       aria-label="Switch Language"
     >
       <div className="w-full h-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
-        {lang === 'en' ? <Icons.FlagUS className="w-4 h-4 md:w-6 md:h-6 rounded-full" /> : <Icons.FlagMX className="w-4 h-4 md:w-6 md:h-6 rounded-full" />}
+        {lang === 'en' ? <Icons.FlagUS className="w-5 h-5 md:w-6 md:h-6 rounded-full" /> : <Icons.FlagMX className="w-5 h-5 md:w-6 md:h-6 rounded-full" />}
       </div>
     </button>
   );
@@ -154,16 +153,16 @@ const Header = ({ setView }: { setView: (v: string) => void }) => {
         onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView('home'); }}
         className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-full backdrop-blur-xl border border-[var(--card-border)]
           ${scrolled 
-            ? 'w-[120px] h-[34px] md:w-[180px] md:h-[44px] bg-[var(--bg-primary)]/80 shadow-2xl' 
+            ? 'w-[140px] h-[38px] md:w-[180px] md:h-[44px] bg-[var(--bg-primary)]/80 shadow-2xl' 
             : 'w-full max-w-[80rem] h-[64px] bg-transparent px-4 md:px-8 border-transparent'}`}
         aria-label="Go to Homepage"
       >
         <div className={`transition-all duration-700 flex items-center gap-2 ${scrolled ? 'scale-90' : 'scale-100'}`}>
           <div className="relative">
-             <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"></div>
-             <div className="absolute inset-0 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-ping opacity-20"></div>
+             <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"></div>
+             <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-20"></div>
           </div>
-          <span className="text-sm md:text-lg font-bold tracking-tight text-[var(--text-primary)]">
+          <span className="text-base md:text-lg font-bold tracking-tight text-[var(--text-primary)]">
             bryan<span className="text-emerald-500 dark:text-emerald-400">vrgsc</span>
           </span>
         </div>
@@ -182,7 +181,7 @@ const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v
   ];
 
   return (
-    <nav className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[400px] md:w-auto md:max-w-none px-0 md:px-6" aria-label="Main Navigation">
+    <nav className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[420px] md:w-auto md:max-w-none px-0 md:px-6" aria-label="Main Navigation">
       <div className="flex items-center justify-between md:justify-center gap-0 md:gap-3 p-1.5 md:p-2.5 rounded-[2rem] md:rounded-[2.5rem] bg-[var(--dock-bg)] border border-[var(--card-border)] shadow-[var(--button-shadow)] ring-1 ring-[var(--card-border)] backdrop-blur-2xl transition-transform duration-300 hover:scale-[1.02]">
         
         {navItems.map((item) => (
@@ -191,23 +190,23 @@ const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v
             onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView(item.id); }}
             aria-current={currentView === item.id ? 'page' : undefined}
             aria-label={item.label}
-            className={`dock-item relative group flex flex-col items-center justify-center w-12 h-10 md:w-12 md:h-12 rounded-2xl md:rounded-[1.5rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500
+            className={`dock-item relative group flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl md:rounded-[1.5rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500
               ${currentView === item.id 
                 ? 'bg-[var(--dock-item-bg-active)] text-[var(--button-text)] shadow-lg scale-100 md:scale-110 z-10' 
                 : 'text-[var(--dock-text)] hover:bg-[var(--dock-item-bg)] hover:text-[var(--text-primary)] hover:scale-110'}`}
           >
-            <item.Icon className="w-5 h-5 md:w-[22px] md:h-[22px]" />
+            <item.Icon className="w-5 h-5 md:w-6 md:h-6" />
             <span className="dock-tooltip absolute -top-14 px-4 py-2 rounded-xl bg-[var(--text-primary)] text-[var(--bg-primary)] text-[11px] font-semibold tracking-wide border border-[var(--card-border)] shadow-xl whitespace-nowrap hidden md:block">
               {item.label}
             </span>
           </button>
         ))}
 
-        <div className="w-px h-6 md:h-8 bg-[var(--card-border)] mx-1 md:mx-2" role="separator"></div>
+        <div className="w-px h-8 md:h-10 bg-[var(--card-border)] mx-1 md:mx-2" role="separator"></div>
 
         <LiquidButton 
           onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView('contact'); }}
-          className={`rounded-2xl md:rounded-[1.5rem] px-3 py-2 md:px-6 md:py-3 text-[11px] md:text-sm whitespace-nowrap font-semibold focus-visible:ring-2 focus-visible:ring-emerald-500 flex-grow md:flex-grow-0
+          className={`rounded-2xl md:rounded-[1.5rem] px-5 py-3 md:px-8 md:py-4 text-xs md:text-sm whitespace-nowrap font-semibold focus-visible:ring-2 focus-visible:ring-emerald-500 flex-grow md:flex-grow-0
             ${currentView === 'contact' 
               ? 'scale-100 md:scale-105' 
               : 'border-transparent hover:bg-[var(--dock-item-bg)]'}`}
@@ -244,12 +243,12 @@ const ScrollToTop = () => {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className={`fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[var(--button-shadow)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50
+      className={`fixed bottom-24 md:bottom-8 right-5 md:right-8 z-40 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[var(--button-shadow)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12 pointer-events-none'}`}
       aria-label="Scroll to top"
     >
       <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      <Icons.ArrowUp className="w-4 h-4 md:w-5 md:h-5 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] group-hover:-translate-y-0.5 transition-all duration-300" />
+      <Icons.ArrowUp className="w-5 h-5 md:w-6 md:h-6 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] group-hover:-translate-y-0.5 transition-all duration-300" />
     </button>
   );
 };
@@ -464,7 +463,7 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
       <div className="flex flex-wrap gap-4 md:gap-6 justify-center items-center w-full">
         <LiquidButton 
           onClick={() => setView('contact')} 
-          className="px-8 py-4 md:px-10 md:py-5 text-base md:text-lg min-w-[160px] md:min-w-[200px]"
+          className="px-9 py-5 md:px-12 md:py-6 text-lg md:text-xl min-w-[180px] md:min-w-[220px]"
           style={{
             '--card-bg': 'rgba(16, 185, 129, 0.15)',
             '--card-border': 'rgba(16, 185, 129, 0.4)',
@@ -476,7 +475,7 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         
         <LiquidButton 
           onClick={() => setView('portfolio')} 
-          className="px-8 py-4 md:px-10 md:py-5 text-base md:text-lg min-w-[160px] md:min-w-[200px]"
+          className="px-9 py-5 md:px-12 md:py-6 text-lg md:text-xl min-w-[180px] md:min-w-[220px]"
         >
           {t.exploreWork}
         </LiquidButton>
@@ -506,15 +505,15 @@ const ServicesView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].services;
   return (
-    <div className="max-w-7xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
-      <div className="flex items-end justify-between mb-8 md:mb-16">
+    <div className="max-w-7xl mx-auto pt-4 md:pt-12 px-2 md:px-6 animate-slide-up">
+      <div className="flex items-end justify-between mb-8 md:mb-16 px-2 md:px-0">
         <div>
           <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
           <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
         {SERVICES[lang].map((s, i) => {
           // @ts-ignore
           const Icon = Icons[s.iconName];
@@ -524,7 +523,7 @@ const ServicesView = ({ lang }: { lang: Language }) => {
             <div 
               onMouseMove={handleMouseMove} 
               key={i} 
-              className="bento-card rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 flex flex-col h-full group"
+              className="bento-card rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-10 flex flex-col h-full group"
               style={theme.colors as React.CSSProperties}
             >
               <div className={`h-16 w-16 md:h-20 md:w-20 rounded-3xl bg-gradient-to-br ${theme.gradientFrom} to-transparent flex items-center justify-center mb-6 md:mb-10 border border-[var(--card-border)] ${theme.text} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10`}>
@@ -555,16 +554,16 @@ const ServicesView = ({ lang }: { lang: Language }) => {
         })}
       </div>
 
-      <div onMouseMove={handleMouseMove} className="mt-12 p-6 md:p-10 bento-card rounded-[2.5rem]">
-          <h3 className="text-2xl font-bold mb-8 tracking-tight text-[var(--text-primary)]">Engagement Models</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div onMouseMove={handleMouseMove} className="mt-8 md:mt-12 p-5 md:p-10 bento-card rounded-[2rem] md:rounded-[2.5rem]">
+          <h3 className="text-2xl font-bold mb-6 md:mb-8 tracking-tight text-[var(--text-primary)]">Engagement Models</h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {ENGAGEMENT_MODELS[lang].map((m, i) => {
                  // @ts-ignore
                  const Icon = Icons[m.iconName];
                  return (
                   <div key={i} className="flex flex-col items-center justify-center p-6 md:p-8 bg-[var(--input-bg)] rounded-3xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-all duration-300 group cursor-default hover:-translate-y-1">
                       <div className="mb-4 text-[var(--text-tertiary)] group-hover:text-emerald-500 group-hover:scale-110 transition-all"><Icon className="w-6 h-6 md:w-8 md:h-8"/></div>
-                      <span className="text-sm font-semibold text-[var(--text-primary)] tracking-wide">{m.label}</span>
+                      <span className="text-sm font-semibold text-[var(--text-primary)] tracking-wide text-center">{m.label}</span>
                   </div>
                  );
               })}
@@ -750,7 +749,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
             
             <LiquidButton 
                 onClick={handleReset}
-                className="px-6 py-3 md:px-8 md:py-4 text-base md:text-lg"
+                className="px-8 py-4 md:px-8 md:py-4 text-base md:text-lg"
                  style={{
                    '--card-bg': 'rgba(16, 185, 129, 0.15)',
                    '--card-border': 'rgba(16, 185, 129, 0.5)',
@@ -776,7 +775,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-4 md:p-5 rounded-2xl md:rounded-3xl bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] text-[var(--text-secondary)] transition-all duration-300 transform hover:scale-110 shadow-sm ${social.color} flex items-center justify-center`}
+              className={`p-5 md:p-6 rounded-2xl md:rounded-3xl bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] text-[var(--text-secondary)] transition-all duration-300 transform hover:scale-110 shadow-sm ${social.color} flex items-center justify-center`}
               aria-label={social.label}
             >
               <social.icon className="w-5 h-5 md:w-6 md:h-6" />
@@ -841,7 +840,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
             
             <LiquidButton 
               type="submit" 
-              className="w-full py-4 md:py-5 text-base md:text-lg font-bold tracking-wide"
+              className="w-full py-5 md:py-6 text-lg md:text-xl font-bold tracking-wide"
               style={{
                  // Adapting material to "Emerald" (Growth/Success)
                  '--card-bg': 'rgba(16, 185, 129, 0.15)',
