@@ -17,6 +17,57 @@ const useMousePosition = () => {
   return handleMouseMove;
 };
 
+// Helper for dynamic category theming
+const getCategoryTheme = (term: string) => {
+  const t = term.toLowerCase();
+  
+  // Automatización / App Development -> Emerald (Green)
+  if (t.includes('auto') || t.includes('app') || t.includes('desarrollo')) {
+    return {
+      text: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-100 dark:bg-emerald-500/10",
+      border: "border-emerald-200 dark:border-emerald-500/20",
+      gradientFrom: "from-emerald-500/20",
+      bullet: "bg-emerald-500",
+      shadow: "shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+    };
+  }
+  
+  // Business Intelligence -> Blue
+  if (t.includes('business') || t.includes('bi') || t.includes('data')) {
+    return {
+      text: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-100 dark:bg-blue-500/10",
+      border: "border-blue-200 dark:border-blue-500/20",
+      gradientFrom: "from-blue-500/20",
+      bullet: "bg-blue-500",
+      shadow: "shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+    };
+  }
+  
+  // Tecnología / Tech Consulting -> Violet (Purple)
+  if (t.includes('tec') || t.includes('consult')) {
+    return {
+      text: "text-violet-600 dark:text-violet-400",
+      bg: "bg-violet-100 dark:bg-violet-500/10",
+      border: "border-violet-200 dark:border-violet-500/20",
+      gradientFrom: "from-violet-500/20",
+      bullet: "bg-violet-500",
+      shadow: "shadow-[0_0_8px_rgba(139,92,246,0.5)]"
+    };
+  }
+
+  // Default -> Cyan
+  return {
+    text: "text-cyan-600 dark:text-cyan-400",
+    bg: "bg-cyan-100 dark:bg-cyan-500/10",
+    border: "border-cyan-200 dark:border-cyan-500/20",
+    gradientFrom: "from-cyan-500/20",
+    bullet: "bg-cyan-500",
+    shadow: "shadow-[0_0_8px_rgba(6,182,212,0.5)]"
+  };
+};
+
 // --- SUB-COMPONENTS ---
 
 type Theme = 'light' | 'dark' | 'system';
@@ -174,15 +225,22 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
     let animationFrameId: number;
     const gridSize = 40; 
     
-    // Get dynamic colors based on CSS variables or specific logic
     const getThemeColors = () => {
-       const style = getComputedStyle(document.body);
+       const style = getComputedStyle(document.documentElement);
        const c1 = style.getPropertyValue('--circuit-color-1').trim();
        const c2 = style.getPropertyValue('--circuit-color-2').trim();
-       // Fallbacks if variables not set immediately
+       
+       // Explicit fallback for light mode to enforce dark green if var fetch fails
+       if (theme === 'light') {
+         return {
+           c1: c1 || 'rgba(6, 78, 59, 1)',
+           c2: c2 || 'rgba(20, 83, 45, 1)'
+         };
+       }
+       
        return {
-         c1: c1 || (theme === 'light' ? 'rgba(2, 44, 34, 0.9)' : 'rgba(52, 211, 153, 0.4)'),
-         c2: c2 || (theme === 'light' ? 'rgba(21, 94, 117, 0.9)' : 'rgba(34, 211, 238, 0.4)')
+         c1: c1 || 'rgba(52, 211, 153, 0.4)',
+         c2: c2 || 'rgba(34, 211, 238, 0.4)'
        };
     };
 
@@ -211,7 +269,7 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
         
         const colors = getThemeColors();
         this.color = Math.random() > 0.5 ? colors.c1 : colors.c2;
-        this.width = Math.random() > 0.8 ? 2 : 1;
+        this.width = Math.random() > 0.8 ? 2.5 : 1.5;
         
         const dir = Math.floor(Math.random() * 4);
         if(dir === 0) this.vy = -this.speed;
@@ -258,7 +316,7 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
         ctx!.fillStyle = this.color;
         ctx!.globalAlpha = 0.8;
         ctx!.beginPath();
-        ctx!.arc(this.x, this.y, 1.5, 0, Math.PI * 2);
+        ctx!.arc(this.x, this.y, 2, 0, Math.PI * 2); 
         ctx!.fill();
         ctx!.globalAlpha = 1;
       }
@@ -300,11 +358,11 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [theme]); // Re-run effect when theme changes to update colors
+  }, [theme]);
 
   return (
     <>
-      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-[-1] opacity-90 dark:opacity-40 pointer-events-none mix-blend-normal dark:mix-blend-screen" />
+      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 opacity-100 dark:opacity-40 pointer-events-none mix-blend-normal dark:mix-blend-screen" />
       <div className="bg-noise" />
     </>
   );
@@ -367,16 +425,18 @@ const ServicesView = () => {
         {SERVICES.map((s, i) => {
           // @ts-ignore
           const Icon = Icons[s.iconName];
+          const theme = getCategoryTheme(s.title);
+          
           return (
             <div onMouseMove={handleMouseMove} key={i} className="bento-card rounded-[2.5rem] p-10 flex flex-col h-full group">
-              <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-[var(--glass-glow)] to-transparent flex items-center justify-center mb-10 border border-[var(--card-border)] text-[var(--text-primary)] group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10">
+              <div className={`h-20 w-20 rounded-3xl bg-gradient-to-br ${theme.gradientFrom} to-transparent flex items-center justify-center mb-10 border border-[var(--card-border)] ${theme.text} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10`}>
                 <Icon className="w-9 h-9 drop-shadow-sm" />
               </div>
               <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-6 relative z-10 tracking-tight">{s.title}</h3>
               <div className="flex-grow space-y-5 relative z-10">
                 {s.items.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_8px_#10b981]"></div>
+                    <div className={`w-2 h-2 rounded-full ${theme.bullet} ${theme.shadow}`}></div>
                     <span className="text-[15px] font-medium">{item}</span>
                   </div>
                 ))}
@@ -386,7 +446,7 @@ const ServicesView = () => {
                 <div className="space-y-3">
                   {s.valueProp.map((vp, vidx) => (
                     <div key={vidx} className="flex items-center gap-3 text-xs text-[var(--text-secondary)] bg-[var(--input-bg)] p-3 rounded-xl border border-[var(--card-border)] group-hover:bg-[var(--glass-glow)] transition-colors">
-                      <span className="text-emerald-500"><Icons.CheckCircle className="w-4 h-4" /></span>
+                      <span className={theme.text}><Icons.CheckCircle className="w-4 h-4" /></span>
                       {vp}
                     </div>
                   ))}
@@ -468,24 +528,29 @@ const BlogView = () => {
         <p className="text-[var(--text-secondary)] text-lg">Strategic thinking and tech deep dives.</p>
       </div>
       <div className="space-y-8">
-        {BLOG_POSTS.map((post, i) => (
-          <article onMouseMove={handleMouseMove} key={i} className="bento-card p-10 rounded-[2.5rem] flex flex-col md:flex-row items-start md:items-center gap-8 cursor-pointer group">
-            <div className="h-28 w-28 rounded-3xl bg-[var(--input-bg)] flex-shrink-0 flex flex-col items-center justify-center border border-[var(--card-border)] group-hover:scale-105 transition-all duration-500 group-hover:border-emerald-500/30 group-hover:shadow-[0_0_30px_rgba(52,211,153,0.1)]">
-              <span className="text-3xl font-bold text-[var(--text-primary)] tracking-tighter">{post.date.split(' ')[1].replace(',','')}</span>
-              <span className="text-[11px] uppercase text-[var(--text-secondary)] font-bold tracking-widest mt-1">{post.date.split(' ')[0]}</span>
-            </div>
-            <div className="flex-grow">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-300 uppercase tracking-widest px-3 py-1.5 rounded-lg bg-cyan-100 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-900/30">{post.category}</span>
+        {BLOG_POSTS.map((post, i) => {
+          const theme = getCategoryTheme(post.category);
+          return (
+            <article onMouseMove={handleMouseMove} key={i} className="bento-card p-10 rounded-[2.5rem] flex flex-col md:flex-row items-start md:items-center gap-8 cursor-pointer group">
+              <div className="h-28 w-28 rounded-3xl bg-[var(--input-bg)] flex-shrink-0 flex flex-col items-center justify-center border border-[var(--card-border)] group-hover:scale-105 transition-all duration-500 group-hover:border-emerald-500/30 group-hover:shadow-[0_0_30px_rgba(52,211,153,0.1)]">
+                <span className="text-3xl font-bold text-[var(--text-primary)] tracking-tighter">{post.date.split(' ')[1].replace(',','')}</span>
+                <span className="text-[11px] uppercase text-[var(--text-secondary)] font-bold tracking-widest mt-1">{post.date.split(' ')[0]}</span>
               </div>
-              <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-3 group-hover:text-cyan-500 transition-colors tracking-tight">{post.title}</h3>
-              <p className="text-[var(--text-secondary)] leading-relaxed text-base font-light">{post.excerpt}</p>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-[var(--input-bg)] text-[var(--text-primary)] flex items-center justify-center group-hover:bg-[var(--text-primary)] group-hover:text-[var(--bg-primary)] transition-all duration-300 transform group-hover:translate-x-2">
-              <Icons.ArrowRight className="w-5 h-5" />
-            </div>
-          </article>
-        ))}
+              <div className="flex-grow">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border ${theme.text} ${theme.bg} ${theme.border}`}>
+                    {post.category}
+                  </span>
+                </div>
+                <h3 className="text-3xl font-bold text-[var(--text-primary)] mb-3 group-hover:text-cyan-500 transition-colors tracking-tight">{post.title}</h3>
+                <p className="text-[var(--text-secondary)] leading-relaxed text-base font-light">{post.excerpt}</p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-[var(--input-bg)] text-[var(--text-primary)] flex items-center justify-center group-hover:bg-[var(--text-primary)] group-hover:text-[var(--bg-primary)] transition-all duration-300 transform group-hover:translate-x-2">
+                <Icons.ArrowRight className="w-5 h-5" />
+              </div>
+            </article>
+          );
+        })}
       </div>
     </div>
   );
@@ -574,7 +639,7 @@ export default function App() {
       <ThemeToggle theme={theme} setTheme={setTheme} />
       <Header setView={setView} />
       
-      <main className="pt-24 min-h-screen pb-40 flex flex-col">
+      <main className="relative z-10 pt-24 min-h-screen pb-40 flex flex-col">
         {view === 'home' && <HomeView setView={setView} />}
         {view === 'services' && <ServicesView />}
         {view === 'portfolio' && <PortfolioView />}
