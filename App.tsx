@@ -121,7 +121,7 @@ const Dock = ({ currentView, setView }: { currentView: string, setView: (v: stri
 
   return (
     <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-auto px-6" aria-label="Main Navigation">
-      <div className="flex items-center gap-3 p-2.5 rounded-[2.5rem] bg-[var(--dock-bg)] border border-[var(--card-border)] shadow-[0_20px_40px_rgba(0,0,0,0.2)] ring-1 ring-[var(--card-border)] backdrop-blur-2xl transition-transform duration-300 hover:scale-[1.02]">
+      <div className="flex items-center gap-3 p-2.5 rounded-[2.5rem] bg-[var(--dock-bg)] border border-[var(--card-border)] shadow-[var(--button-shadow)] ring-1 ring-[var(--card-border)] backdrop-blur-2xl transition-transform duration-300 hover:scale-[1.02]">
         
         {navItems.map((item) => (
           <button
@@ -318,7 +318,7 @@ const CanvasBackground = () => {
 
   return (
     <>
-      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-[-1] opacity-60 dark:opacity-40 pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
+      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-[-1] opacity-30 dark:opacity-40 pointer-events-none mix-blend-normal dark:mix-blend-screen" />
       <div className="bg-noise" />
     </>
   );
@@ -342,7 +342,7 @@ const HomeView = ({ setView }: { setView: (v: string) => void }) => (
         Start Project
       </LiquidButton>
       
-      <LiquidButton onClick={() => setView('portfolio')} className="px-10 py-5 rounded-full text-lg min-w-[200px] text-[var(--text-primary)] border-[var(--card-border)] hover:bg-[var(--card-hover-bg)]">
+      <LiquidButton onClick={() => setView('portfolio')} className="px-10 py-5 rounded-full text-lg min-w-[200px] text-[var(--text-primary)] border-[var(--card-border)] hover:bg-[var(--card-hover-bg)] shadow-[var(--button-shadow)]">
         Explore Work
       </LiquidButton>
     </div>

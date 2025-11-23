@@ -4,33 +4,47 @@
   --apple-ease: cubic-bezier(0.25, 1, 0.3, 1); /* Smoother spring feel */
   
   /* Luminous Light Mode (Premium) */
-  --bg-primary: #f2f4f6;
+  --bg-primary: #f0f9ff; /* Brighter, slight cool tint */
   --bg-secondary: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-tertiary: #9ca3af;
+  --text-primary: #0f172a; /* Darker slate for contrast */
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
   
-  --card-bg: rgba(255, 255, 255, 0.7);
-  --card-border: rgba(255, 255, 255, 0.6);
-  --card-hover-bg: rgba(255, 255, 255, 0.9);
+  /* Increased opacity for cards to pop against colorful bg */
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(255, 255, 255, 1);
+  --card-hover-bg: rgba(255, 255, 255, 0.95);
   
-  --glass-glow: rgba(52, 211, 153, 0.2);
+  --glass-glow: rgba(16, 185, 129, 0.2); /* Emerald tint for hover */
   --neon-glow: rgba(52, 211, 153, 0.4);
   
   --input-bg: rgba(255, 255, 255, 0.6);
   --input-border: rgba(0, 0, 0, 0.08);
   
-  --dock-bg: rgba(255, 255, 255, 0.6);
-  --dock-item-bg: rgba(0, 0, 0, 0.05);
+  --dock-bg: rgba(255, 255, 255, 0.7);
+  --dock-item-bg: rgba(0, 0, 0, 0.03);
   --dock-item-bg-active: #ffffff;
   --dock-text: #64748b;
   
   /* Liquid Button Specifics - Light Mode */
-  --button-text: #111827;
+  --button-text: #0f172a;
   --button-bg: #ffffff;
-  --button-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.05);
+  /* Colorful shadow for lift */
+  --button-shadow: 
+      0 12px 25px -8px rgba(34, 211, 238, 0.4), 
+      0 4px 10px -4px rgba(52, 211, 153, 0.2), 
+      inset 0 0 0 1px rgba(255,255,255, 0.9);
+      
   --highlight-color: rgba(255, 255, 255, 0.9);
-  --sheen-gradient: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%);
+  --sheen-gradient: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.9) 40%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.9) 60%, transparent 100%);
+
+  /* Vibrant Background Gradient for Light Mode */
+  --bg-gradient: 
+    radial-gradient(circle at 0% 0%, rgba(34, 211, 238, 0.35) 0%, transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(52, 211, 153, 0.35) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.8) 0%, transparent 70%),
+    radial-gradient(circle at 100% 0%, rgba(34, 211, 238, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(52, 211, 153, 0.15) 0%, transparent 40%);
 }
 
 [data-theme='dark'] {
@@ -61,6 +75,12 @@
   --button-shadow: 0 0 30px -5px rgba(52, 211, 153, 0.4);
   --highlight-color: rgba(255, 255, 255, 0.2);
   --sheen-gradient: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%);
+
+  /* Dark Mode Gradient */
+  --bg-gradient: 
+    radial-gradient(circle at 50% 0%, var(--bg-secondary) 0%, transparent 70%),
+    radial-gradient(circle at 85% 10%, rgba(52, 211, 153, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 15% 90%, rgba(34, 211, 238, 0.08) 0%, transparent 40%);
 }
 
 body {
@@ -68,9 +88,8 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   /* Deep, rich ambient background with transition */
-  background-image: 
-    radial-gradient(circle at 50% 0%, var(--bg-secondary) 0%, transparent 70%),
-    radial-gradient(circle at 85% 10%, rgba(52, 211, 153, 0.05) 0%, transparent 40%);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
   transition: background-color 0.5s var(--apple-ease), color 0.5s var(--apple-ease);
 }
 
@@ -137,12 +156,12 @@ body {
 /* Bento Card - Premium Apple Glass Look */
 .bento-card {
   background: var(--card-bg);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid var(--card-border);
   box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.02),
-    0 2px 4px -1px rgba(0, 0, 0, 0.02),
+    0 8px 32px -4px rgba(0, 0, 0, 0.05), /* Deeper shadow */
+    0 4px 8px -2px rgba(0, 0, 0, 0.02),
     inset 0 0 0 1px var(--card-border);
   transition: all 0.6s var(--apple-ease);
   position: relative;
@@ -156,7 +175,7 @@ body {
   border-color: var(--glass-glow);
   transform: scale(1.01) translateY(-4px);
   box-shadow: 
-    0 20px 40px -10px rgba(0, 0, 0, 0.1),
+    0 20px 40px -10px rgba(0, 0, 0, 0.08),
     0 0 20px var(--neon-glow),
     inset 0 0 0 1px var(--glass-glow);
   z-index: 10;

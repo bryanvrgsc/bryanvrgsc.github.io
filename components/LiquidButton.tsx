@@ -20,19 +20,19 @@ export const LiquidButton: React.FC<LiquidButtonProps> = ({ children, onClick, c
       
       {/* Subtle internal gradient for depth (Uses variables for Light/Dark mode support) */}
       <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-        style={{ background: 'linear-gradient(to top right, var(--highlight-color), transparent)' }}
+        className="absolute inset-0 opacity-100 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+        style={{ background: 'linear-gradient(to top right, var(--highlight-color) 0%, transparent 40%)' }}
       ></div>
 
       {/* Gradient Glow */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-gradient-to-r from-emerald-500/40 via-cyan-500/40 to-emerald-500/40 blur-2xl"></div>
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-emerald-500/20 blur-2xl"></div>
       
       {/* Content */}
       <span className="relative z-20 flex items-center justify-center gap-2 tracking-wide text-[var(--text-primary)]">
         {children}
       </span>
       
-      {/* Border Layer */}
+      {/* Border Layer - Slightly stronger in light mode via variable */}
       <div className="absolute inset-0 border border-[var(--card-border)] rounded-full group-hover:border-[var(--glass-glow)] transition-colors duration-500 pointer-events-none"></div>
     </button>
   );
