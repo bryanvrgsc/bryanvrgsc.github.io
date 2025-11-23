@@ -176,7 +176,7 @@ const ScrollToTop = () => {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className={`fixed bottom-8 right-8 z-40 w-12 h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50
+      className={`fixed bottom-8 right-8 z-40 w-12 h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[var(--button-shadow)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12 pointer-events-none'}`}
       aria-label="Scroll to top"
     >
@@ -318,7 +318,7 @@ const CanvasBackground = () => {
 
   return (
     <>
-      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-[-1] opacity-40 pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
+      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-[-1] opacity-60 dark:opacity-40 pointer-events-none mix-blend-multiply dark:mix-blend-screen" />
       <div className="bg-noise" />
     </>
   );
@@ -338,7 +338,7 @@ const HomeView = ({ setView }: { setView: (v: string) => void }) => (
     </p>
     
     <div className="flex flex-wrap gap-6 justify-center items-center">
-      <LiquidButton onClick={() => setView('contact')} className="px-10 py-5 rounded-full text-lg min-w-[200px] bg-[var(--button-bg)] text-[var(--button-text)] shadow-[0_0_40px_rgba(52,211,153,0.15)] border border-[var(--card-border)]">
+      <LiquidButton onClick={() => setView('contact')} className="px-10 py-5 rounded-full text-lg min-w-[200px] bg-[var(--button-bg)] text-[var(--button-text)] shadow-[var(--button-shadow)] border border-[var(--card-border)]">
         Start Project
       </LiquidButton>
       
@@ -534,7 +534,7 @@ const ContactView = () => {
               <textarea id="message" placeholder="Tell us about your project..." rows={4} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all resize-none text-sm focus:ring-1 focus:ring-emerald-500/50"></textarea>
           </div>
           
-          <LiquidButton type="submit" className="w-full py-5 text-lg rounded-2xl bg-[var(--button-bg)] text-[var(--button-text)] hover:scale-[1.02] shadow-lg">
+          <LiquidButton type="submit" className="w-full py-5 text-lg rounded-2xl bg-[var(--button-bg)] text-[var(--button-text)] hover:scale-[1.02] shadow-[var(--button-shadow)]">
             Schedule Call
           </LiquidButton>
         </form>

@@ -18,8 +18,11 @@ export const LiquidButton: React.FC<LiquidButtonProps> = ({ children, onClick, c
       {/* Background Layer with blur */}
       <div className="absolute inset-0 bg-[var(--card-bg)] backdrop-blur-xl group-hover:bg-[var(--card-hover-bg)] transition-colors duration-500"></div>
       
-      {/* Subtle internal gradient for depth */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
+      {/* Subtle internal gradient for depth (Uses variables for Light/Dark mode support) */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+        style={{ background: 'linear-gradient(to top right, var(--highlight-color), transparent)' }}
+      ></div>
 
       {/* Gradient Glow */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 bg-gradient-to-r from-emerald-500/40 via-cyan-500/40 to-emerald-500/40 blur-2xl"></div>
