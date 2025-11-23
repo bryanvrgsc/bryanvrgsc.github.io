@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
-import { SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS } from './constants';
+import { SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS, UI_TEXT, Language } from './constants';
 
 // --- UTILS ---
 const useMousePosition = () => {
@@ -116,6 +116,29 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ theme, setTheme }) => {
   );
 };
 
+interface LanguageToggleProps {
+  lang: Language;
+  setLang: (lang: Language) => void;
+}
+
+const LanguageToggle: React.FC<LanguageToggleProps> = ({ lang, setLang }) => {
+  const toggleLang = () => {
+    setLang(lang === 'en' ? 'es' : 'en');
+  };
+
+  return (
+    <button
+      onClick={toggleLang}
+      className="fixed top-6 right-24 z-50 w-11 h-11 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group overflow-hidden"
+      aria-label="Switch Language"
+    >
+      <div className="w-full h-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
+        {lang === 'en' ? <Icons.FlagUS className="w-6 h-6 rounded-full" /> : <Icons.FlagMX className="w-6 h-6 rounded-full" />}
+      </div>
+    </button>
+  );
+};
+
 const Header = ({ setView }: { setView: (v: string) => void }) => {
   const [scrolled, setScrolled] = useState(false);
 
@@ -149,12 +172,13 @@ const Header = ({ setView }: { setView: (v: string) => void }) => {
   );
 };
 
-const Dock = ({ currentView, setView }: { currentView: string, setView: (v: string) => void }) => {
+const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v: string) => void, lang: Language }) => {
+  const t = UI_TEXT[lang].nav;
   const navItems = [
-    { id: 'home', label: 'Home', Icon: Icons.Home },
-    { id: 'services', label: 'Services', Icon: Icons.ServicesNav },
-    { id: 'portfolio', label: 'Work', Icon: Icons.BriefcaseNav },
-    { id: 'blog', label: 'Blog', Icon: Icons.BlogNav },
+    { id: 'home', label: t.home, Icon: Icons.Home },
+    { id: 'services', label: t.services, Icon: Icons.ServicesNav },
+    { id: 'portfolio', label: t.work, Icon: Icons.BriefcaseNav },
+    { id: 'blog', label: t.blog, Icon: Icons.BlogNav },
   ];
 
   return (
@@ -194,7 +218,7 @@ const Dock = ({ currentView, setView }: { currentView: string, setView: (v: stri
              '--text-primary': currentView === 'contact' ? 'var(--button-text)' : 'var(--text-primary)'
           } as React.CSSProperties}
         >
-          Contact
+          {t.contact}
         </LiquidButton>
       </div>
     </nav>
@@ -396,70 +420,77 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
 
 // --- VIEWS ---
 
-const HomeView = ({ setView }: { setView: (v: string) => void }) => (
-  <div className="relative flex flex-col items-center justify-center min-h-[85vh] text-center px-4 w-full overflow-hidden animate-slide-up">
-    <h1 className="text-6xl md:text-[7rem] font-bold tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.95]">
-      Future <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 filter drop-shadow-[0_0_30px_rgba(52,211,153,0.3)]">Architects.</span>
-    </h1>
-    
-    <p className="max-w-xl mx-auto text-xl text-[var(--text-secondary)] mb-14 font-normal leading-relaxed tracking-wide">
-      Engineering the next generation of digital experiences.
-      <br/><span className="text-[var(--text-tertiary)] text-lg mt-2 block">iOS • Web • Intelligence</span>
-    </p>
-    
-    <div className="flex flex-wrap gap-6 justify-center items-center">
-      <LiquidButton 
-        onClick={() => setView('contact')} 
-        className="px-10 py-5 text-lg min-w-[200px]"
-        style={{
-          '--card-bg': 'rgba(16, 185, 129, 0.15)',
-          '--card-border': 'rgba(16, 185, 129, 0.4)',
-          '--glass-glow': 'rgba(16, 185, 129, 0.6)'
-        } as React.CSSProperties}
-      >
-        Start Project
-      </LiquidButton>
+const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Language }) => {
+  const t = UI_TEXT[lang];
+  return (
+    <div className="relative flex flex-col items-center justify-center min-h-[85vh] text-center px-4 w-full overflow-hidden animate-slide-up">
+      <h1 className="text-6xl md:text-[7rem] font-bold tracking-tighter mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.95]">
+        {t.heroTitle.split(' ')[0]} <br/> 
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 filter drop-shadow-[0_0_30px_rgba(52,211,153,0.3)]">
+          {t.heroTitle.split(' ').slice(1).join(' ')}
+        </span>
+      </h1>
       
-      <LiquidButton 
-        onClick={() => setView('portfolio')} 
-        className="px-10 py-5 text-lg min-w-[200px]"
-      >
-        Explore Work
-      </LiquidButton>
-    </div>
+      <p className="max-w-xl mx-auto text-xl text-[var(--text-secondary)] mb-14 font-normal leading-relaxed tracking-wide">
+        {t.heroSubtitle}
+        <br/><span className="text-[var(--text-tertiary)] text-lg mt-2 block">{t.heroTags}</span>
+      </p>
+      
+      <div className="flex flex-wrap gap-6 justify-center items-center">
+        <LiquidButton 
+          onClick={() => setView('contact')} 
+          className="px-10 py-5 text-lg min-w-[200px]"
+          style={{
+            '--card-bg': 'rgba(16, 185, 129, 0.15)',
+            '--card-border': 'rgba(16, 185, 129, 0.4)',
+            '--glass-glow': 'rgba(16, 185, 129, 0.6)'
+          } as React.CSSProperties}
+        >
+          {t.startProject}
+        </LiquidButton>
+        
+        <LiquidButton 
+          onClick={() => setView('portfolio')} 
+          className="px-10 py-5 text-lg min-w-[200px]"
+        >
+          {t.exploreWork}
+        </LiquidButton>
+      </div>
 
-    <div className="mt-32 grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-5xl">
-      {[
-        { val: "<50ms", label: "Latency" },
-        { val: "99.9%", label: "Uptime" },
-        { val: "A+", label: "Security" },
-        { val: "24/7", label: "Global" },
-      ].map((stat, i) => {
-        const handleMouseMove = useMousePosition();
-        return (
-          <div onMouseMove={handleMouseMove} key={i} className="bento-card p-6 rounded-3xl flex flex-col items-center justify-center h-32 group">
-            <span className="text-3xl font-mono font-bold text-[var(--text-primary)] tracking-tight mb-1 group-hover:scale-110 transition-transform duration-500 group-hover:text-emerald-500 group-hover:drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">{stat.val}</span>
-            <span className="text-[11px] text-[var(--text-secondary)] uppercase font-bold tracking-[0.2em] group-hover:text-[var(--text-primary)] transition-colors">{stat.label}</span>
-          </div>
-        );
-      })}
+      <div className="mt-32 grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-5xl">
+        {[
+          { val: "<50ms", label: t.stats.latency },
+          { val: "99.9%", label: t.stats.uptime },
+          { val: "A+", label: t.stats.security },
+          { val: "24/7", label: t.stats.global },
+        ].map((stat, i) => {
+          const handleMouseMove = useMousePosition();
+          return (
+            <div onMouseMove={handleMouseMove} key={i} className="bento-card p-6 rounded-3xl flex flex-col items-center justify-center h-32 group">
+              <span className="text-3xl font-mono font-bold text-[var(--text-primary)] tracking-tight mb-1 group-hover:scale-110 transition-transform duration-500 group-hover:text-emerald-500 group-hover:drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">{stat.val}</span>
+              <span className="text-[11px] text-[var(--text-secondary)] uppercase font-bold tracking-[0.2em] group-hover:text-[var(--text-primary)] transition-colors">{stat.label}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
-const ServicesView = () => {
+const ServicesView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
+  const t = UI_TEXT[lang].services;
   return (
     <div className="max-w-7xl mx-auto pt-12 px-6 animate-slide-up">
       <div className="flex items-end justify-between mb-16">
         <div>
-          <h2 className="text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">Services</h2>
-          <p className="text-[var(--text-secondary)] text-lg">High-performance engineering solutions.</p>
+          <h2 className="text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
+          <p className="text-[var(--text-secondary)] text-lg">{t.subtitle}</p>
         </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {SERVICES.map((s, i) => {
+        {SERVICES[lang].map((s, i) => {
           // @ts-ignore
           const Icon = Icons[s.iconName];
           const theme = getCategoryTheme(s.title);
@@ -484,7 +515,7 @@ const ServicesView = () => {
                 ))}
               </div>
               <div className="mt-10 pt-8 border-t border-[var(--card-border)] relative z-10">
-                <p className="text-[10px] font-bold text-[var(--text-tertiary)] uppercase tracking-[0.2em] mb-4">Impact</p>
+                <p className="text-[10px] font-bold text-[var(--text-tertiary)] uppercase tracking-[0.2em] mb-4">{t.impact}</p>
                 <div className="space-y-3">
                   {s.valueProp.map((vp, vidx) => (
                     <div key={vidx} className="flex items-center gap-3 text-xs text-[var(--text-secondary)] bg-[var(--input-bg)] p-3 rounded-xl border border-[var(--card-border)] group-hover:bg-[var(--glass-glow)] transition-colors">
@@ -502,7 +533,7 @@ const ServicesView = () => {
       <div onMouseMove={handleMouseMove} className="mt-12 p-10 bento-card rounded-[2.5rem]">
           <h3 className="text-2xl font-bold mb-8 tracking-tight text-[var(--text-primary)]">Engagement Models</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {ENGAGEMENT_MODELS.map((m, i) => {
+              {ENGAGEMENT_MODELS[lang].map((m, i) => {
                  // @ts-ignore
                  const Icon = Icons[m.iconName];
                  return (
@@ -518,16 +549,17 @@ const ServicesView = () => {
   );
 };
 
-const PortfolioView = () => {
+const PortfolioView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
+  const t = UI_TEXT[lang].portfolio;
   return (
     <div className="max-w-7xl mx-auto pt-12 px-6 animate-slide-up">
       <div className="mb-16">
-        <h2 className="text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">Portfolio</h2>
-        <p className="text-[var(--text-secondary)] text-lg">Selected works and case studies.</p>
+        <h2 className="text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
+        <p className="text-[var(--text-secondary)] text-lg">{t.subtitle}</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {PORTFOLIO.map((item, i) => (
+        {PORTFOLIO[lang].map((item, i) => (
           <div onMouseMove={handleMouseMove} key={i} className="bento-card rounded-[3rem] overflow-hidden group p-0 border-0">
             <div className="h-[400px] overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
@@ -545,11 +577,11 @@ const PortfolioView = () => {
               </p>
               <div className="grid grid-cols-2 gap-6 text-sm text-[var(--text-secondary)]">
                 <div className="bg-[var(--input-bg)] p-6 rounded-2xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-colors">
-                  <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-3 font-bold">Challenge</span>
+                  <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-3 font-bold">{t.challenge}</span>
                   <span className="text-sm leading-relaxed block">{item.problem}</span>
                 </div>
                 <div className="bg-[var(--input-bg)] p-6 rounded-2xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-colors">
-                    <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-3 font-bold">Solution</span>
+                    <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-3 font-bold">{t.solution}</span>
                   <span className="text-sm leading-relaxed block">{item.solution}</span>
                 </div>
               </div>
@@ -561,16 +593,17 @@ const PortfolioView = () => {
   );
 };
 
-const BlogView = () => {
+const BlogView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
+  const t = UI_TEXT[lang].blog;
   return (
     <div className="max-w-5xl mx-auto pt-12 px-6 animate-slide-up">
       <div className="mb-16 text-center">
-        <h2 className="text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">Insights</h2>
-        <p className="text-[var(--text-secondary)] text-lg">Strategic thinking and tech deep dives.</p>
+        <h2 className="text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
+        <p className="text-[var(--text-secondary)] text-lg">{t.subtitle}</p>
       </div>
       <div className="space-y-8">
-        {BLOG_POSTS.map((post, i) => {
+        {BLOG_POSTS[lang].map((post, i) => {
           const theme = getCategoryTheme(post.category);
           return (
             <article 
@@ -603,8 +636,9 @@ const BlogView = () => {
   );
 };
 
-const ContactView = () => {
+const ContactView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
+  const t = UI_TEXT[lang].contact;
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -613,15 +647,20 @@ const ContactView = () => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Reset form when language changes to prevent stuck error messages in wrong language
+  useEffect(() => {
+    setErrorMessage('');
+  }, [lang]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, [e.target.id]: e.target.value }));
     if (errorMessage) setErrorMessage('');
   };
 
   const validate = () => {
-    if (!formData.name.trim()) return "Please enter your name.";
-    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return "Please enter a valid email address.";
-    if (!formData.message.trim()) return "Please tell us about your project.";
+    if (!formData.name.trim()) return t.errors.name;
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return t.errors.email;
+    if (!formData.message.trim()) return t.errors.message;
     return null;
   };
 
@@ -647,11 +686,11 @@ const ContactView = () => {
         setStatus('success');
       } else {
         setStatus('error');
-        setErrorMessage("Something went wrong. Please try again.");
+        setErrorMessage(t.errors.generic);
       }
     } catch (error) {
       setStatus('error');
-      setErrorMessage("Network error. Please try again.");
+      setErrorMessage(t.errors.network);
     }
   };
 
@@ -671,10 +710,9 @@ const ContactView = () => {
                 <Icons.CheckCircle className="w-12 h-12 text-white" />
             </div>
             
-            <h2 className="text-4xl font-bold text-[var(--text-primary)] mb-4 tracking-tight">Message Received.</h2>
+            <h2 className="text-4xl font-bold text-[var(--text-primary)] mb-4 tracking-tight">{t.successTitle}</h2>
             <p className="text-xl text-[var(--text-secondary)] mb-10 max-w-md">
-              Thank you for reaching out, {formData.name}. <br/>
-              We'll analyze your request and get back to you within 2 hours.
+              {t.successMessage.replace('{name}', formData.name)}
             </p>
             
             <LiquidButton 
@@ -686,7 +724,7 @@ const ContactView = () => {
                    '--glass-glow': 'rgba(16, 185, 129, 0.6)'
                 } as React.CSSProperties}
             >
-                Send another message
+                {t.sendAnother}
             </LiquidButton>
           </div>
         </div>
@@ -701,10 +739,9 @@ const ContactView = () => {
             <Icons.Talk className="w-10 h-10 text-white" />
         </div>
         
-        <h2 className="text-5xl font-bold text-[var(--text-primary)] mb-6 relative z-10 tracking-tight">Let's talk business.</h2>
+        <h2 className="text-5xl font-bold text-[var(--text-primary)] mb-6 relative z-10 tracking-tight">{t.title}</h2>
         <p className="text-xl text-[var(--text-secondary)] mb-12 leading-relaxed relative z-10 max-w-xl mx-auto font-light">
-          Schedule a strategic 30-minute call. <br/>
-          We'll analyze your current architecture and growth opportunities.
+          {t.subtitle}
         </p>
 
         <form className="space-y-5 text-left mb-12 relative z-10 max-w-lg mx-auto" onSubmit={handleSubmit}>
@@ -713,7 +750,7 @@ const ContactView = () => {
               <input 
                 id="name" 
                 type="text" 
-                placeholder="Name" 
+                placeholder={t.placeholders.name} 
                 value={formData.name}
                 onChange={handleChange}
                 disabled={status === 'submitting'}
@@ -724,7 +761,7 @@ const ContactView = () => {
               <input 
                 id="email" 
                 type="email" 
-                placeholder="Email" 
+                placeholder={t.placeholders.email} 
                 value={formData.email}
                 onChange={handleChange}
                 disabled={status === 'submitting'}
@@ -735,7 +772,7 @@ const ContactView = () => {
           <div className="relative group">
               <textarea 
                 id="message" 
-                placeholder="Tell us about your project..." 
+                placeholder={t.placeholders.message}
                 rows={4} 
                 value={formData.message}
                 onChange={handleChange}
@@ -762,11 +799,11 @@ const ContactView = () => {
                '--highlight-color': 'rgba(16, 185, 129, 0.2)'
             } as React.CSSProperties}
           >
-            {status === 'submitting' ? 'Sending...' : 'Schedule Call'}
+            {status === 'submitting' ? t.button.sending : t.button.default}
           </LiquidButton>
         </form>
         
-        <p className="mt-8 text-xs text-[var(--text-tertiary)] relative z-10 font-medium uppercase tracking-widest">Average response time: 2 hours.</p>
+        <p className="mt-8 text-xs text-[var(--text-tertiary)] relative z-10 font-medium uppercase tracking-widest">{t.responseTime}</p>
       </div>
     </div>
   );
@@ -778,6 +815,7 @@ export default function App() {
   const [view, setView] = useState('home');
   const [theme, setTheme] = useState<Theme>('system');
   const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>('light');
+  const [lang, setLang] = useState<Language>('es'); // Default to Spanish per content
 
   // Handle Theme Logic
   useEffect(() => {
@@ -812,18 +850,19 @@ export default function App() {
   return (
     <>
       <CanvasBackground theme={effectiveTheme} />
+      <LanguageToggle lang={lang} setLang={setLang} />
       <ThemeToggle theme={theme} setTheme={setTheme} />
       <Header setView={setView} />
       
       <main className="relative z-10 pt-24 min-h-screen pb-40 flex flex-col">
-        {view === 'home' && <HomeView setView={setView} />}
-        {view === 'services' && <ServicesView />}
-        {view === 'portfolio' && <PortfolioView />}
-        {view === 'blog' && <BlogView />}
-        {view === 'contact' && <ContactView />}
+        {view === 'home' && <HomeView setView={setView} lang={lang} />}
+        {view === 'services' && <ServicesView lang={lang} />}
+        {view === 'portfolio' && <PortfolioView lang={lang} />}
+        {view === 'blog' && <BlogView lang={lang} />}
+        {view === 'contact' && <ContactView lang={lang} />}
       </main>
       
-      <Dock currentView={view} setView={setView} />
+      <Dock currentView={view} setView={setView} lang={lang} />
       <ScrollToTop />
     </>
   );

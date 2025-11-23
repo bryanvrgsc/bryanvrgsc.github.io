@@ -55,5 +55,21 @@ export const Icons = {
   ),
   Monitor: ({ className }: { className?: string }) => (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+  ),
+  FlagUS: ({ className }: { className?: string }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480">
+      <path fill="#bd3d44" d="M0 0h640v480H0"/>
+      <path stroke="#fff" strokeWidth="37" d="M0 55.3h640M0 129h640M0 202.8h640M0 276.5h640M0 350.2h640M0 423.9h640"/>
+      <path fill="#192f5d" d="M0 0h296.2v240H0"/>
+      <path fill="#fff" d="M14 22h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m-256 24h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m-256 24h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m-256 24h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m-256 24h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m-256 24h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m-256 24h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m-256 24h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m-256 24h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27m15 0h27"/>
+    </svg>
+  ),
+  FlagMX: ({ className }: { className?: string }) => (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480">
+      <path fill="#006341" d="M0 0h213.3v480H0z"/>
+      <path fill="#fff" d="M213.3 0h213.4v480H213.3z"/>
+      <path fill="#ce1126" d="M426.7 0H640v480H426.7z"/>
+      <circle cx="320" cy="240" r="40" fill="#a05d21"/>
+    </svg>
   )
 };
