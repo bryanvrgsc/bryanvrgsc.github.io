@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -26,27 +27,6 @@
     <!-- Global SVG Filters for Liquid Apple Effect -->
     <svg style="display: none; height: 0; width: 0; position: absolute;" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <!-- Smoother Liquid Distortion (Apple Style) -->
-        <filter id="liquid-glass" x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
-          <!-- FractalNoise is smoother than standard turbulence for glass -->
-          <feTurbulence type="fractalNoise" baseFrequency="0.002" numOctaves="3" seed="1" result="turbulence" />
-          
-          <!-- High blur to create the organic blob feel -->
-          <feGaussianBlur stdDeviation="8" in="turbulence" result="blurTurbulence" />
-          
-          <!-- High contrast specular lighting for the "wet" look -->
-          <feSpecularLighting surfaceScale="12" specularConstant="1.5" specularExponent="40" lighting-color="#ffffff" in="blurTurbulence" result="specular">
-            <fePointLight x="-500" y="-500" z="600" />
-          </feSpecularLighting>
-          
-          <feComposite in="specular" in2="SourceGraphic" operator="in" result="specularComposite" />
-          
-          <!-- Displacement map creates the refraction -->
-          <feDisplacementMap in="SourceGraphic" in2="blurTurbulence" scale="20" xChannelSelector="R" yChannelSelector="G" result="distorted" />
-          
-          <feComposite in="specularComposite" in2="distorted" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
-        </filter>
-
         <!-- Fine Grain Noise -->
         <filter id="noiseFilter">
           <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>

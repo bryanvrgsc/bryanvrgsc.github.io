@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
+import { GlassDock } from './components/GlassDock';
 import { SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS, UI_TEXT, Language } from './constants';
 
 // --- UTILS ---
@@ -80,6 +82,109 @@ const getCategoryTheme = (term: string) => {
       '--neon-glow': 'rgba(6, 182, 212, 0.3)',
     }
   };
+};
+
+// --- TYPEWRITER COMPONENTS ---
+
+const Typewriter = ({ text, delay = 25, startDelay = 0, cursorColor = "bg-emerald-500", onComplete }: { text: string, delay?: number, startDelay?: number, cursorColor?: string, onComplete?: () => void }) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [started, setStarted] = useState(false);
+  const elementRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setStarted(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.5 });
+    
+    if (elementRef.current) observer.observe(elementRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+
+    const timeout = setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          setDisplayedText(text.slice(0, i + 1));
+          i++;
+        } else {
+          clearInterval(interval);
+          if (onComplete) onComplete();
+        }
+      }, delay);
+      
+      return () => clearInterval(interval);
+    }, startDelay);
+
+    return () => clearTimeout(timeout);
+  }, [started, text, delay, startDelay, onComplete]);
+
+  return (
+    <span ref={elementRef} className="break-words">
+      {displayedText}
+      <span className={`animate-pulse inline-block w-2 h-4 md:w-2.5 md:h-5 ${cursorColor} align-text-bottom ml-0.5`} />
+    </span>
+  );
+};
+
+// "Tech" Card Design (Futuristic HUD style)
+const TechCard = ({ title, children, accentColor = "emerald" }: { title: string, children: React.ReactNode, accentColor?: "emerald" | "blue" }) => {
+  // Styles based on accent color
+  const styles = accentColor === 'emerald' 
+    ? {
+        border: "border-emerald-500/20",
+        bg: "bg-emerald-500/5",
+        text: "text-emerald-600 dark:text-emerald-400",
+        indicator: "bg-emerald-500",
+        glow: "group-hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]"
+      }
+    : {
+        border: "border-cyan-500/20",
+        bg: "bg-cyan-500/5",
+        text: "text-cyan-600 dark:text-cyan-400",
+        indicator: "bg-cyan-500",
+        glow: "group-hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]"
+      };
+
+  return (
+    <div className={`relative overflow-hidden rounded-[20px] border ${styles.border} ${styles.bg} backdrop-blur-md p-6 md:p-8 flex flex-col h-full group transition-all duration-700 hover:border-opacity-60 ${styles.glow}`}>
+       
+       {/* Decorative Tech Corners */}
+       <div className={`absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 ${styles.border} rounded-tl-[18px] opacity-40 group-hover:opacity-100 transition-opacity duration-500`}></div>
+       <div className={`absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 ${styles.border} rounded-br-[18px] opacity-40 group-hover:opacity-100 transition-opacity duration-500`}></div>
+       <div className="absolute top-4 right-4 flex gap-1 opacity-20 group-hover:opacity-50 transition-opacity">
+          <div className={`w-1 h-1 rounded-full ${styles.indicator}`}></div>
+          <div className={`w-1 h-1 rounded-full ${styles.indicator}`}></div>
+          <div className={`w-1 h-1 rounded-full ${styles.indicator}`}></div>
+       </div>
+
+       {/* Header */}
+       <div className="flex items-center gap-3 mb-5 opacity-90 relative z-10">
+          <div className="relative">
+             <div className={`w-2 h-2 rounded-sm ${styles.indicator} shadow-[0_0_10px_rgba(255,255,255,0.5)]`}></div>
+             <div className={`absolute inset-0 w-2 h-2 rounded-sm ${styles.indicator} animate-ping opacity-30`}></div>
+          </div>
+          <span className={`text-[10px] md:text-xs font-bold tracking-[0.25em] uppercase font-mono ${styles.text}`}>
+            {title}
+          </span>
+          <div className={`h-[1px] flex-grow bg-gradient-to-r from-${accentColor === 'emerald' ? 'emerald' : 'cyan'}-500/30 to-transparent`}></div>
+       </div>
+
+       {/* Content Area */}
+       <div className={`font-mono text-sm md:text-[15px] leading-relaxed ${styles.text} opacity-90 relative z-10 h-full flex flex-col justify-start`}>
+         {children}
+       </div>
+       
+       {/* Background Scanline/Grid Effect */}
+       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
+       <div className={`absolute -right-20 -bottom-20 w-64 h-64 bg-gradient-to-tl from-${accentColor === 'emerald' ? 'emerald' : 'cyan'}-500/10 to-transparent rounded-full blur-3xl pointer-events-none group-hover:opacity-100 opacity-50 transition-opacity duration-700`}></div>
+    </div>
+  );
 };
 
 // --- SUB-COMPONENTS ---
@@ -175,51 +280,64 @@ const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v
   const t = UI_TEXT[lang].nav;
   const navItems = [
     { id: 'home', label: t.home, Icon: Icons.Home },
-    { id: 'services', label: t.services, Icon: Icons.ServicesNav },
-    { id: 'portfolio', label: t.work, Icon: Icons.BriefcaseNav },
-    { id: 'blog', label: t.blog, Icon: Icons.BlogNav },
+    { id: 'services', label: t.services, Icon: Icons.Layers }, 
+    { id: 'portfolio', label: t.work, Icon: Icons.Briefcase },
+    { id: 'blog', label: t.blog, Icon: Icons.Book },
   ];
 
   return (
-    <nav className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-[420px] md:w-auto md:max-w-none px-0 md:px-6" aria-label="Main Navigation">
-      <div className="flex items-center justify-between md:justify-center gap-0 md:gap-3 p-1.5 md:p-2.5 rounded-[2rem] md:rounded-[2.5rem] bg-[var(--dock-bg)] border border-[var(--card-border)] shadow-[var(--button-shadow)] ring-1 ring-[var(--card-border)] backdrop-blur-2xl transition-transform duration-300 hover:scale-[1.02]">
-        
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView(item.id); }}
-            aria-current={currentView === item.id ? 'page' : undefined}
-            aria-label={item.label}
-            className={`dock-item relative group flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl md:rounded-[1.5rem] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500
-              ${currentView === item.id 
-                ? 'bg-[var(--dock-item-bg-active)] text-[var(--button-text)] shadow-lg scale-100 md:scale-110 z-10' 
-                : 'text-[var(--dock-text)] hover:bg-[var(--dock-item-bg)] hover:text-[var(--text-primary)] hover:scale-110'}`}
-          >
-            <item.Icon className="w-5 h-5 md:w-6 md:h-6" />
-            <span className="dock-tooltip absolute -top-14 px-4 py-2 rounded-xl bg-[var(--text-primary)] text-[var(--bg-primary)] text-[11px] font-semibold tracking-wide border border-[var(--card-border)] shadow-xl whitespace-nowrap hidden md:block">
-              {item.label}
-            </span>
-          </button>
-        ))}
+    <nav className="fixed bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center select-none" aria-label="Main Navigation">
+       <GlassDock>
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView(item.id); }}
+                className={`dock-item group relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full transition-all duration-300 ease-[cubic-bezier(0.25,1,0.3,1)]
+                  ${currentView === item.id 
+                    ? 'text-[var(--text-primary)]' 
+                    : 'text-[var(--dock-text)] hover:text-[var(--text-primary)] hover:scale-125'}`}
+              >
+                {/* Active Indicator (Dot) */}
+                {currentView === item.id && (
+                    <div className="absolute -bottom-1.5 w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,1)]"></div>
+                )}
+                
+                {/* Active Background Spotlight (Subtle) */}
+                 {currentView === item.id && (
+                     <div className="absolute inset-0 bg-[var(--text-primary)] opacity-[0.03] rounded-full scale-110"></div>
+                 )}
 
-        <div className="w-px h-8 md:h-10 bg-[var(--card-border)] mx-1 md:mx-2" role="separator"></div>
+                <item.Icon className={`w-6 h-6 md:w-7 md:h-7 transition-all duration-300 ${currentView === item.id ? 'stroke-[2px]' : 'stroke-[1.5px]'}`} />
+                
+                {/* Tooltip (iOS Style) */}
+                <span className="absolute -top-14 opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 px-3 py-1.5 rounded-xl bg-[var(--dock-bg)] backdrop-blur-xl border border-[var(--card-border)] text-[11px] font-semibold tracking-wide text-[var(--text-primary)] shadow-xl pointer-events-none whitespace-nowrap z-50">
+                  {item.label}
+                </span>
+              </button>
+            ))}
 
-        <LiquidButton 
-          onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView('contact'); }}
-          className={`rounded-2xl md:rounded-[1.5rem] px-5 py-3 md:px-8 md:py-4 text-xs md:text-sm whitespace-nowrap font-semibold focus-visible:ring-2 focus-visible:ring-emerald-500 flex-grow md:flex-grow-0
-            ${currentView === 'contact' 
-              ? 'scale-100 md:scale-105' 
-              : 'border-transparent hover:bg-[var(--dock-item-bg)]'}`}
-          style={{
-             '--card-bg': currentView === 'contact' ? 'var(--dock-item-bg-active)' : 'transparent',
-             '--card-border': currentView === 'contact' ? 'var(--card-border)' : 'transparent',
-             '--glass-glow': 'rgba(16, 185, 129, 0.4)',
-             '--text-primary': currentView === 'contact' ? 'var(--button-text)' : 'var(--text-primary)'
-          } as React.CSSProperties}
-        >
-          {t.contact}
-        </LiquidButton>
-      </div>
+            {/* Separator */}
+            <div className="w-[1px] h-6 bg-[var(--card-border)] mx-1 md:mx-2 opacity-50"></div>
+
+            {/* Contact Button */}
+            <LiquidButton 
+              onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView('contact'); }}
+              className={`rounded-full px-5 py-3 md:px-7 md:py-3.5 text-xs md:text-sm font-semibold transition-all duration-500
+                ${currentView === 'contact' 
+                  ? 'scale-105 shadow-[0_0_20px_rgba(16,185,129,0.3)]' 
+                  : 'hover:scale-105 opacity-90 hover:opacity-100'}`}
+              style={{
+                 '--card-bg': currentView === 'contact' ? 'var(--dock-item-bg-active)' : 'rgba(125,125,125,0.05)',
+                 '--card-hover-bg': currentView === 'contact' ? '#f0fdf4' : 'var(--dock-item-bg)',
+                 '--card-border': currentView === 'contact' ? 'rgba(16, 185, 129, 0.3)' : 'transparent',
+                 '--text-primary': currentView === 'contact' ? 'var(--button-text)' : 'var(--text-primary)',
+                 '--glass-glow': 'rgba(16, 185, 129, 0.4)',
+                 color: currentView === 'contact' ? '#064e3b' : undefined,
+              } as React.CSSProperties}
+            >
+              {t.contact}
+            </LiquidButton>
+       </GlassDock>
     </nav>
   );
 };
@@ -447,7 +565,7 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
 const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Language }) => {
   const t = UI_TEXT[lang];
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-[85vh] text-center px-4 w-full overflow-hidden animate-slide-up">
+    <div className="relative flex flex-col items-center justify-center min-h-[85vh] text-center px-4 w-full overflow-hidden animate-slide-up pb-10">
       <h1 className="text-5xl md:text-[7rem] font-bold tracking-tighter mb-6 md:mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.95]">
         {t.heroTitle.split(' ')[0]} <br/> 
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 filter drop-shadow-[0_0_30px_rgba(52,211,153,0.3)]">
@@ -463,7 +581,7 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
       <div className="flex flex-wrap gap-4 md:gap-6 justify-center items-center w-full">
         <LiquidButton 
           onClick={() => setView('contact')} 
-          className="px-9 py-5 md:px-12 md:py-6 text-lg md:text-xl min-w-[180px] md:min-w-[220px]"
+          className="px-9 py-5 md:px-12 md:py-6 text-lg md:text-xl min-w-[180px] md:min-w-[220px] rounded-full"
           style={{
             '--card-bg': 'rgba(16, 185, 129, 0.15)',
             '--card-border': 'rgba(16, 185, 129, 0.4)',
@@ -475,7 +593,7 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         
         <LiquidButton 
           onClick={() => setView('portfolio')} 
-          className="px-9 py-5 md:px-12 md:py-6 text-lg md:text-xl min-w-[180px] md:min-w-[220px]"
+          className="px-9 py-5 md:px-12 md:py-6 text-lg md:text-xl min-w-[180px] md:min-w-[220px] rounded-full"
         >
           {t.exploreWork}
         </LiquidButton>
@@ -496,6 +614,25 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
             </div>
           );
         })}
+      </div>
+
+      {/* MISSION & VISION - FUTURISTIC GLASS CARDS */}
+      <div className="mt-16 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <TechCard title={`/// ${t.mission.title.toUpperCase()}`} accentColor="emerald">
+          <Typewriter 
+            text={t.mission.content} 
+            startDelay={200} 
+            cursorColor="bg-emerald-500" 
+          />
+        </TechCard>
+
+        <TechCard title={`/// ${t.vision.title.toUpperCase()}`} accentColor="blue">
+          <Typewriter 
+            text={t.vision.content} 
+            startDelay={3000} 
+            cursorColor="bg-cyan-500"
+          />
+        </TechCard>
       </div>
     </div>
   );
@@ -749,7 +886,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
             
             <LiquidButton 
                 onClick={handleReset}
-                className="px-8 py-4 md:px-8 md:py-4 text-base md:text-lg"
+                className="px-8 py-4 md:px-8 md:py-4 text-base md:text-lg rounded-full"
                  style={{
                    '--card-bg': 'rgba(16, 185, 129, 0.15)',
                    '--card-border': 'rgba(16, 185, 129, 0.5)',
@@ -840,7 +977,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
             
             <LiquidButton 
               type="submit" 
-              className="w-full py-5 md:py-6 text-lg md:text-xl font-bold tracking-wide"
+              className="w-full py-5 md:py-6 text-lg md:text-xl font-bold tracking-wide rounded-full"
               style={{
                  // Adapting material to "Emerald" (Growth/Success)
                  '--card-bg': 'rgba(16, 185, 129, 0.15)',

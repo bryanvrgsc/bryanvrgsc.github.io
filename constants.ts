@@ -14,6 +14,14 @@ export const UI_TEXT = {
       security: "Security",
       global: "Global"
     },
+    mission: {
+      title: "Mission",
+      content: "Develop innovative technological solutions that drive efficiency, business intelligence, and strategic decision-making for our clients, through custom software, data analysis, and high-impact digital platforms."
+    },
+    vision: {
+      title: "Vision",
+      content: "To become a leading company in digital solutions and advanced analytics in Latin America, recognized for transforming data into value, optimizing processes, and creating technological products that drive sustainable growth for our clients."
+    },
     services: {
       title: "Services",
       subtitle: "High-performance engineering solutions.",
@@ -73,6 +81,14 @@ export const UI_TEXT = {
       uptime: "Uptime",
       security: "Seguridad",
       global: "Global"
+    },
+    mission: {
+      title: "Misión",
+      content: "Desarrollar soluciones tecnológicas innovadoras que impulsen la eficiencia, la inteligencia empresarial y la toma de decisiones estratégicas de nuestros clientes, mediante software a la medida, análisis de datos y plataformas digitales de alto impacto."
+    },
+    vision: {
+      title: "Visión",
+      content: "Convertirnos en una empresa líder en soluciones digitales y analítica avanzada en Latinoamérica, reconocida por transformar datos en valor, optimizar procesos y crear productos tecnológicos que impulsen el crecimiento sostenible de nuestros clientes."
     },
     services: {
       title: "Servicios",
