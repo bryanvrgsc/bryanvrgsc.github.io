@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
@@ -69,16 +70,46 @@ const getCategoryTheme = (term: string) => {
     };
   }
 
-  // Default -> Cyan/Slate
+  // Cloud & DevOps -> Cyan/Sky
+  if (t.includes('cloud') || t.includes('nube') || t.includes('devops')) {
+      return {
+      text: "text-cyan-700 dark:text-cyan-400",
+      bg: "bg-cyan-50 dark:bg-cyan-500/10",
+      bullet: "bg-cyan-600",
+      gradientFrom: "from-cyan-600/20",
+      colors: {
+        '--card-border': 'rgba(6, 182, 212, 0.3)',
+        '--glass-glow': 'rgba(6, 182, 212, 0.5)',
+        '--neon-glow': 'rgba(6, 182, 212, 0.4)',
+      }
+    };
+  }
+
+  // Networks / Redes -> Rose/Pink
+  if (t.includes('network') || t.includes('red') || t.includes('connect') || t.includes('wifi')) {
+      return {
+      text: "text-rose-700 dark:text-rose-400",
+      bg: "bg-rose-50 dark:bg-rose-500/10",
+      bullet: "bg-rose-600",
+      gradientFrom: "from-rose-600/20",
+      colors: {
+        '--card-border': 'rgba(225, 29, 72, 0.3)',
+        '--glass-glow': 'rgba(225, 29, 72, 0.5)',
+        '--neon-glow': 'rgba(225, 29, 72, 0.4)',
+      }
+    };
+  }
+
+  // Default -> Slate
   return {
-    text: "text-slate-700 dark:text-cyan-400",
-    bg: "bg-slate-50 dark:bg-cyan-500/10",
+    text: "text-slate-700 dark:text-slate-400",
+    bg: "bg-slate-50 dark:bg-slate-500/10",
     bullet: "bg-slate-600",
     gradientFrom: "from-slate-600/20",
     colors: {
       '--card-border': 'rgba(71, 85, 105, 0.25)',
-      '--glass-glow': 'rgba(6, 182, 212, 0.4)',
-      '--neon-glow': 'rgba(6, 182, 212, 0.3)',
+      '--glass-glow': 'rgba(148, 163, 184, 0.4)',
+      '--neon-glow': 'rgba(148, 163, 184, 0.3)',
     }
   };
 };
@@ -88,7 +119,6 @@ const getCategoryTheme = (term: string) => {
 const Typewriter = ({ text, delay = 25, startDelay = 0, cursorColor = "bg-emerald-500", onComplete, active = true }: { text: string, delay?: number, startDelay?: number, cursorColor?: string, onComplete?: () => void, active?: boolean }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [started, setStarted] = useState(false);
-  const elementRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (active) {
@@ -118,9 +148,18 @@ const Typewriter = ({ text, delay = 25, startDelay = 0, cursorColor = "bg-emeral
   }, [started, text, delay, startDelay, onComplete]);
 
   return (
-    <span ref={elementRef} className="break-words">
-      {displayedText}
-      <span className={`animate-pulse inline-block w-2 h-4 md:w-2.5 md:h-5 ${cursorColor} align-text-bottom ml-0.5`} />
+    <span className="relative block w-full break-words">
+      {/* Ghost text for layout reservation (Prevents CLS) */}
+      <span className="opacity-0 pointer-events-none select-none" aria-hidden="true">
+        {text}
+        <span className="inline-block w-2 h-4 md:w-2.5 md:h-5 ml-0.5" />
+      </span>
+      
+      {/* Actual Animated Text Overlay */}
+      <span className="absolute inset-0 top-0 left-0">
+        {displayedText}
+        <span className={`animate-pulse inline-block w-2 h-4 md:w-2.5 md:h-5 ${cursorColor} align-text-bottom ml-0.5`} />
+      </span>
     </span>
   );
 };
@@ -226,7 +265,7 @@ const LanguageToggle: React.FC<LanguageToggleProps> = ({ lang, setLang }) => {
   return (
     <button
       onClick={toggleLang}
-      className="fixed top-3 right-16 md:top-6 md:right-24 z-50 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group overflow-hidden"
+      className="fixed top-16 right-3 md:top-6 md:right-24 z-50 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-xl border border-[var(--card-border)] shadow-lg hover:scale-110 transition-transform duration-300 group overflow-hidden"
       aria-label="Switch Language"
     >
       <div className="w-full h-full flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity">
@@ -787,15 +826,15 @@ const ServicesView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].services;
   return (
-    <div className="max-w-7xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
-      <div className="flex items-end justify-between mb-8 md:mb-16 px-2 md:px-0">
+    <div className="max-w-7xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-40 md:pb-52 animate-slide-up">
+      <div className="flex flex-col items-center text-center mb-8 md:mb-16 px-2 md:px-0">
         <div>
           <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
           <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+      <div className="flex flex-wrap justify-center gap-4 md:gap-8">
         {SERVICES[lang].map((s, i) => {
           const Icon = Icons[s.iconName as keyof typeof Icons];
           const theme = getCategoryTheme(s.title);
@@ -804,26 +843,26 @@ const ServicesView = ({ lang }: { lang: Language }) => {
             <div 
               onMouseMove={handleMouseMove} 
               key={i} 
-              className="bento-card rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-10 flex flex-col h-full group"
+              className="bento-card rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-10 flex flex-col items-start text-left h-full group w-full md:w-[calc(33.33%-1.5rem)] flex-grow-0"
               style={theme.colors as React.CSSProperties}
             >
               <div className={`h-16 w-16 md:h-20 md:w-20 rounded-3xl bg-gradient-to-br ${theme.gradientFrom} to-transparent flex items-center justify-center mb-6 md:mb-10 border border-[var(--card-border)] ${theme.text} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10`}>
                 <Icon className="w-7 h-7 md:w-9 md:h-9 drop-shadow-sm" />
               </div>
               <h3 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-4 md:mb-6 relative z-10 tracking-tight">{s.title}</h3>
-              <div className="flex-grow space-y-3 md:space-y-5 relative z-10">
+              <div className="flex-grow space-y-3 md:space-y-5 relative z-10 w-full flex flex-col items-start">
                 {s.items.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 md:gap-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">
-                    <div className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${theme.bullet} shadow-sm`}></div>
-                    <span className="text-sm md:text-[15px] font-medium">{item}</span>
+                  <div key={idx} className="flex items-start justify-start gap-3 md:gap-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors w-full">
+                    <div className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${theme.bullet} shadow-sm flex-shrink-0 mt-2`}></div>
+                    <span className="text-sm md:text-[15px] font-medium leading-relaxed">{item}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-8 md:mt-10 pt-6 md:pt-8 border-t border-[var(--card-border)] relative z-10">
+              <div className="mt-8 md:mt-10 pt-6 md:pt-8 border-t border-[var(--card-border)] relative z-10 w-full flex flex-col items-start">
                 <p className="text-[10px] font-bold text-[var(--text-tertiary)] uppercase tracking-[0.2em] mb-4">{t.impact}</p>
-                <div className="space-y-3">
+                <div className="space-y-3 w-full flex flex-col items-start">
                   {s.valueProp.map((vp, vidx) => (
-                    <div key={vidx} className="flex items-center gap-3 text-xs text-[var(--text-secondary)] bg-[var(--input-bg)] p-3 rounded-xl border border-[var(--card-border)] group-hover:bg-[var(--glass-glow)] transition-colors">
+                    <div key={vidx} className="flex items-center justify-start gap-3 text-xs text-[var(--text-secondary)] bg-[var(--input-bg)] p-3 rounded-xl border border-[var(--card-border)] group-hover:bg-[var(--glass-glow)] transition-colors w-full max-w-[280px]">
                       <span className={theme.text}><Icons.CheckCircle className="w-4 h-4" /></span>
                       {vp}
                     </div>
@@ -836,14 +875,14 @@ const ServicesView = ({ lang }: { lang: Language }) => {
       </div>
 
       <div onMouseMove={handleMouseMove} className="mt-8 md:mt-12 p-5 md:p-10 bento-card rounded-[2rem] md:rounded-[2.5rem]">
-          <h3 className="text-2xl font-bold mb-6 md:mb-8 tracking-tight text-[var(--text-primary)]">Engagement Models</h3>
+          <h3 className="text-2xl font-bold mb-6 md:mb-8 tracking-tight text-[var(--text-primary)] text-center">Engagement Models</h3>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {ENGAGEMENT_MODELS[lang].map((m, i) => {
                  const Icon = Icons[m.iconName as keyof typeof Icons];
                  return (
-                  <div key={i} className="flex flex-col items-center justify-center p-6 md:p-8 bg-[var(--input-bg)] rounded-3xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-all duration-300 group cursor-default hover:-translate-y-1">
+                  <div key={i} className="flex flex-col items-center justify-center p-6 md:p-8 bg-[var(--input-bg)] rounded-3xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-all duration-300 group cursor-default hover:-translate-y-1 text-center">
                       <div className="mb-4 text-[var(--text-tertiary)] group-hover:text-emerald-500 group-hover:scale-110 transition-all"><Icon className="w-6 h-6 md:w-8 md:h-8"/></div>
-                      <span className="text-sm font-semibold text-[var(--text-primary)] tracking-wide text-center">{m.label}</span>
+                      <span className="text-sm font-semibold text-[var(--text-primary)] tracking-wide">{m.label}</span>
                   </div>
                  );
               })}

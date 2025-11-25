@@ -1,4 +1,5 @@
 
+
 export type Language = 'en' | 'es';
 
 export const UI_TEXT = {
@@ -149,6 +150,12 @@ export const SERVICES = {
       valueProp: ["Digitize processes", "Reduce operating costs", "Solid & scalable apps"]
     },
     {
+      title: "Cloud & DevOps",
+      iconName: "Cloud",
+      items: ["Cloud Infrastructure (AWS / GCP / Azure)", "Serverless Backend & Containers", "CI/CD with GitHub Actions", "Cloud Databases (SQL/NoSQL)", "Cloud Cost Optimization"],
+      valueProp: ["High availability", "Automated deployments", "Scalability"]
+    },
+    {
       title: "Business Intelligence",
       iconName: "ChartBar",
       items: ["Interactive Dashboards", "KPI Reporting Models", "Report Automation", "Data Consulting"],
@@ -159,6 +166,12 @@ export const SERVICES = {
       iconName: "ShieldCheck",
       items: ["Architecture Assessment", "App Optimization", "Tech Migration", "Security & Auth"],
       valueProp: ["Avoid costly mistakes", "Reliable systems", "Guaranteed scalability"]
+    },
+    {
+      title: "Networks & Connectivity",
+      iconName: "Wifi",
+      items: ["Residential/Business Wi-Fi Optimization", "Mesh Network Design", "IoT Device Integration", "Network Performance Diagnostic"],
+      valueProp: ["Stable connection", "Full coverage", "Secure ecosystem"]
     }
   ],
   es: [
@@ -167,6 +180,12 @@ export const SERVICES = {
       iconName: "Smartphone",
       items: ["Apps iOS (SwiftUI, Combine)", "Apps Flutter (iOS/Android)", "Web Apps y APIs", "Integraciones (Auth0, Firebase)"],
       valueProp: ["Digitalizar procesos", "Reducir costos operativos", "Apps sólidas y escalables"]
+    },
+    {
+      title: "Cloud & DevOps",
+      iconName: "Cloud",
+      items: ["Infraestructura en la nube (AWS / GCP / Azure)", "Backend serverless y contenedores", "CI/CD con GitHub Actions", "Bases de datos en la nube (SQL/NoSQL)", "Optimización de costos en nube"],
+      valueProp: ["Alta disponibilidad", "Despliegues automatizados", "Escalabilidad"]
     },
     {
       title: "Business Intelligence",
@@ -179,6 +198,12 @@ export const SERVICES = {
       iconName: "ShieldCheck",
       items: ["Evaluación de arquitectura", "Optimización de apps", "Migración tecnológica", "Seguridad y autenticación"],
       valueProp: ["Evitar errores costosos", "Sistemas confiables", "Escalabilidad garantizada"]
+    },
+    {
+      title: "Redes y Conectividad",
+      iconName: "Wifi",
+      items: ["Optimización de Wi-Fi residencial/empresarial", "Diseño de redes Mesh", "Integración de dispositivos IoT", "Diagnóstico de rendimiento de red"],
+      valueProp: ["Conexión estable", "Cobertura total", "Ecosistema seguro"]
     }
   ]
 };
