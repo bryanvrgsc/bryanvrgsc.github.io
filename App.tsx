@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
@@ -86,22 +85,16 @@ const getCategoryTheme = (term: string) => {
 
 // --- TYPEWRITER COMPONENTS ---
 
-const Typewriter = ({ text, delay = 25, startDelay = 0, cursorColor = "bg-emerald-500", onComplete }: { text: string, delay?: number, startDelay?: number, cursorColor?: string, onComplete?: () => void }) => {
+const Typewriter = ({ text, delay = 25, startDelay = 0, cursorColor = "bg-emerald-500", onComplete, active = true }: { text: string, delay?: number, startDelay?: number, cursorColor?: string, onComplete?: () => void, active?: boolean }) => {
   const [displayedText, setDisplayedText] = useState('');
   const [started, setStarted] = useState(false);
   const elementRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
+    if (active) {
         setStarted(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.5 });
-    
-    if (elementRef.current) observer.observe(elementRef.current);
-    return () => observer.disconnect();
-  }, []);
+    }
+  }, [active]);
 
   useEffect(() => {
     if (!started) return;
@@ -133,7 +126,7 @@ const Typewriter = ({ text, delay = 25, startDelay = 0, cursorColor = "bg-emeral
 };
 
 // "Tech" Card Design (Futuristic HUD style)
-const TechCard = ({ title, children, accentColor = "emerald" }: { title: string, children: React.ReactNode, accentColor?: "emerald" | "blue" }) => {
+const TechCard = ({ title, children, accentColor = "emerald", className = "" }: { title: string, children: React.ReactNode, accentColor?: "emerald" | "blue", className?: string }) => {
   // Styles based on accent color
   const styles = accentColor === 'emerald' 
     ? {
@@ -152,7 +145,7 @@ const TechCard = ({ title, children, accentColor = "emerald" }: { title: string,
       };
 
   return (
-    <div className={`relative overflow-hidden rounded-[20px] border ${styles.border} ${styles.bg} backdrop-blur-md p-6 md:p-8 flex flex-col h-full group transition-all duration-700 hover:border-opacity-60 ${styles.glow}`}>
+    <div className={`relative overflow-hidden rounded-[20px] border ${styles.border} ${styles.bg} backdrop-blur-md p-6 md:p-8 flex flex-col h-full group transition-all duration-700 hover:border-opacity-60 ${styles.glow} ${className}`}>
        
        {/* Decorative Tech Corners */}
        <div className={`absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 ${styles.border} rounded-tl-[18px] opacity-40 group-hover:opacity-100 transition-opacity duration-500`}></div>
@@ -243,7 +236,7 @@ const LanguageToggle: React.FC<LanguageToggleProps> = ({ lang, setLang }) => {
   );
 };
 
-const Header = ({ setView }: { setView: (v: string) => void }) => {
+const Header = ({ setView, theme }: { setView: (v: string) => void, theme: 'light' | 'dark' }) => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -258,18 +251,30 @@ const Header = ({ setView }: { setView: (v: string) => void }) => {
         onClick={() => { window.scrollTo({top: 0, behavior: 'smooth'}); setView('home'); }}
         className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-full backdrop-blur-xl border border-[var(--card-border)]
           ${scrolled 
-            ? 'w-[140px] h-[38px] md:w-[180px] md:h-[44px] bg-[var(--bg-primary)]/80 shadow-2xl' 
+            ? 'w-auto px-6 h-[38px] md:h-[44px] bg-[var(--bg-primary)]/80 shadow-2xl' 
             : 'w-full max-w-[80rem] h-[64px] bg-transparent px-4 md:px-8 border-transparent'}`}
         aria-label="Go to Homepage"
       >
         <div className={`transition-all duration-700 flex items-center gap-2 ${scrolled ? 'scale-90' : 'scale-100'}`}>
-          <div className="relative">
-             <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"></div>
-             <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-20"></div>
-          </div>
-          <span className="text-base md:text-lg font-bold tracking-tight text-[var(--text-primary)]">
-            bryan<span className="text-emerald-500 dark:text-emerald-400">vrgsc</span>
-          </span>
+           {/* OS Icons with Gradient Simulation and Glow */}
+           <div className="flex items-center gap-3 mr-3">
+              <Icons.Windows className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+              {/* Apple Icon */}
+              <Icons.Apple className={`w-4 h-4 md:w-5 md:h-5 transition-colors duration-300 ${
+                theme === 'dark' 
+                  ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' 
+                  : 'text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.5)]'
+              }`} />
+              <Icons.Linux className="w-4 h-4 md:w-5 md:h-5 text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+           </div>
+
+           {/* Terminal Text */}
+           <span className="font-mono text-base md:text-lg font-bold tracking-tight text-[var(--text-primary)] flex items-center">
+             <span className="text-[var(--text-tertiary)] mr-[1px]">@</span>
+             bryan<span className="text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]">vrgsc</span>
+             <span className="text-[var(--text-secondary)]">~%</span>
+             <span className="ml-2 w-2.5 h-4 md:w-3 md:h-5 bg-[var(--text-primary)] animate-cursor-blink block"></span>
+           </span>
         </div>
       </button>
     </header>
@@ -564,75 +569,215 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
 
 const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Language }) => {
   const t = UI_TEXT[lang];
-  return (
-    <div className="relative flex flex-col items-center justify-center min-h-[85vh] text-center px-4 w-full overflow-hidden animate-slide-up pb-10">
-      <h1 className="text-5xl md:text-[7rem] font-bold tracking-tighter mb-6 md:mb-8 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.95]">
-        {t.heroTitle.split(' ')[0]} <br/> 
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 filter drop-shadow-[0_0_30px_rgba(52,211,153,0.3)]">
-          {t.heroTitle.split(' ').slice(1).join(' ')}
-        </span>
-      </h1>
-      
-      <p className="max-w-xl mx-auto text-lg md:text-xl text-[var(--text-secondary)] mb-10 md:mb-14 font-normal leading-relaxed tracking-wide">
-        {t.heroSubtitle}
-        <br/><span className="text-[var(--text-tertiary)] text-base md:text-lg mt-2 block">{t.heroTags}</span>
-      </p>
-      
-      <div className="flex flex-wrap gap-4 md:gap-6 justify-center items-center w-full">
-        <LiquidButton 
-          onClick={() => setView('contact')} 
-          className="px-9 py-5 md:px-12 md:py-6 text-lg md:text-xl min-w-[180px] md:min-w-[220px] rounded-full"
-          style={{
-            '--card-bg': 'rgba(16, 185, 129, 0.15)',
-            '--card-border': 'rgba(16, 185, 129, 0.4)',
-            '--glass-glow': 'rgba(16, 185, 129, 0.6)'
-          } as React.CSSProperties}
-        >
-          {t.startProject}
-        </LiquidButton>
+  const [activeStep, setActiveStep] = useState(1);
+  const handleMouseMove = useMousePosition();
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
+
+  // Enable Scroll Snap for the whole page when in HomeView
+  useEffect(() => {
+    // Apply styles to both HTML and BODY to ensure compatibility across browsers
+    // Using direct style manipulation for strongest effect
+    document.documentElement.style.scrollSnapType = 'y mandatory';
+    document.body.style.scrollSnapType = 'y mandatory';
+    
+    return () => {
+      document.documentElement.style.scrollSnapType = '';
+      document.body.style.scrollSnapType = '';
+    };
+  }, []);
+
+  // Scroll Listener for Active Step (Spy)
+  useEffect(() => {
+    const handleScroll = () => {
+        const scrollPosition = window.scrollY + window.innerHeight / 2;
         
-        <LiquidButton 
-          onClick={() => setView('portfolio')} 
-          className="px-9 py-5 md:px-12 md:py-6 text-lg md:text-xl min-w-[180px] md:min-w-[220px] rounded-full"
-        >
-          {t.exploreWork}
-        </LiquidButton>
-      </div>
+        sectionRefs.current.forEach((section, index) => {
+            if (section) {
+                const { offsetTop, offsetHeight } = section;
+                if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+                    setActiveStep(index + 1);
+                }
+            }
+        });
+    };
 
-      <div className="mt-16 md:mt-32 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-5xl">
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (index: number) => {
+      sectionRefs.current[index - 1]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  return (
+    // Removed overflow-hidden to prevent conflicts with document-level scroll snap
+    <div className="relative flex flex-col items-center w-full">
+      
+      {/* Left Side Navigation Steps */}
+      <div className="fixed left-3 md:left-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 md:gap-6 pointer-events-auto">
         {[
-          { val: "<50ms", label: t.stats.latency },
-          { val: "99.9%", label: t.stats.uptime },
-          { val: "A+", label: t.stats.security },
-          { val: "24/7", label: t.stats.global },
-        ].map((stat, i) => {
-          const handleMouseMove = useMousePosition();
-          return (
-            <div onMouseMove={handleMouseMove} key={i} className="bento-card p-4 md:p-6 rounded-3xl flex flex-col items-center justify-center h-24 md:h-32 group">
-              <span className="text-2xl md:text-3xl font-mono font-bold text-[var(--text-primary)] tracking-tight mb-1 group-hover:scale-110 transition-transform duration-500 group-hover:text-emerald-500 group-hover:drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">{stat.val}</span>
-              <span className="text-[10px] md:text-[11px] text-[var(--text-secondary)] uppercase font-bold tracking-[0.2em] group-hover:text-[var(--text-primary)] transition-colors">{stat.label}</span>
-            </div>
-          );
-        })}
+          { id: 1, label: "Overview" },
+          { id: 2, label: t.mission.title },
+          { id: 3, label: t.vision.title }
+        ].map((step) => (
+          <div key={step.id} className="group flex items-center gap-3 cursor-pointer" onClick={() => scrollToSection(step.id)}>
+             <div 
+                className={`w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full transition-all duration-500 ease-in-out border border-[var(--card-border)]
+                ${activeStep === step.id 
+                    ? 'bg-emerald-500 scale-125 shadow-[0_0_15px_rgba(16,185,129,0.6)] border-emerald-500' 
+                    : 'bg-[var(--dock-item-bg)] hover:bg-[var(--text-tertiary)] group-hover:scale-110'}`}
+             ></div>
+             <span className={`hidden md:block text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-500 ${activeStep === step.id ? 'text-[var(--text-primary)] opacity-100 translate-x-0' : 'text-[var(--text-tertiary)] opacity-0 -translate-x-2 group-hover:opacity-70 group-hover:translate-x-0'}`}>
+                {step.label}
+             </span>
+          </div>
+        ))}
+        {/* Vertical Line connecting steps */}
+        <div className="absolute left-[4px] md:left-[6px] top-2 bottom-2 w-[1px] bg-[var(--card-border)] -z-10 opacity-30"></div>
       </div>
 
-      {/* MISSION & VISION - FUTURISTIC GLASS CARDS */}
-      <div className="mt-16 w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-        <TechCard title={`/// ${t.mission.title.toUpperCase()}`} accentColor="emerald">
-          <Typewriter 
-            text={t.mission.content} 
-            startDelay={200} 
-            cursorColor="bg-emerald-500" 
-          />
-        </TechCard>
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8">
+        
+        {/* Step 1: Hero & Stats */}
+        <section 
+          ref={(el) => { sectionRefs.current[0] = el }} 
+          className="min-h-screen md:h-screen w-full flex flex-col justify-center items-center py-12 md:py-20 snap-center snap-always relative"
+        >
+          <div className="flex flex-col items-center text-center animate-slide-up max-w-5xl mx-auto w-full">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[8rem] font-bold tracking-tighter mb-4 md:mb-6 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.9]">
+              {t.heroTitle.split(' ')[0]} <br/> 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 dark:from-emerald-400 dark:to-cyan-400 filter drop-shadow-[0_0_30px_rgba(52,211,153,0.3)]">
+                {t.heroTitle.split(' ').slice(1).join(' ')}
+              </span>
+            </h1>
+            
+            <p className="max-w-xl md:max-w-2xl mx-auto text-sm sm:text-lg md:text-xl text-[var(--text-secondary)] mb-8 md:mb-12 font-normal leading-relaxed tracking-wide px-2">
+              {t.heroSubtitle}
+              <br/><span className="text-[var(--text-tertiary)] text-xs md:text-lg mt-2 block font-light">{t.heroTags}</span>
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center w-full px-4 mb-10 md:mb-16">
+              <LiquidButton 
+                onClick={() => setView('contact')} 
+                className="w-full sm:w-auto px-8 py-3.5 md:px-10 md:py-5 text-base md:text-lg min-w-[180px] md:min-w-[200px] rounded-full"
+                style={{
+                  '--card-bg': 'rgba(16, 185, 129, 0.15)',
+                  '--card-border': 'rgba(16, 185, 129, 0.4)',
+                  '--glass-glow': 'rgba(16, 185, 129, 0.6)'
+                } as React.CSSProperties}
+              >
+                {t.startProject}
+              </LiquidButton>
+              
+              <LiquidButton 
+                onClick={() => setView('portfolio')} 
+                className="w-full sm:w-auto px-8 py-3.5 md:px-10 md:py-5 text-base md:text-lg min-w-[180px] md:min-w-[200px] rounded-full"
+              >
+                {t.exploreWork}
+              </LiquidButton>
+            </div>
 
-        <TechCard title={`/// ${t.vision.title.toUpperCase()}`} accentColor="blue">
-          <Typewriter 
-            text={t.vision.content} 
-            startDelay={3000} 
-            cursorColor="bg-cyan-500"
-          />
-        </TechCard>
+            {/* Stats - Compact */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 w-full max-w-4xl mx-auto px-1">
+              {[
+                { val: "<50ms", label: t.stats.latency },
+                { val: "99.9%", label: t.stats.uptime },
+                { val: "A+", label: t.stats.security },
+                { val: "24/7", label: t.stats.global },
+              ].map((stat, i) => (
+                <div onMouseMove={handleMouseMove} key={i} className="bento-card p-3 md:p-4 rounded-2xl md:rounded-3xl flex flex-col items-center justify-center h-20 md:h-28 group">
+                  <span className="text-lg md:text-3xl font-mono font-bold text-[var(--text-primary)] tracking-tight mb-1 group-hover:scale-110 transition-transform duration-500 group-hover:text-emerald-500 group-hover:drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">{stat.val}</span>
+                  <span className="text-[9px] md:text-[11px] text-[var(--text-secondary)] uppercase font-bold tracking-[0.2em] group-hover:text-[var(--text-primary)] transition-colors">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+            
+             <button 
+                onClick={() => scrollToSection(2)}
+                className="mt-8 md:mt-16 animate-bounce p-2 md:p-3 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors backdrop-blur-md shadow-sm"
+                aria-label="Scroll Down"
+              >
+                <Icons.ArrowUp className="w-4 h-4 md:w-5 md:h-5 rotate-180" />
+             </button>
+          </div>
+        </section>
+
+        {/* Step 2: Mission */}
+        <section 
+          ref={(el) => { sectionRefs.current[1] = el }} 
+          className="min-h-screen md:h-screen w-full flex flex-col justify-center items-center py-12 md:py-20 snap-center snap-always"
+        >
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
+              <div className="order-2 md:order-1 h-full w-full">
+                 <TechCard title={`/// ${t.mission.title.toUpperCase()}`} accentColor="emerald" className="h-full flex flex-col justify-center w-full">
+                    <div className="flex flex-col h-full justify-center">
+                       <div className="text-base md:text-lg lg:text-xl leading-relaxed">
+                           <Typewriter 
+                              text={t.mission.content} 
+                              startDelay={200} 
+                              cursorColor="bg-emerald-500" 
+                              delay={15}
+                              active={activeStep >= 2}
+                            />
+                       </div>
+                    </div>
+                 </TechCard>
+              </div>
+              <div className="order-1 md:order-2 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
+                 <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/60 via-transparent to-transparent z-10 mix-blend-multiply"></div>
+                 <img 
+                    src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" 
+                    alt="Mission Team" 
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-110"
+                 />
+                 <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20">
+                    <div className="bg-emerald-500/20 backdrop-blur-xl border border-emerald-500/30 text-emerald-100 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2">
+                       <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                       Collaboration
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </section>
+
+        {/* Step 3: Vision */}
+        <section 
+          ref={(el) => { sectionRefs.current[2] = el }} 
+          className="min-h-screen md:h-screen w-full flex flex-col justify-center items-center py-12 md:py-20 snap-center snap-always"
+        >
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
+              <div className="order-1 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
+                 <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/60 via-transparent to-transparent z-10 mix-blend-multiply"></div>
+                 <img 
+                    src="https://images.unsplash.com/photo-1480694313141-fce5e697ee25?q=80&w=2070&auto=format&fit=crop" 
+                    alt="Future Vision" 
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-110"
+                 />
+                 <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-20">
+                    <div className="bg-cyan-500/20 backdrop-blur-xl border border-cyan-500/30 text-cyan-100 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2">
+                       <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+                       Future
+                    </div>
+                 </div>
+              </div>
+              <div className="order-2 h-full w-full flex flex-col">
+                 <TechCard title={`/// ${t.vision.title.toUpperCase()}`} accentColor="blue" className="h-full flex flex-col justify-center w-full">
+                    <div className="flex flex-col h-full justify-center">
+                       <div className="text-base md:text-lg lg:text-xl leading-relaxed">
+                           <Typewriter 
+                              text={t.vision.content} 
+                              startDelay={200} 
+                              cursorColor="bg-cyan-500" 
+                              delay={15}
+                              active={activeStep >= 3}
+                           />
+                       </div>
+                    </div>
+                 </TechCard>
+              </div>
+           </div>
+        </section>
+
       </div>
     </div>
   );
@@ -642,7 +787,7 @@ const ServicesView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].services;
   return (
-    <div className="max-w-7xl mx-auto pt-4 md:pt-12 px-2 md:px-6 animate-slide-up">
+    <div className="max-w-7xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
       <div className="flex items-end justify-between mb-8 md:mb-16 px-2 md:px-0">
         <div>
           <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
@@ -652,8 +797,7 @@ const ServicesView = ({ lang }: { lang: Language }) => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
         {SERVICES[lang].map((s, i) => {
-          // @ts-ignore
-          const Icon = Icons[s.iconName];
+          const Icon = Icons[s.iconName as keyof typeof Icons];
           const theme = getCategoryTheme(s.title);
           
           return (
@@ -695,8 +839,7 @@ const ServicesView = ({ lang }: { lang: Language }) => {
           <h3 className="text-2xl font-bold mb-6 md:mb-8 tracking-tight text-[var(--text-primary)]">Engagement Models</h3>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {ENGAGEMENT_MODELS[lang].map((m, i) => {
-                 // @ts-ignore
-                 const Icon = Icons[m.iconName];
+                 const Icon = Icons[m.iconName as keyof typeof Icons];
                  return (
                   <div key={i} className="flex flex-col items-center justify-center p-6 md:p-8 bg-[var(--input-bg)] rounded-3xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-all duration-300 group cursor-default hover:-translate-y-1">
                       <div className="mb-4 text-[var(--text-tertiary)] group-hover:text-emerald-500 group-hover:scale-110 transition-all"><Icon className="w-6 h-6 md:w-8 md:h-8"/></div>
@@ -714,7 +857,7 @@ const PortfolioView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].portfolio;
   return (
-    <div className="max-w-7xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
+    <div className="max-w-7xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
       <div className="mb-8 md:mb-16">
         <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
         <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
@@ -758,7 +901,7 @@ const BlogView = ({ lang }: { lang: Language }) => {
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].blog;
   return (
-    <div className="max-w-5xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
+    <div className="max-w-5xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
       <div className="mb-8 md:mb-16 text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
         <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
@@ -870,7 +1013,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
 
   if (status === 'success') {
       return (
-        <div className="max-w-3xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
+        <div className="max-w-3xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
           <div onMouseMove={handleMouseMove} className="bento-card p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px]">
             {/* Background Effects */}
             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none"></div>
@@ -901,7 +1044,7 @@ const ContactView = ({ lang }: { lang: Language }) => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto pt-4 md:pt-12 px-4 md:px-6 animate-slide-up">
+    <div className="max-w-5xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
       <div className="flex flex-col-reverse md:flex-row gap-6 items-stretch">
         
         {/* Social Sidebar */}
@@ -1021,8 +1164,11 @@ export default function App() {
       setEffectiveTheme(resolved);
 
       root.removeAttribute('data-theme');
+      root.classList.remove('dark');
+
       if (resolved === 'dark') {
         root.setAttribute('data-theme', 'dark');
+        root.classList.add('dark');
       }
     };
 
@@ -1041,9 +1187,10 @@ export default function App() {
       <CanvasBackground theme={effectiveTheme} />
       <LanguageToggle lang={lang} setLang={setLang} />
       <ThemeToggle theme={theme} setTheme={setTheme} />
-      <Header setView={setView} />
+      <Header setView={setView} theme={effectiveTheme} />
       
-      <main className="relative z-10 pt-20 md:pt-24 min-h-screen pb-32 md:pb-40 flex flex-col">
+      {/* Removed global padding from main to allow HomeView to handle full-screen snapping */}
+      <main className="relative z-10 min-h-screen flex flex-col">
         {view === 'home' && <HomeView setView={setView} lang={lang} />}
         {view === 'services' && <ServicesView lang={lang} />}
         {view === 'portfolio' && <PortfolioView lang={lang} />}
