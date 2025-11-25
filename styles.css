@@ -256,7 +256,6 @@ body {
   z-index: -2;
   filter: url(#noiseFilter);
   mix-blend-mode: overlay;
-  transform: translate3d(0, 0, 0); /* Force GPU Layer */
 }
 
 /* GlassElement Styles (Moved from module to fix import error) */

@@ -516,9 +516,7 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
-      // Optimize: Limit DPR to 2 for performance on high-res screens
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      
+      dpr = window.devicePixelRatio || 1;
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
@@ -848,7 +846,7 @@ const ServicesView = ({ lang }: { lang: Language }) => {
               className="bento-card rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-10 flex flex-col items-start text-left h-full group w-full md:w-[calc(33.33%-1.5rem)] flex-grow-0"
               style={theme.colors as React.CSSProperties}
             >
-              <div className={`h-16 w-16 md:h-20 md:h-20 rounded-3xl bg-gradient-to-br ${theme.gradientFrom} to-transparent flex items-center justify-center mb-6 md:mb-10 border border-[var(--card-border)] ${theme.text} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10`}>
+              <div className={`h-16 w-16 md:h-20 md:w-20 rounded-3xl bg-gradient-to-br ${theme.gradientFrom} to-transparent flex items-center justify-center mb-6 md:mb-10 border border-[var(--card-border)] ${theme.text} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10`}>
                 <Icon className="w-7 h-7 md:w-9 md:h-9 drop-shadow-sm" />
               </div>
               <h3 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-4 md:mb-6 relative z-10 tracking-tight">{s.title}</h3>
