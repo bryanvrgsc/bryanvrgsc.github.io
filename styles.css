@@ -254,9 +254,8 @@ body {
   opacity: 0.035;
   pointer-events: none;
   z-index: -2;
+  filter: url(#noiseFilter);
   mix-blend-mode: overlay;
-  /* Removed unused SVG filter */
-  /* filter: url(#noiseFilter); */
   transform: translate3d(0, 0, 0); /* Force GPU Layer */
 }
 
