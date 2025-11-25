@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -23,17 +22,6 @@
 </head>
 <body class="overflow-x-hidden antialiased selection:bg-emerald-500/30">
     <div id="root"></div>
-    
-    <!-- Global SVG Filters for Liquid Apple Effect -->
-    <svg style="display: none; height: 0; width: 0; position: absolute;" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- Fine Grain Noise -->
-        <filter id="noiseFilter">
-          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="1" stitchTiles="stitch"/>
-          <feColorMatrix type="saturate" values="0"/>
-        </filter>
-      </defs>
-    </svg>
     <script type="module" src="/index.tsx"></script>
 </body>
 </html>

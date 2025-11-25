@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
 import { GlassDock } from './components/GlassDock';
@@ -165,7 +165,7 @@ const Typewriter = ({ text, delay = 25, startDelay = 0, cursorColor = "bg-emeral
 };
 
 // "Tech" Card Design (Futuristic HUD style)
-const TechCard = ({ title, children, accentColor = "emerald", className = "" }: { title: string, children: React.ReactNode, accentColor?: "emerald" | "blue", className?: string }) => {
+const TechCard = ({ title, children, accentColor = "emerald", className = "" }: { title: string, children?: React.ReactNode, accentColor?: "emerald" | "blue", className?: string }) => {
   // Styles based on accent color
   const styles = accentColor === 'emerald' 
     ? {
@@ -417,6 +417,30 @@ const ScrollToTop = () => {
 
 const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [noiseDataUrl, setNoiseDataUrl] = useState('');
+
+  // 1. Generate Static Noise Texture once (CPU/GPU save: doesn't recalculate per frame)
+  useEffect(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128; // Small tile size is enough
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        const w = canvas.width;
+        const h = canvas.height;
+        const idata = ctx.createImageData(w, h);
+        const buffer32 = new Uint32Array(idata.data.buffer);
+        const len = buffer32.length;
+        for (let i = 0; i < len; i++) {
+            if (Math.random() < 0.5) {
+                // Subtle noise pixel
+                buffer32[i] = 0x08000000; // Very faint black
+            }
+        }
+        ctx.putImageData(idata, 0, 0);
+        setNoiseDataUrl(canvas.toDataURL());
+    }
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -427,11 +451,14 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
 
     let w = window.innerWidth;
     let h = window.innerHeight;
-    let dpr = window.devicePixelRatio || 1;
+    // 2. Optimization: Cap DPR at 1.5. 
+    // On 3x screens (iPhone Pro), this reduces pixel count by 75% while keeping good visual quality.
+    let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    
     let animationFrameId: number;
     
     // Configuration for "Communication Network"
-    const nodeCount = Math.min(Math.floor((w * h) / 20000), 50); 
+    const nodeCount = Math.min(Math.floor((w * h) / 25000), 40); // Reduced density
     const connectionDistance = Math.min(w, h) * 0.3;
     const signalSpeed = 0.015;
 
@@ -446,8 +473,8 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
         this.x = Math.random() * w;
         this.y = Math.random() * h;
         // Slower movement for a background
-        this.vx = (Math.random() - 0.5) * 0.3; 
-        this.vy = (Math.random() - 0.5) * 0.3;
+        this.vx = (Math.random() - 0.5) * 0.2; 
+        this.vy = (Math.random() - 0.5) * 0.2;
         this.r = Math.random() * 2 + 1.5;
       }
 
@@ -516,8 +543,7 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
-      // Optimize: Limit DPR to 2 for performance on high-res screens
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       
       canvas.width = w * dpr;
       canvas.height = h * dpr;
@@ -527,7 +553,19 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
       init();
     };
 
-    const animate = () => {
+    // 3. Optimization: Frame Throttling
+    const fps = 30; // Cap at 30fps for background elements
+    const interval = 1000 / fps;
+    let lastTime = 0;
+
+    const animate = (time: number) => {
+      requestAnimationFrame(animate);
+      
+      const delta = time - lastTime;
+      if (delta < interval) return;
+      
+      lastTime = time - (delta % interval);
+
       ctx.clearRect(0, 0, w, h);
       
       const isDark = theme === 'dark';
@@ -580,13 +618,11 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
             p.draw(packetColor, packetGlow);
         }
       }
-
-      animationFrameId = requestAnimationFrame(animate);
     };
 
     window.addEventListener('resize', resize);
     resize();
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('resize', resize);
@@ -601,7 +637,11 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
         className="fixed top-0 left-0 w-full h-full z-0 opacity-100 pointer-events-none transition-opacity duration-700"
         style={{ mixBlendMode: 'normal' }} 
       />
-      <div className="bg-noise" />
+      {/* 4. Optimization: Static noise background instead of live SVG filter */}
+      <div 
+        className="bg-noise" 
+        style={{ backgroundImage: `url(${noiseDataUrl})` }}
+      />
     </>
   );
 };
