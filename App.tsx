@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
@@ -1019,8 +1017,34 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
                 </p>
              </div>
 
-             {/* Video Demo (if available) */}
-             {project.videoUrl && (
+             {/* PDF Presentation Viewer */}
+             {project.presentationUrl && (
+                <div className="mb-4">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                      <Icons.Book className="w-5 h-5 text-indigo-500"/> Presentation / Slides
+                  </h3>
+                  <div className="w-full h-[300px] md:h-[450px] rounded-xl overflow-hidden border border-[var(--card-border)] shadow-sm bg-[var(--card-bg)]">
+                      <iframe 
+                        src={`${project.presentationUrl}#view=FitH`} 
+                        title="Project Presentation"
+                        className="w-full h-full"
+                      >
+                         <div className="flex flex-col items-center justify-center h-full">
+                            <p className="text-[var(--text-secondary)] mb-2">PDF viewing not supported.</p>
+                            <a href={project.presentationUrl} target="_blank" rel="noreferrer" className="text-emerald-500 font-bold">Download PDF</a>
+                         </div>
+                      </iframe>
+                  </div>
+                  <div className="mt-2 text-right">
+                      <a href={project.presentationUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-500 hover:underline flex items-center justify-end gap-1">
+                         Open in new tab <Icons.ExternalLink className="w-3 h-3" />
+                      </a>
+                   </div>
+                </div>
+             )}
+
+             {/* Video Demo (Only if Embeddable) */}
+             {project.videoUrl && project.videoUrl.includes("embed") && (
                 <div className="mb-4">
                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
                       <Icons.Video className="w-5 h-5 text-red-500"/> Demo Video
@@ -1028,13 +1052,36 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
                   <div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden border border-[var(--card-border)] bg-black/50 shadow-lg group">
                       <iframe 
                         src={project.videoUrl} 
-                        className="absolute top-0 left-0 w-full h-full"
-                        allow="autoplay"
+                        title={project.title}
+                        className="absolute top-0 left-0 w-full h-full z-10"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                         allowFullScreen
                       ></iframe>
                   </div>
                 </div>
              )}
+
+            {/* Video Link Button (if not embedded) */}
+            {project.videoUrl && !project.videoUrl.includes("embed") && (
+               <div className="mb-6">
+                  <a 
+                    href={project.videoUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 w-full p-4 rounded-xl bg-[var(--input-bg)] border border-[var(--card-border)] text-[var(--text-primary)] hover:border-red-500/50 hover:bg-red-500/5 transition-all group shadow-sm hover:shadow-md"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+                        <Icons.Video className="w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-sm font-bold">Watch Demo Video</span>
+                        <span className="text-xs text-[var(--text-secondary)]">External Link</span>
+                    </div>
+                    <Icons.ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity ml-auto" />
+                  </a>
+               </div>
+            )}
 
              {/* Features List (if available) */}
              {project.details?.currentFeatures && (
@@ -1070,6 +1117,33 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
                 </div>
              )}
 
+             {/* Documents List */}
+             {project.details?.documents && (
+                <div>
+                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                      <Icons.Book className="w-5 h-5 text-indigo-500"/> Documentation
+                   </h3>
+                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                     {project.details.documents.map((doc: any, i: number) => (
+                       <li key={i}>
+                          <a 
+                            href={doc.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 rounded-xl bg-[var(--input-bg)] border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-colors group h-full"
+                          >
+                             <div className="bg-indigo-500/10 p-2 rounded-lg text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                                <Icons.Book className="w-4 h-4" />
+                             </div>
+                             <span className="text-sm font-medium text-[var(--text-primary)] leading-tight">{doc.label}</span>
+                             <Icons.ExternalLink className="w-3 h-3 ml-auto opacity-50 group-hover:opacity-100 flex-shrink-0" />
+                          </a>
+                       </li>
+                     ))}
+                   </ul>
+                </div>
+             )}
+
              {/* Upcoming / Roadmap (if available) */}
              {project.details?.upcomingFeatures && (
                 <div>
@@ -1087,9 +1161,9 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
                 </div>
              )}
 
-             {/* Repo Link */}
-             {project.repoUrl && (
-                <div className="pt-4 border-t border-[var(--card-border)]">
+             {/* Links (Repo & External Video) */}
+             <div className="pt-4 border-t border-[var(--card-border)] flex flex-col gap-3">
+                {project.repoUrl && (
                    <a 
                      href={project.repoUrl} 
                      target="_blank" 
@@ -1100,8 +1174,8 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
                      View Repository
                      <Icons.ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
                    </a>
-                </div>
-             )}
+                )}
+             </div>
            </div>
         </div>
       </div>
