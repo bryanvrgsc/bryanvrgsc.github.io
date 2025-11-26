@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
@@ -656,13 +658,12 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
   // Enable Scroll Snap for the whole page when in HomeView
   useEffect(() => {
     // Apply styles to both HTML and BODY to ensure compatibility across browsers
-    // Using direct style manipulation for strongest effect
     document.documentElement.style.scrollSnapType = 'y mandatory';
-    document.body.style.scrollSnapType = 'y mandatory';
+    document.documentElement.style.scrollBehavior = 'smooth';
     
     return () => {
       document.documentElement.style.scrollSnapType = '';
-      document.body.style.scrollSnapType = '';
+      document.documentElement.style.scrollBehavior = '';
     };
   }, []);
 
@@ -696,7 +697,7 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
       {/* Left Side Navigation Steps */}
       <div className="fixed left-3 md:left-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 md:gap-6 pointer-events-auto">
         {[
-          { id: 1, label: "Overview" },
+          { id: 1, label: t.homeLabels.overview },
           { id: 2, label: t.mission.title },
           { id: 3, label: t.vision.title }
         ].map((step) => (
@@ -808,12 +809,12 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
                  <img 
                     src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" 
                     alt="Mission Team" 
-                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105"
                  />
                  <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20">
                     <div className="bg-emerald-500/20 backdrop-blur-xl border border-emerald-500/30 text-emerald-100 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2">
                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                       Collaboration
+                       {t.homeLabels.collaboration}
                     </div>
                  </div>
               </div>
@@ -831,12 +832,12 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
                  <img 
                     src="https://images.unsplash.com/photo-1480694313141-fce5e697ee25?q=80&w=2070&auto=format&fit=crop" 
                     alt="Future Vision" 
-                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105"
                  />
                  <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-20">
                     <div className="bg-cyan-500/20 backdrop-blur-xl border border-cyan-500/30 text-cyan-100 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2">
                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-                       Future
+                       {t.homeLabels.future}
                     </div>
                  </div>
               </div>
@@ -934,8 +935,17 @@ const ServicesView = ({ lang }: { lang: Language }) => {
 };
 
 // New Modal Component for Project Details
-const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => void }) => {
+const PortfolioModal = ({ project, onClose, lang }: { project: any, onClose: () => void, lang: Language }) => {
   const [activeScreenshot, setActiveScreenshot] = useState(0);
+  // Track the currently displayed PDF URL (defaults to main presentation or first doc)
+  const [currentPdf, setCurrentPdf] = useState<string | null>(project.presentationUrl || project.details?.documents?.[0]?.url || null);
+  
+  const t = UI_TEXT[lang].portfolio.modal;
+
+  // Reset current PDF when project changes
+  useEffect(() => {
+    setCurrentPdf(project.presentationUrl || project.details?.documents?.[0]?.url || null);
+  }, [project]);
 
   // Prevent background scroll when modal is open
   useEffect(() => {
@@ -948,6 +958,18 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
   const images = project.screenshots && project.screenshots.length > 0 
     ? project.screenshots 
     : [project.image];
+    
+  // Helper to determine iframe src and convert Drive links to preview mode
+  const getEmbedUrl = (url: string) => {
+    if (url.includes('drive.google.com')) {
+      // If it's already a preview link, fine. If it's a view link, replace it.
+      if (url.includes('/preview')) return url;
+      return url.replace(/\/view.*/, '/preview');
+    }
+    return `${url}#view=FitH`;
+  };
+
+  const pdfSrc = currentPdf ? getEmbedUrl(currentPdf) : null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fadeIn">
@@ -995,7 +1017,7 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
         {/* Right Side: Details */}
         <div className="w-full md:w-1/2 p-6 md:p-10 overflow-y-auto custom-scrollbar flex flex-col">
            <div className="mb-6">
-              <span className="text-emerald-500 font-bold uppercase tracking-widest text-xs mb-2 block">Case Study</span>
+              <span className="text-emerald-500 font-bold uppercase tracking-widest text-xs mb-2 block">{t.caseStudy}</span>
               <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 leading-tight">{project.title}</h2>
               <div className="flex flex-wrap gap-2 mt-3">
                  {project.tech.split(',').map((t: string, i: number) => (
@@ -1010,44 +1032,44 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
              {/* Description / Summary */}
              <div>
                 <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-                   <Icons.Briefcase className="w-5 h-5 text-emerald-500"/> Overview
+                   <Icons.Briefcase className="w-5 h-5 text-emerald-500"/> {t.overview}
                 </h3>
                 <p className="text-[var(--text-secondary)] leading-relaxed text-sm md:text-base">
                   {project.problem} {project.solution}
                 </p>
              </div>
 
-             {/* PDF Presentation Viewer */}
-             {project.presentationUrl && (
+             {/* PDF Presentation Viewer (Shows currentPdf) */}
+             {pdfSrc && (
                 <div className="mb-4">
                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-                      <Icons.Book className="w-5 h-5 text-indigo-500"/> Presentation / Slides
+                      <Icons.Book className="w-5 h-5 text-indigo-500"/> {t.presentation}
                   </h3>
                   <div className="w-full h-[300px] md:h-[450px] rounded-xl overflow-hidden border border-[var(--card-border)] shadow-sm bg-[var(--card-bg)]">
                       <iframe 
-                        src={`${project.presentationUrl}#view=FitH`} 
+                        src={pdfSrc} 
                         title="Project Presentation"
                         className="w-full h-full"
                       >
                          <div className="flex flex-col items-center justify-center h-full">
-                            <p className="text-[var(--text-secondary)] mb-2">PDF viewing not supported.</p>
-                            <a href={project.presentationUrl} target="_blank" rel="noreferrer" className="text-emerald-500 font-bold">Download PDF</a>
+                            <p className="text-[var(--text-secondary)] mb-2">{t.pdfError}</p>
+                            <a href={currentPdf || '#'} target="_blank" rel="noreferrer" className="text-emerald-500 font-bold">{t.downloadPdf}</a>
                          </div>
                       </iframe>
                   </div>
                   <div className="mt-2 text-right">
-                      <a href={project.presentationUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-500 hover:underline flex items-center justify-end gap-1">
-                         Open in new tab <Icons.ExternalLink className="w-3 h-3" />
+                      <a href={currentPdf || '#'} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-500 hover:underline flex items-center justify-end gap-1">
+                         {t.openTab} <Icons.ExternalLink className="w-3 h-3" />
                       </a>
                    </div>
                 </div>
              )}
 
              {/* Video Demo (Only if Embeddable) */}
-             {project.videoUrl && project.videoUrl.includes("embed") && (
+             {project.videoUrl && (project.videoUrl.includes("embed") || project.videoUrl.includes("/preview")) && (
                 <div className="mb-4">
                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-                      <Icons.Video className="w-5 h-5 text-red-500"/> Demo Video
+                      <Icons.Video className="w-5 h-5 text-red-500"/> {t.demoVideo}
                   </h3>
                   <div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden border border-[var(--card-border)] bg-black/50 shadow-lg group">
                       <iframe 
@@ -1063,7 +1085,7 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
              )}
 
             {/* Video Link Button (if not embedded) */}
-            {project.videoUrl && !project.videoUrl.includes("embed") && (
+            {project.videoUrl && !(project.videoUrl.includes("embed") || project.videoUrl.includes("/preview")) && (
                <div className="mb-6">
                   <a 
                     href={project.videoUrl} 
@@ -1075,8 +1097,8 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
                         <Icons.Video className="w-5 h-5" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-sm font-bold">Watch Demo Video</span>
-                        <span className="text-xs text-[var(--text-secondary)]">External Link</span>
+                        <span className="text-sm font-bold">{t.watchDemo}</span>
+                        <span className="text-xs text-[var(--text-secondary)]">{t.externalLink}</span>
                     </div>
                     <Icons.ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity ml-auto" />
                   </a>
@@ -1087,7 +1109,7 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
              {project.details?.currentFeatures && (
                 <div>
                    <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-                      <Icons.Layers className="w-5 h-5 text-blue-500"/> Features
+                      <Icons.Layers className="w-5 h-5 text-blue-500"/> {t.features}
                    </h3>
                    <ul className="grid grid-cols-1 gap-2">
                      {project.details.currentFeatures.map((f: string, i: number) => (
@@ -1104,7 +1126,7 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
              {project.details?.techStack && (
                 <div>
                    <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-                      <Icons.Code className="w-5 h-5 text-orange-500"/> Key Packages
+                      <Icons.Code className="w-5 h-5 text-orange-500"/> {t.techStack}
                    </h3>
                    <ul className="grid grid-cols-1 gap-2">
                      {project.details.techStack.map((f: string, i: number) => (
@@ -1117,29 +1139,39 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
                 </div>
              )}
 
-             {/* Documents List */}
+             {/* Documents List (Switches PDF View) */}
              {project.details?.documents && (
                 <div>
                    <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-                      <Icons.Book className="w-5 h-5 text-indigo-500"/> Documentation
+                      <Icons.Book className="w-5 h-5 text-indigo-500"/> {t.documentation}
                    </h3>
                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                     {project.details.documents.map((doc: any, i: number) => (
-                       <li key={i}>
-                          <a 
-                            href={doc.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-3 p-3 rounded-xl bg-[var(--input-bg)] border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-colors group h-full"
-                          >
-                             <div className="bg-indigo-500/10 p-2 rounded-lg text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                                <Icons.Book className="w-4 h-4" />
-                             </div>
-                             <span className="text-sm font-medium text-[var(--text-primary)] leading-tight">{doc.label}</span>
-                             <Icons.ExternalLink className="w-3 h-3 ml-auto opacity-50 group-hover:opacity-100 flex-shrink-0" />
-                          </a>
-                       </li>
-                     ))}
+                     {project.details.documents.map((doc: any, i: number) => {
+                       // Check if this doc is currently active
+                       const isActive = currentPdf && (currentPdf === doc.url || currentPdf.includes(doc.url) || doc.url.includes(currentPdf));
+                       
+                       return (
+                         <li key={i}>
+                            <button 
+                              onClick={() => setCurrentPdf(doc.url)}
+                              className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all group h-full text-left
+                                ${isActive 
+                                    ? 'bg-indigo-500/10 border-indigo-500 shadow-md ring-1 ring-indigo-500/30' 
+                                    : 'bg-[var(--input-bg)] border-[var(--card-border)] hover:bg-[var(--glass-glow)]'
+                                }`}
+                            >
+                               <div className={`p-2 rounded-lg transition-colors ${isActive ? 'bg-indigo-500 text-white' : 'bg-indigo-500/10 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white'}`}>
+                                  <Icons.Book className="w-4 h-4" />
+                               </div>
+                               <span className={`text-sm font-medium leading-tight ${isActive ? 'text-[var(--text-primary)] font-bold' : 'text-[var(--text-primary)]'}`}>
+                                 {doc.label}
+                               </span>
+                               {/* Indicator to show it's active or interactive */}
+                               {isActive && <div className="ml-auto w-2 h-2 rounded-full bg-indigo-500"></div>}
+                            </button>
+                         </li>
+                       );
+                     })}
                    </ul>
                 </div>
              )}
@@ -1148,7 +1180,7 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
              {project.details?.upcomingFeatures && (
                 <div>
                    <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-                      <Icons.Rocket className="w-5 h-5 text-purple-500"/> Roadmap
+                      <Icons.Rocket className="w-5 h-5 text-purple-500"/> {t.roadmap}
                    </h3>
                    <ul className="space-y-2">
                      {project.details.upcomingFeatures.map((f: string, i: number) => (
@@ -1171,7 +1203,7 @@ const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => voi
                      className="inline-flex items-center gap-2 text-sm font-bold text-[var(--text-primary)] hover:text-emerald-500 transition-colors group"
                    >
                      <Icons.GitHub className="w-5 h-5" />
-                     View Repository
+                     {t.viewRepo}
                      <Icons.ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
                    </a>
                 )}
@@ -1550,7 +1582,7 @@ export default function App() {
       
       {/* Render Modal at Root Level to avoid Z-Index / Stacking Context issues with transforms */}
       {selectedProject && (
-        <PortfolioModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+        <PortfolioModal project={selectedProject} onClose={() => setSelectedProject(null)} lang={lang} />
       )}
     </>
   );

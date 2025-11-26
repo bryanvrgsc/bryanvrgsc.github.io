@@ -4,6 +4,11 @@ export type Language = 'en' | 'es';
 
 export const UI_TEXT = {
   en: {
+    homeLabels: {
+      overview: "Overview",
+      collaboration: "Collaboration",
+      future: "Future"
+    },
     heroTitle: "Future Architects.",
     heroSubtitle: "Engineering the next generation of digital experiences.",
     heroTags: "iOS • Web • Intelligence",
@@ -33,7 +38,23 @@ export const UI_TEXT = {
       subtitle: "Selected works and case studies.",
       result: "Result",
       challenge: "Challenge",
-      solution: "Solution"
+      solution: "Solution",
+      modal: {
+        caseStudy: "Case Study",
+        overview: "Overview",
+        presentation: "Presentation / Slides",
+        demoVideo: "Demo Video",
+        watchDemo: "Watch Demo Video",
+        externalLink: "External Link",
+        features: "Features",
+        techStack: "Key Packages",
+        documentation: "Documentation",
+        roadmap: "Roadmap",
+        viewRepo: "View Repository",
+        openTab: "Open in new tab",
+        downloadPdf: "Download PDF",
+        pdfError: "PDF viewing not supported."
+      }
     },
     blog: {
       title: "Insights",
@@ -72,6 +93,11 @@ export const UI_TEXT = {
     }
   },
   es: {
+    homeLabels: {
+      overview: "Resumen",
+      collaboration: "Colaboración",
+      future: "Futuro"
+    },
     heroTitle: "Arquitectos del Futuro.",
     heroSubtitle: "Ingeniería para la próxima generación de experiencias digitales.",
     heroTags: "iOS • Web • Inteligencia",
@@ -101,7 +127,23 @@ export const UI_TEXT = {
       subtitle: "Trabajos seleccionados y casos de estudio.",
       result: "Resultado",
       challenge: "Desafío",
-      solution: "Solución"
+      solution: "Solución",
+      modal: {
+        caseStudy: "Caso de Estudio",
+        overview: "Resumen",
+        presentation: "Presentación / Diapositivas",
+        demoVideo: "Video Demo",
+        watchDemo: "Ver Video Demo",
+        externalLink: "Enlace Externo",
+        features: "Funcionalidades",
+        techStack: "Paquetes Clave",
+        documentation: "Documentación",
+        roadmap: "Próximos Pasos",
+        viewRepo: "Ver Repositorio",
+        openTab: "Abrir en nueva pestaña",
+        downloadPdf: "Descargar PDF",
+        pdfError: "Visualización de PDF no soportada."
+      }
     },
     blog: {
       title: "Insights",
@@ -437,7 +479,7 @@ export const PORTFOLIO = {
     {
       title: "Calendarización de Citas 📅",
       problem: "App multiplataforma (iOS y Android) para gestión de membresías y acceso físico.",
-      solution: "Solución integral con Flutter y Firebase, ideal para gestión de servicios y acceso mediante QR.",
+      solution: "Solución integral con Flutter, Firebase, y QR Scanner, ideal para gestión de servicios y acceso mediante QR.",
       tech: "Flutter, Dart, Firebase, QR Scanner",
       result: "Gestión eficiente de citas y accesos",
       image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
