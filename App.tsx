@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
 import { GlassDock } from './components/GlassDock';
@@ -165,7 +166,7 @@ const Typewriter = ({ text, delay = 25, startDelay = 0, cursorColor = "bg-emeral
 };
 
 // "Tech" Card Design (Futuristic HUD style)
-const TechCard = ({ title, children, accentColor = "emerald", className = "" }: { title: string, children: React.ReactNode, accentColor?: "emerald" | "blue", className?: string }) => {
+const TechCard = ({ title, children, accentColor = "emerald", className = "" }: { title: string, children?: React.ReactNode, accentColor?: "emerald" | "blue", className?: string }) => {
   // Styles based on accent color
   const styles = accentColor === 'emerald' 
     ? {
@@ -330,7 +331,7 @@ const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v
   ];
 
   return (
-    <nav className="fixed bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center select-none" aria-label="Main Navigation">
+    <nav className="fixed bottom-2 md:bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center select-none" aria-label="Main Navigation">
        <GlassDock>
             {navItems.map((item) => (
               <button
@@ -417,6 +418,30 @@ const ScrollToTop = () => {
 
 const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [noiseDataUrl, setNoiseDataUrl] = useState('');
+
+  // 1. Generate Static Noise Texture once (CPU/GPU save: doesn't recalculate per frame)
+  useEffect(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128; // Small tile size is enough
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        const w = canvas.width;
+        const h = canvas.height;
+        const idata = ctx.createImageData(w, h);
+        const buffer32 = new Uint32Array(idata.data.buffer);
+        const len = buffer32.length;
+        for (let i = 0; i < len; i++) {
+            if (Math.random() < 0.5) {
+                // Subtle noise pixel
+                buffer32[i] = 0x08000000; // Very faint black
+            }
+        }
+        ctx.putImageData(idata, 0, 0);
+        setNoiseDataUrl(canvas.toDataURL());
+    }
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -427,11 +452,14 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
 
     let w = window.innerWidth;
     let h = window.innerHeight;
-    let dpr = window.devicePixelRatio || 1;
+    // 2. Optimization: Cap DPR at 1.5. 
+    // On 3x screens (iPhone Pro), this reduces pixel count by 75% while keeping good visual quality.
+    let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    
     let animationFrameId: number;
     
     // Configuration for "Communication Network"
-    const nodeCount = Math.min(Math.floor((w * h) / 20000), 50); 
+    const nodeCount = Math.min(Math.floor((w * h) / 25000), 40); // Reduced density
     const connectionDistance = Math.min(w, h) * 0.3;
     const signalSpeed = 0.015;
 
@@ -446,8 +474,8 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
         this.x = Math.random() * w;
         this.y = Math.random() * h;
         // Slower movement for a background
-        this.vx = (Math.random() - 0.5) * 0.3; 
-        this.vy = (Math.random() - 0.5) * 0.3;
+        this.vx = (Math.random() - 0.5) * 0.2; 
+        this.vy = (Math.random() - 0.5) * 0.2;
         this.r = Math.random() * 2 + 1.5;
       }
 
@@ -516,7 +544,8 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
     const resize = () => {
       w = window.innerWidth;
       h = window.innerHeight;
-      dpr = window.devicePixelRatio || 1;
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
@@ -525,7 +554,19 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
       init();
     };
 
-    const animate = () => {
+    // 3. Optimization: Frame Throttling
+    const fps = 30; // Cap at 30fps for background elements
+    const interval = 1000 / fps;
+    let lastTime = 0;
+
+    const animate = (time: number) => {
+      requestAnimationFrame(animate);
+      
+      const delta = time - lastTime;
+      if (delta < interval) return;
+      
+      lastTime = time - (delta % interval);
+
       ctx.clearRect(0, 0, w, h);
       
       const isDark = theme === 'dark';
@@ -578,13 +619,11 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
             p.draw(packetColor, packetGlow);
         }
       }
-
-      animationFrameId = requestAnimationFrame(animate);
     };
 
     window.addEventListener('resize', resize);
     resize();
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('resize', resize);
@@ -599,7 +638,11 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
         className="fixed top-0 left-0 w-full h-full z-0 opacity-100 pointer-events-none transition-opacity duration-700"
         style={{ mixBlendMode: 'normal' }} 
       />
-      <div className="bg-noise" />
+      {/* 4. Optimization: Static noise background instead of live SVG filter */}
+      <div 
+        className="bg-noise" 
+        style={{ backgroundImage: `url(${noiseDataUrl})` }}
+      />
     </>
   );
 };
@@ -846,7 +889,7 @@ const ServicesView = ({ lang }: { lang: Language }) => {
               className="bento-card rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-10 flex flex-col items-start text-left h-full group w-full md:w-[calc(33.33%-1.5rem)] flex-grow-0"
               style={theme.colors as React.CSSProperties}
             >
-              <div className={`h-16 w-16 md:h-20 md:w-20 rounded-3xl bg-gradient-to-br ${theme.gradientFrom} to-transparent flex items-center justify-center mb-6 md:mb-10 border border-[var(--card-border)] ${theme.text} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10`}>
+              <div className={`h-16 w-16 md:h-20 md:h-20 rounded-3xl bg-gradient-to-br ${theme.gradientFrom} to-transparent flex items-center justify-center mb-6 md:mb-10 border border-[var(--card-border)] ${theme.text} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10`}>
                 <Icon className="w-7 h-7 md:w-9 md:h-9 drop-shadow-sm" />
               </div>
               <h3 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-4 md:mb-6 relative z-10 tracking-tight">{s.title}</h3>
@@ -892,47 +935,237 @@ const ServicesView = ({ lang }: { lang: Language }) => {
   );
 };
 
-const PortfolioView = ({ lang }: { lang: Language }) => {
-  const handleMouseMove = useMousePosition();
-  const t = UI_TEXT[lang].portfolio;
+// New Modal Component for Project Details
+const PortfolioModal = ({ project, onClose }: { project: any, onClose: () => void }) => {
+  const [activeScreenshot, setActiveScreenshot] = useState(0);
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
+  if (!project) return null;
+
+  const images = project.screenshots && project.screenshots.length > 0 
+    ? project.screenshots 
+    : [project.image];
+
   return (
-    <div className="max-w-7xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
-      <div className="mb-8 md:mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
-        <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-        {PORTFOLIO[lang].map((item, i) => (
-          <div onMouseMove={handleMouseMove} key={i} className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0">
-            <div className="h-[250px] md:h-[400px] overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
-              <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"/>
-              <div className="absolute top-6 right-6 md:top-8 md:right-8 z-20">
-                  <span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[var(--text-primary)] backdrop-blur-xl shadow-xl">
-                    {item.tech.split(',')[0]}
-                  </span>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fadeIn">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
+
+      {/* Modal Content */}
+      <div className="bg-[var(--card-bg)] backdrop-blur-3xl border border-[var(--card-border)] w-full max-w-6xl max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row animate-slide-up">
+        
+        {/* Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md transition-colors border border-white/10"
+        >
+          <Icons.X className="w-6 h-6" />
+        </button>
+
+        {/* Left Side: Gallery */}
+        <div className="w-full md:w-1/2 h-[40vh] md:h-auto bg-black relative flex flex-col">
+           <div className="flex-grow relative overflow-hidden group">
+              <img 
+                src={images[activeScreenshot]} 
+                alt="Project Screenshot" 
+                className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-50"></div>
+           </div>
+           
+           {/* Thumbnails */}
+           {images.length > 1 && (
+             <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4 z-20">
+               {images.map((img: string, idx: number) => (
+                 <button 
+                   key={idx}
+                   onClick={() => setActiveScreenshot(idx)}
+                   className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${activeScreenshot === idx ? 'border-emerald-500 scale-110' : 'border-white/30 opacity-70 hover:opacity-100'}`}
+                 >
+                   <img src={img} alt="thumb" className="w-full h-full object-cover" />
+                 </button>
+               ))}
+             </div>
+           )}
+        </div>
+
+        {/* Right Side: Details */}
+        <div className="w-full md:w-1/2 p-6 md:p-10 overflow-y-auto custom-scrollbar flex flex-col">
+           <div className="mb-6">
+              <span className="text-emerald-500 font-bold uppercase tracking-widest text-xs mb-2 block">Case Study</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 leading-tight">{project.title}</h2>
+              <div className="flex flex-wrap gap-2 mt-3">
+                 {project.tech.split(',').map((t: string, i: number) => (
+                   <span key={i} className="px-3 py-1 rounded-full bg-[var(--input-bg)] border border-[var(--card-border)] text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                     {t.trim()}
+                   </span>
+                 ))}
               </div>
-            </div>
-            <div className="p-6 md:p-10 relative z-20 -mt-16 md:-mt-24">
-              <h3 className="text-2xl md:text-4xl font-bold text-[var(--text-primary)] mb-3 drop-shadow-lg tracking-tight">{item.title}</h3>
-              <p className="text-emerald-500 font-semibold mb-6 md:mb-8 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider">
-                <Icons.CheckCircle className="w-4 h-4 md:w-5 md:h-5" /> {item.result}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm text-[var(--text-secondary)]">
-                <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-colors">
-                  <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.challenge}</span>
-                  <span className="text-sm leading-relaxed block">{item.problem}</span>
+           </div>
+
+           <div className="space-y-8">
+             {/* Description / Summary */}
+             <div>
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                   <Icons.Briefcase className="w-5 h-5 text-emerald-500"/> Overview
+                </h3>
+                <p className="text-[var(--text-secondary)] leading-relaxed text-sm md:text-base">
+                  {project.problem} {project.solution}
+                </p>
+             </div>
+
+             {/* Video Demo (if available) */}
+             {project.videoUrl && (
+                <div className="mb-4">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                      <Icons.Video className="w-5 h-5 text-red-500"/> Demo Video
+                  </h3>
+                  <div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden border border-[var(--card-border)] bg-black/50 shadow-lg group">
+                      <iframe 
+                        src={project.videoUrl} 
+                        className="absolute top-0 left-0 w-full h-full"
+                        allow="autoplay"
+                        allowFullScreen
+                      ></iframe>
+                  </div>
                 </div>
-                <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-colors">
-                    <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.solution}</span>
-                  <span className="text-sm leading-relaxed block">{item.solution}</span>
+             )}
+
+             {/* Features List (if available) */}
+             {project.details?.currentFeatures && (
+                <div>
+                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                      <Icons.Layers className="w-5 h-5 text-blue-500"/> Features
+                   </h3>
+                   <ul className="grid grid-cols-1 gap-2">
+                     {project.details.currentFeatures.map((f: string, i: number) => (
+                       <li key={i} className="flex items-start gap-3 text-sm text-[var(--text-secondary)] bg-[var(--input-bg)] p-3 rounded-xl border border-[var(--card-border)]">
+                          <Icons.CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                          <span>{f}</span>
+                       </li>
+                     ))}
+                   </ul>
                 </div>
-              </div>
-            </div>
-          </div>
-        ))}
+             )}
+
+             {/* Tech Stack Details (if available) */}
+             {project.details?.techStack && (
+                <div>
+                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                      <Icons.Code className="w-5 h-5 text-orange-500"/> Key Packages
+                   </h3>
+                   <ul className="grid grid-cols-1 gap-2">
+                     {project.details.techStack.map((f: string, i: number) => (
+                       <li key={i} className="flex items-start gap-3 text-sm text-[var(--text-secondary)] font-mono opacity-80">
+                          <span className="text-emerald-500 font-bold">{'>'}</span>
+                          <span>{f}</span>
+                       </li>
+                     ))}
+                   </ul>
+                </div>
+             )}
+
+             {/* Upcoming / Roadmap (if available) */}
+             {project.details?.upcomingFeatures && (
+                <div>
+                   <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                      <Icons.Rocket className="w-5 h-5 text-purple-500"/> Roadmap
+                   </h3>
+                   <ul className="space-y-2">
+                     {project.details.upcomingFeatures.map((f: string, i: number) => (
+                       <li key={i} className="flex items-start gap-3 text-sm text-[var(--text-secondary)] opacity-80">
+                          <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 flex-shrink-0"></div>
+                          <span>{f}</span>
+                       </li>
+                     ))}
+                   </ul>
+                </div>
+             )}
+
+             {/* Repo Link */}
+             {project.repoUrl && (
+                <div className="pt-4 border-t border-[var(--card-border)]">
+                   <a 
+                     href={project.repoUrl} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="inline-flex items-center gap-2 text-sm font-bold text-[var(--text-primary)] hover:text-emerald-500 transition-colors group"
+                   >
+                     <Icons.GitHub className="w-5 h-5" />
+                     View Repository
+                     <Icons.ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+                   </a>
+                </div>
+             )}
+           </div>
+        </div>
       </div>
     </div>
+  );
+};
+
+const PortfolioView = ({ lang, setSelectedProject }: { lang: Language, setSelectedProject: (p: any) => void }) => {
+  const handleMouseMove = useMousePosition();
+  const t = UI_TEXT[lang].portfolio;
+
+  return (
+    <>
+      <div className="max-w-7xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
+        <div className="mb-8 md:mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
+          <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+          {PORTFOLIO[lang].map((item, i) => (
+            <div 
+              onMouseMove={handleMouseMove} 
+              onClick={() => setSelectedProject(item)}
+              key={i} 
+              className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer"
+            >
+              <div className="h-[250px] md:h-[400px] overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
+                <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"/>
+                
+                {/* Click Hint Overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center backdrop-blur-[2px]">
+                   <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 text-white font-bold text-sm tracking-widest uppercase transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">
+                      View Details <Icons.ArrowRight className="w-4 h-4" />
+                   </div>
+                </div>
+
+                <div className="absolute top-6 right-6 md:top-8 md:right-8 z-20 pointer-events-none">
+                    <span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[var(--text-primary)] backdrop-blur-xl shadow-xl">
+                      {item.tech.split(',')[0]}
+                    </span>
+                </div>
+              </div>
+              <div className="p-6 md:p-10 relative z-20 -mt-16 md:-mt-24 pointer-events-none">
+                <h3 className="text-2xl md:text-4xl font-bold text-[var(--text-primary)] mb-3 drop-shadow-lg tracking-tight">{item.title}</h3>
+                <p className="text-emerald-500 font-semibold mb-6 md:mb-8 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider">
+                  <Icons.CheckCircle className="w-4 h-4 md:w-5 md:h-5" /> {item.result}
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm text-[var(--text-secondary)]">
+                  <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]">
+                    <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.challenge}</span>
+                    <span className="text-sm leading-relaxed block line-clamp-3">{item.problem}</span>
+                  </div>
+                  <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]">
+                      <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.solution}</span>
+                    <span className="text-sm leading-relaxed block line-clamp-3">{item.solution}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 };
 
@@ -1187,6 +1420,7 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>('system');
   const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>('light');
   const [lang, setLang] = useState<Language>('es'); // Default to Spanish per content
+  const [selectedProject, setSelectedProject] = useState<any>(null);
 
   // Handle Theme Logic
   useEffect(() => {
@@ -1232,13 +1466,18 @@ export default function App() {
       <main className="relative z-10 min-h-screen flex flex-col">
         {view === 'home' && <HomeView setView={setView} lang={lang} />}
         {view === 'services' && <ServicesView lang={lang} />}
-        {view === 'portfolio' && <PortfolioView lang={lang} />}
+        {view === 'portfolio' && <PortfolioView lang={lang} setSelectedProject={setSelectedProject} />}
         {view === 'blog' && <BlogView lang={lang} />}
         {view === 'contact' && <ContactView lang={lang} />}
       </main>
       
       <Dock currentView={view} setView={setView} lang={lang} />
       <ScrollToTop />
+      
+      {/* Render Modal at Root Level to avoid Z-Index / Stacking Context issues with transforms */}
+      {selectedProject && (
+        <PortfolioModal project={selectedProject} onClose={() => setSelectedProject(null)} />
+      )}
     </>
   );
 }

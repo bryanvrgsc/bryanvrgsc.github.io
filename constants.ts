@@ -211,12 +211,32 @@ export const SERVICES = {
 export const PORTFOLIO = {
   en: [
     {
-      title: "Gym App with QR",
-      problem: "Long queues at reception and shared access fraud.",
-      solution: "Mobile app with dynamic QR generation and real-time validation.",
-      tech: "Flutter, Firebase, Node.js",
+      title: "GymApp iOS 🏋️‍♂️",
+      problem: "Membership and service management for gyms.",
+      solution: "Complete experience for users and admins with SwiftUI & Auth0.",
+      tech: "Swift, SwiftUI, Combine, Auth0",
       result: "Smart access & 60% time reduction",
-      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop",
+      repoUrl: "https://github.com/bryanvrgsc/GymApp",
+      screenshots: [
+        "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1381&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop"
+      ],
+      details: {
+        currentFeatures: [
+          "Secure Login with Auth0",
+          "User Profile with membership status",
+          "Temporary Access QR",
+          "Service and routine visualization"
+        ],
+        upcomingFeatures: [
+          "Discord-style badge system for active members",
+          "Entry/Exit logs (Attendance Calendar)",
+          "Real-time gym occupancy visualization",
+          "Equipment/Activity preference system"
+        ]
+      }
     },
     {
       title: "BI Dashboard",
@@ -227,12 +247,29 @@ export const PORTFOLIO = {
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop"
     },
     {
-      title: "Flutter App + Backend",
-      problem: "Manual operational processes on paper and excel.",
-      solution: "Complete platform for digitizing field operations.",
-      tech: "Flutter, NestJS, PostgreSQL",
-      result: "100% digitalization of operations",
-      image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop"
+      title: "Appointment Scheduling App",
+      problem: "Multi-platform app (iOS & Android) for membership and physical access management.",
+      solution: "Comprehensive solution with Flutter, Firebase, and QR attendance control.",
+      tech: "Flutter, Dart, Firebase, QR Scanner",
+      result: "Efficient appointment & access management",
+      image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
+      repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
+      videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
+      details: {
+        currentFeatures: [
+           "Secure authentication with Firebase Auth",
+           "Membership and service management",
+           "QR code generation and scanning",
+           "Attendance calendar (Entry/Exit logs)",
+           "Cross-platform interface for iOS and Android"
+        ],
+        techStack: [
+            "firebase_auth, cloud_firestore, firebase_core",
+            "qr_flutter, qr_code_scanner",
+            "syncfusion_flutter_calendar",
+            "url_launcher"
+        ]
+      }
     },
     {
       title: "Predictive Analysis Scripts",
@@ -245,12 +282,32 @@ export const PORTFOLIO = {
   ],
   es: [
     {
-      title: "App de Gimnasio con QR",
-      problem: "Largas filas en recepción y fraude en accesos compartidos.",
-      solution: "App móvil con generación dinámica de QR y validación en tiempo real.",
-      tech: "Flutter, Firebase, Node.js",
+      title: "GymApp iOS 🏋️‍♂️",
+      problem: "App para gestionar membresías y servicios de un gimnasio.",
+      solution: "Experiencia completa para usuarios y administradores con SwiftUI y Auth0.",
+      tech: "Swift, SwiftUI, Combine, Auth0",
       result: "Acceso inteligente y reducción de tiempos en 60%",
-      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop",
+      repoUrl: "https://github.com/bryanvrgsc/GymApp",
+      screenshots: [
+        "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1381&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop"
+      ],
+      details: {
+        currentFeatures: [
+          "Login seguro con Auth0",
+          "Perfil de usuario con estado de membresía",
+          "QR de acceso temporal",
+          "Visualización de servicios y rutinas"
+        ],
+        upcomingFeatures: [
+          "Sistema de badges tipo Discord para usuarios que mantienen su membresía activa",
+          "Registro de entradas y salidas (Calendario de asistencias)",
+          "Visualización del volumen de usuarios dentro del gimnasio en tiempo real",
+          "Sistema de preferencias de equipos o actividades"
+        ]
+      }
     },
     {
       title: "Dashboard de BI",
@@ -261,12 +318,30 @@ export const PORTFOLIO = {
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop"
     },
     {
-      title: "App Flutter + Backend",
-      problem: "Procesos operativos manuales en papel y excel.",
-      solution: "Plataforma completa de digitalización de operaciones en campo.",
-      tech: "Flutter, NestJS, PostgreSQL",
-      result: "Digitalización de operaciones al 100%",
-      image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop"
+      title: "Calendarización de Citas",
+      problem: "App multiplataforma (iOS y Android) para gestión de membresías y acceso físico.",
+      solution: "Solución integral con Flutter y Firebase, ideal para gestión de servicios y acceso mediante QR.",
+      tech: "Flutter, Dart, Firebase, QR Scanner",
+      result: "Gestión eficiente de citas y accesos",
+      image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
+      repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
+      videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
+      details: {
+        currentFeatures: [
+           "Autenticación segura con Firebase Auth",
+           "Gestión de membresías y servicios",
+           "Generación y escaneo de códigos QR de acceso",
+           "Calendario de asistencias / registro de entradas y salidas",
+           "Interfaz multiplataforma para iOS y Android"
+        ],
+        techStack: [
+            "firebase_auth, cloud_firestore, firebase_core",
+            "qr_flutter, qr_code_scanner",
+            "syncfusion_flutter_calendar (para calendario de asistencias)",
+            "url_launcher",
+            "Entre otros utilitarios para manejo de datos y UI"
+        ]
+      }
     },
     {
       title: "Scripts de Análisis Predictivo",

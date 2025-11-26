@@ -1,8 +1,7 @@
-
 import React, { useRef, useState, useLayoutEffect } from 'react';
 import { GlassElement } from '../GlassElement/GlassElement';
 
-export const GlassDock = ({ children }: { children: React.ReactNode }) => {
+export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const hiddenRef = useRef<HTMLDivElement>(null);
 
