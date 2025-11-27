@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { useStore } from '@nanostores/react';
 import { settings } from '../store';
 import { Icons } from './Icons';
-import { LiquidButton } from './LiquidButton';
+import { LiquidButton } from './SharedUI';
 import { UI_TEXT, SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS } from '../constants';
 
 // --- UTILS ---

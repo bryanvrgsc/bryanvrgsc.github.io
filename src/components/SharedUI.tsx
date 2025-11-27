@@ -1,10 +1,8 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings, setLang, setTheme, applyTheme, type Language, type Theme } from '../store';
 import { Icons } from './Icons';
-import { GlassDock } from './GlassDock';
-import { LiquidButton } from './LiquidButton';
 import { UI_TEXT } from '../constants';
 
 // Helper for SPA navigation (Hash Mode for GitHub Pages)
@@ -14,144 +12,400 @@ const navigateTo = (path: string) => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// --- CANVAS BACKGROUND ---
-export const CanvasBackground = () => {
-  const { theme } = useStore(settings);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [noiseDataUrl, setNoiseDataUrl] = useState('');
-  const [effectiveTheme, setEffectiveTheme] = useState<'light'|'dark'>('light');
+// --- PRIMITIVE COMPONENTS (Consolidated) ---
 
-  useEffect(() => {
-    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    setEffectiveTheme(isDark ? 'dark' : 'light');
-  }, [theme]);
+// 1. LiquidButton
+interface LiquidButtonProps {
+  children?: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  type?: "button" | "submit" | "reset";
+  style?: React.CSSProperties;
+}
 
-  // Generate Static Noise
-  useEffect(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-        const idata = ctx.createImageData(128, 128);
-        const buffer32 = new Uint32Array(idata.data.buffer);
-        for (let i = 0; i < buffer32.length; i++) {
-            if (Math.random() < 0.5) buffer32[i] = 0x08000000;
-        }
-        ctx.putImageData(idata, 0, 0);
-        setNoiseDataUrl(canvas.toDataURL());
-    }
-  }, []);
+export const LiquidButton: React.FC<LiquidButtonProps> = ({ children, onClick, className = "", type = "button", style }) => {
+  return (
+    <button 
+      type={type}
+      onClick={onClick} 
+      style={style}
+      className={`relative group inline-flex items-center justify-center font-medium transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] active:scale-95 border-none outline-none focus:outline-none ${className}`}
+    >
+      {/* Outer Glow (Spills out) */}
+      <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-60 transition-opacity duration-500 bg-[var(--glass-glow)] blur-xl"></div>
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+      {/* Clipped Internal Layer */}
+      <div className="absolute inset-0 overflow-hidden rounded-full liquid-glass-wrapper">
+          {/* Background Layer with blur */}
+          <div className="absolute inset-0 bg-[var(--card-bg)] backdrop-blur-xl group-hover:bg-[var(--card-hover-bg)] transition-colors duration-500"></div>
+          
+          {/* Subtle internal gradient for depth */}
+          <div 
+            className="absolute inset-0 opacity-100 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
+            style={{ background: 'linear-gradient(to top right, var(--highlight-color) 0%, transparent 40%)' }}
+          ></div>
 
-    let w = window.innerWidth;
-    let h = window.innerHeight;
-    let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    let animationFrameId: number;
-    
-    const nodeCount = Math.min(Math.floor((w * h) / 30000), 30);
-    const connectionDistance = Math.min(w, h) * 0.3;
-    const signalSpeed = 0.015;
+          {/* Internal Gradient Glow */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-emerald-500/20 blur-md"></div>
+          
+          {/* Border Layer */}
+          <div className="absolute inset-0 border border-[var(--card-border)] rounded-full group-hover:border-[var(--glass-glow)] transition-colors duration-500 pointer-events-none"></div>
+      </div>
+      
+      {/* Content */}
+      <span className="relative z-20 flex items-center justify-center gap-2 tracking-wide text-[var(--text-primary)]">
+        {children}
+      </span>
+    </button>
+  );
+};
 
-    class NetworkNode {
-      x: number; y: number; vx: number; vy: number; r: number;
-      constructor() {
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        this.vx = (Math.random() - 0.5) * 0.2;
-        this.vy = (Math.random() - 0.5) * 0.2;
-        this.r = Math.random() * 2 + 1.5;
-      }
-      update() {
-        this.x += this.vx; this.y += this.vy;
-        if (this.x < 0 || this.x > w) this.vx *= -1;
-        if (this.y < 0 || this.y > h) this.vy *= -1;
-      }
-      draw(color: string) {
-        ctx!.beginPath(); ctx!.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-        ctx!.fillStyle = color; ctx!.fill();
-      }
-    }
+// 2. GlassElement
+type GlassElementProps = {
+  children?: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  height?: number;
+  width?: number;
+  radius?: number;
+  blur?: number;
+};
 
-    class DataPacket {
-      start: NetworkNode; end: NetworkNode; progress: number = 0; isDead: boolean = false;
-      constructor(n1: NetworkNode, n2: NetworkNode) { this.start = n1; this.end = n2; }
-      update() { this.progress += signalSpeed; if (this.progress >= 1) this.isDead = true; }
-      draw(color: string, glowColor: string) {
-        const cx = this.start.x + (this.end.x - this.start.x) * this.progress;
-        const cy = this.start.y + (this.end.y - this.start.y) * this.progress;
-        ctx!.beginPath(); ctx!.arc(cx, cy, 4, 0, Math.PI * 2); ctx!.fillStyle = glowColor; ctx!.fill();
-        ctx!.beginPath(); ctx!.arc(cx, cy, 2, 0, Math.PI * 2); ctx!.fillStyle = color; ctx!.fill();
-      }
-    }
-
-    let nodes: NetworkNode[] = [];
-    let packets: DataPacket[] = [];
-
-    const init = () => {
-      nodes = []; packets = [];
-      for(let i=0; i<nodeCount; i++) nodes.push(new NetworkNode());
-    };
-
-    const resize = () => {
-      w = window.innerWidth; h = window.innerHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      canvas.style.width = `${w}px`; canvas.style.height = `${h}px`;
-      ctx!.scale(dpr, dpr);
-      init();
-    };
-
-    const animate = () => {
-      ctx!.clearRect(0, 0, w, h);
-      const isDark = effectiveTheme === 'dark';
-      const nodeColor = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(15,23,42,0.1)';
-      const lineColor = isDark ? '255,255,255' : '15,23,42';
-      const packetColor = isDark ? '#34d399' : '#059669';
-      const packetGlow = isDark ? 'rgba(52, 211, 153, 0.3)' : 'rgba(5, 150, 105, 0.15)';
-
-      nodes.forEach(n => { n.update(); n.draw(nodeColor); });
-
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-            const n1 = nodes[i]; const n2 = nodes[j];
-            const dist = Math.hypot(n1.x - n2.x, n1.y - n2.y);
-            if (dist < connectionDistance) {
-                ctx!.beginPath(); ctx!.moveTo(n1.x, n1.y); ctx!.lineTo(n2.x, n2.y);
-                ctx!.strokeStyle = `rgba(${lineColor}, ${(1 - dist/connectionDistance) * 0.15})`;
-                ctx!.lineWidth = 1; ctx!.stroke();
-                if (Math.random() < 0.003) packets.push(new DataPacket(n1, n2));
-            }
-        }
-      }
-      for (let i = packets.length - 1; i >= 0; i--) {
-        const p = packets[i]; p.update();
-        if (p.isDead) packets.splice(i, 1); else p.draw(packetColor, packetGlow);
-      }
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener('resize', resize);
-    resize();
-    animate();
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [effectiveTheme]);
+export const GlassElement = ({
+  children,
+  className = "",
+  style = {},
+  height,
+  width,
+  radius,
+  blur = 16,
+}: GlassElementProps) => {
+  
+  // Construct dynamic styles based on sizing props
+  const dynamicStyle: React.CSSProperties = {
+    ...style,
+    ...(width ? { width: `${width}px` } : {}),
+    ...(height ? { height: `${height}px` } : {}),
+    ...(radius ? { borderRadius: `${radius}px` } : {}),
+    '--glass-blur': `${blur}px`,
+  } as React.CSSProperties;
 
   return (
-    <>
-      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 opacity-100 pointer-events-none" style={{ mixBlendMode: 'normal' }} />
-      <div className="bg-noise" style={{ backgroundImage: `url(${noiseDataUrl})` }} />
-    </>
+    <div className={`glass-element-box ${className}`} style={dynamicStyle}>
+      <div className="glass-element-shine" />
+      {children}
+    </div>
   );
+};
+
+// 3. GlassDock
+export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  const hiddenRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!hiddenRef.current) return;
+
+    // Compatibility check for older browsers (e.g., iOS < 13.4)
+    if (typeof ResizeObserver === 'undefined') {
+        // Fallback: Set size once and don't observe changes
+        if (hiddenRef.current) {
+          setSize({
+              width: hiddenRef.current.offsetWidth,
+              height: hiddenRef.current.offsetHeight
+          });
+        }
+        return;
+    }
+
+    const obs = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (hiddenRef.current) {
+            setSize({
+                width: hiddenRef.current.offsetWidth,
+                height: hiddenRef.current.offsetHeight
+            });
+        }
+      }
+    });
+    obs.observe(hiddenRef.current);
+    return () => obs.disconnect();
+  }, [children]);
+
+  return (
+    <div className="relative flex justify-center items-end pb-2">
+      {/* Hidden Layout for Sizing: Renders children invisibly to calculate natural width */}
+      <div 
+        ref={hiddenRef} 
+        className="absolute bottom-2 opacity-0 pointer-events-none flex items-center gap-2 md:gap-3 p-1.5 md:p-2 whitespace-nowrap"
+        aria-hidden="true"
+        style={{ visibility: 'hidden' }} 
+      >
+        {children}
+      </div>
+
+      {/* Actual Visible Glass Element */}
+      <div className={`transition-opacity duration-500 ${size.width > 0 ? 'opacity-100' : 'opacity-0'}`}>
+          <GlassElement
+            width={size.width}
+            height={size.height}
+            radius={size.height / 2}
+            className="flex items-center gap-2 md:gap-3 p-1.5 md:p-2"
+          >
+            {children}
+          </GlassElement>
+      </div>
+    </div>
+  );
+};
+
+// --- CUSTOM CANVAS BACKGROUND (Network Data Traffic) ---
+
+class NetworkNode {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    radius: number;
+    opacity: number;
+    targetOpacity: number;
+    neighbors: NetworkNode[] = [];
+
+    constructor(w: number, h: number) {
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+        // Moderate speed for organic feel
+        this.vx = (Math.random() - 0.5) * 0.5; 
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.radius = Math.random() * 1.5 + 1;
+        this.opacity = Math.random() * 0.5 + 0.1;
+        this.targetOpacity = this.opacity;
+    }
+
+    update(w: number, h: number) {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Bounce off walls
+        if (this.x < 0 || this.x > w) this.vx *= -1;
+        if (this.y < 0 || this.y > h) this.vy *= -1;
+
+        // Pulse opacity
+        if (Math.random() < 0.01) {
+            this.targetOpacity = Math.random() * 0.6 + 0.1;
+        }
+        this.opacity += (this.targetOpacity - this.opacity) * 0.05;
+        
+        // OPTIMIZATION: Clear neighbors array instead of reallocating
+        this.neighbors.length = 0;
+    }
+}
+
+class DataPacket {
+    from: NetworkNode;
+    to: NetworkNode;
+    progress: number = 0;
+    speed: number;
+    active: boolean = true;
+
+    constructor(startNode: NetworkNode, endNode: NetworkNode) {
+        this.from = startNode;
+        this.to = endNode;
+        // Faster speed to appreciate 60hz smoothness (Range 0.01 to 0.03)
+        this.speed = Math.random() * 0.02 + 0.01; 
+    }
+
+    update() {
+        this.progress += this.speed;
+        if (this.progress >= 1) {
+            this.progress = 1;
+            this.active = false; // Reached destination
+        }
+    }
+
+    draw(ctx: CanvasRenderingContext2D, color: string) {
+        const x = this.from.x + (this.to.x - this.from.x) * this.progress;
+        const y = this.from.y + (this.to.y - this.from.y) * this.progress;
+
+        // Draw Glow
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = color;
+        ctx.fillStyle = color; // Colored core
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, Math.PI * 2); 
+        ctx.fill();
+        
+        // White center for pop
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+export const CanvasBackground = () => {
+    const { theme } = useStore(settings);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const nodesRef = useRef<NetworkNode[]>([]);
+    const packetsRef = useRef<DataPacket[]>([]);
+    const animationRef = useRef<number | undefined>(undefined);
+    const [noiseDataUrl, setNoiseDataUrl] = useState('');
+
+    // Generate Static Noise (Texture)
+    useEffect(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            const idata = ctx.createImageData(128, 128);
+            const buffer32 = new Uint32Array(idata.data.buffer);
+            for (let i = 0; i < buffer32.length; i++) {
+                if (Math.random() < 0.5) buffer32[i] = 0x08000000;
+            }
+            ctx.putImageData(idata, 0, 0);
+            setNoiseDataUrl(canvas.toDataURL());
+        }
+    }, []);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Determine Theme Colors
+        const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        
+        const nodeColor = isDark ? "rgba(16, 185, 129, " : "rgba(71, 85, 105, "; // Emerald vs Slate
+        const lineColor = isDark ? "rgba(16, 185, 129, 0.15)" : "rgba(71, 85, 105, 0.1)";
+        const packetColor = isDark ? "#34d399" : "#059669"; 
+
+        // Initialization
+        const init = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Limit node count for performance on high-res screens
+            const area = canvas.width * canvas.height;
+            const nodeCount = Math.min(Math.floor(area / 15000), 80); // Cap at 80 nodes
+            
+            nodesRef.current = [];
+            packetsRef.current = [];
+            
+            for (let i = 0; i < nodeCount; i++) {
+                nodesRef.current.push(new NetworkNode(canvas.width, canvas.height));
+            }
+        };
+
+        const draw = () => {
+            if (!canvas || !ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Update Nodes & Calculate Connections
+            const nodes = nodesRef.current;
+            const maxDist = 180;
+            const maxDistSq = maxDist * maxDist; // OPTIMIZATION: Compare squared distance
+
+            // OPTIMIZATION: Batch draw lines
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = lineColor;
+            ctx.beginPath(); // Start ONE path for all lines
+
+            for (let i = 0; i < nodes.length; i++) {
+                const nodeA = nodes[i];
+                nodeA.update(canvas.width, canvas.height);
+
+                // Check connections
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const nodeB = nodes[j];
+                    const dx = nodeA.x - nodeB.x;
+                    const dy = nodeA.y - nodeB.y;
+                    // OPTIMIZATION: Avoid Math.sqrt
+                    const distSq = dx * dx + dy * dy;
+
+                    if (distSq < maxDistSq) {
+                        nodeA.neighbors.push(nodeB);
+                        nodeB.neighbors.push(nodeA);
+
+                        // Queue line for drawing
+                        ctx.moveTo(nodeA.x, nodeA.y);
+                        ctx.lineTo(nodeB.x, nodeB.y);
+                    }
+                }
+            }
+            ctx.stroke(); // Draw all lines at once
+
+            // Draw Nodes (Separate pass needed for opacity variation)
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+                ctx.fillStyle = nodeColor + node.opacity + ")";
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 2. Manage Packets
+            const packets = packetsRef.current;
+            
+            // Cleanup & Routing
+            for (let i = packets.length - 1; i >= 0; i--) {
+                if (!packets[i].active) {
+                    const consumeData = Math.random() < 0.4;
+
+                    if (!consumeData) {
+                        const current = packets[i].to;
+                        if (current.neighbors.length > 0) {
+                            let next = current.neighbors[Math.floor(Math.random() * current.neighbors.length)];
+                            packets.push(new DataPacket(current, next));
+                        }
+                    }
+                    packets.splice(i, 1);
+                }
+            }
+
+            // Spawn new packets
+            const maxPackets = 20;
+            if (packets.length < maxPackets && Math.random() < 0.05) { 
+                const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+                if (randomNode.neighbors.length > 0) {
+                    const target = randomNode.neighbors[Math.floor(Math.random() * randomNode.neighbors.length)];
+                    packets.push(new DataPacket(randomNode, target));
+                }
+            }
+
+            // Update & Draw Packets
+            for (const p of packets) {
+                p.update();
+                p.draw(ctx, packetColor);
+            }
+
+            animationRef.current = requestAnimationFrame(draw);
+        };
+
+        // Debounce resize
+        let resizeTimeout: ReturnType<typeof setTimeout>;
+        const handleResize = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(init, 200);
+        };
+
+        window.addEventListener('resize', handleResize);
+        init();
+        draw();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+        };
+    }, [theme]);
+
+    return (
+        <>
+            <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-60 dark:opacity-100" />
+            <div className="bg-noise" style={{ backgroundImage: `url(${noiseDataUrl})` }} />
+        </>
+    );
 };
 
 // --- HEADER ---
@@ -259,7 +513,7 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
               } as React.CSSProperties}
               onClick={() => navigateTo('/contact')}
             >
-              {t.contact}
+              {t.contact} 
             </LiquidButton>
        </GlassDock>
     </nav>
