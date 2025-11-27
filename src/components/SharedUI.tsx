@@ -438,29 +438,33 @@ export const Header = () => {
   const { theme } = useStore(settings);
 
   useEffect(() => {
+    // Detect scroll to toggle 'pill' mode
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
+    // Initial check
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 flex justify-center pt-2 md:pt-6 pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-40 flex justify-center pt-4 md:pt-6 pointer-events-none">
       <a 
         href="#/"
         onClick={(e) => { e.preventDefault(); navigateTo('/'); }}
-        className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-full backdrop-blur-xl border border-[var(--card-border)]
+        className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-full
+          w-auto px-6 h-[44px]
           ${scrolled 
-            ? 'w-auto px-6 h-[38px] md:h-[44px] bg-[var(--bg-primary)]/80 shadow-2xl' 
-            : 'w-full max-w-[80rem] h-[64px] bg-transparent px-4 md:px-8 border-transparent'}`}
+            ? 'bg-[var(--bg-primary)]/80 backdrop-blur-xl border border-[var(--card-border)] shadow-2xl opacity-100 translate-y-0' 
+            : 'bg-transparent border-transparent shadow-none opacity-100 translate-y-0'}`}
         aria-label="Go to Homepage"
       >
-        <div className={`transition-all duration-700 flex items-center gap-2 ${scrolled ? 'scale-90' : 'scale-100'}`}>
+        <div className="flex items-center gap-2">
            <div className="flex items-center gap-3 mr-3">
-              <Icons.Windows className="w-4 h-4 md:w-5 md:h-5 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              <Icons.Apple className={`w-4 h-4 md:w-5 md:h-5 transition-colors duration-300 ${isDark ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.5)]'}`} />
-              <Icons.Linux className="w-4 h-4 md:w-5 md:h-5 text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+              <Icons.Windows className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+              <Icons.Apple className={`w-5 h-5 transition-colors duration-300 ${isDark ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.5)]'}`} />
+              <Icons.Linux className="w-5 h-5 text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
            </div>
            <span className="font-mono text-base md:text-lg font-bold tracking-tight text-[var(--text-primary)] flex items-center">
              <span className="text-[var(--text-tertiary)] mr-[1px]">@</span>
