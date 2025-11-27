@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Icons } from './components/Icons';
 import { LiquidButton } from './components/LiquidButton';
@@ -461,7 +463,8 @@ const CanvasBackground = ({ theme }: { theme: 'light' | 'dark' }) => {
     let animationFrameId: number;
     
     // Configuration for "Communication Network"
-    const nodeCount = Math.min(Math.floor((w * h) / 25000), 40); // Reduced density
+    // Optimization for old devices: Reduce node density calculation
+    const nodeCount = Math.min(Math.floor((w * h) / 30000), 30); // Reduced density further for compatibility
     const connectionDistance = Math.min(w, h) * 0.3;
     const signalSpeed = 0.015;
 
@@ -724,7 +727,8 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         <section 
           ref={(el) => { sectionRefs.current[0] = el }} 
           // iPad Optimization: using 100svh instead of screen/vh to respect Safari UI bars
-          className="min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start relative"
+          // Added min-h-screen for old browsers that don't support svh
+          className="min-h-screen min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start relative"
         >
           <div className="flex flex-col items-center text-center animate-slide-up max-w-5xl mx-auto w-full">
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[8rem] font-bold tracking-tighter mb-4 md:mb-6 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.9]">
@@ -789,7 +793,8 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         <section 
           ref={(el) => { sectionRefs.current[1] = el }} 
           // iPad Optimization: using 100svh instead of screen/vh
-          className="min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start"
+          // Added min-h-screen for old browsers
+          className="min-h-screen min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start"
         >
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
               <div className="order-2 md:order-1 h-full w-full">
@@ -828,7 +833,8 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         <section 
           ref={(el) => { sectionRefs.current[2] = el }} 
           // iPad Optimization: using 100svh instead of screen/vh
-          className="min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start"
+          // Added min-h-screen for old browsers
+          className="min-h-screen min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start"
         >
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
               <div className="order-1 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">

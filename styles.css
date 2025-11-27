@@ -90,6 +90,7 @@
 }
 
 html {
+    min-height: 100vh; /* Compatibility fallback */
     min-height: 100svh;
 }
 
@@ -101,6 +102,7 @@ body {
   background-image: var(--bg-gradient);
   background-attachment: fixed;
   transition: background-color 0.5s var(--apple-ease), color 0.5s var(--apple-ease);
+  min-height: 100vh; /* Compatibility fallback */
   min-height: 100svh; /* Stable height on mobile Safari */
 }
 
@@ -308,4 +310,31 @@ body {
     rgba(255, 255, 255, 0.05) 80%, 
     rgba(255, 255, 255, 0.1) 100%
   );
+}
+
+/* --- Compatibility Fallbacks --- */
+
+/* Fallback for browsers that do NOT support backdrop-filter (Old Safari, Firefox, Chrome) */
+@supports not ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+  .glass-element-box, 
+  .bento-card,
+  header button {
+    /* Solid background fallback to ensure text readability */
+    background-color: var(--bg-secondary) !important;
+    opacity: 0.98;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  [data-theme='dark'] .glass-element-box, 
+  [data-theme='dark'] .bento-card,
+  [data-theme='dark'] header button {
+     background-color: #111115 !important; /* Dark solid background */
+     border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  /* Make tooltips solid */
+  .dock-item span {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--card-border);
+  }
 }

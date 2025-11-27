@@ -7,6 +7,17 @@ export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
 
   useLayoutEffect(() => {
     if (!hiddenRef.current) return;
+
+    // Compatibility check for older browsers (e.g., iOS < 13.4)
+    if (typeof ResizeObserver === 'undefined') {
+        // Fallback: Set size once and don't observe changes
+        setSize({
+            width: hiddenRef.current.offsetWidth,
+            height: hiddenRef.current.offsetHeight
+        });
+        return;
+    }
+
     const obs = new ResizeObserver((entries) => {
       for (const entry of entries) {
         if (hiddenRef.current) {
