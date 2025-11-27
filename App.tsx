@@ -1,9 +1,15 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useStore } from '@nanostores/react';
-import { settings, applyTheme } from './src/store';
+import { settings, applyTheme, checkPerformance } from './src/store';
 import { CanvasBackground, Header, Dock, ThemeToggle, LanguageToggle, ScrollToTop } from './src/components/SharedUI';
-import { HomeView, ServicesView, PortfolioView, BlogView, ContactView } from './src/components/PageViews';
+
+// Lazy load views for Code Splitting
+const HomeView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.HomeView })));
+const ServicesView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.ServicesView })));
+const PortfolioView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.PortfolioView })));
+const BlogView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.BlogView })));
+const ContactView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.ContactView })));
 
 export default function App() {
   const { theme } = useStore(settings);
@@ -13,6 +19,8 @@ export default function App() {
 
   useEffect(() => {
     applyTheme(theme);
+    // Initialize performance check (Lite Mode detection)
+    checkPerformance();
   }, [theme]);
 
   useEffect(() => {
@@ -50,7 +58,9 @@ export default function App() {
       <LanguageToggle />
       
       <main className="relative z-10 w-full">
-        {renderView()}
+        <Suspense fallback={<div className="min-h-screen w-full flex items-center justify-center opacity-50">Loading...</div>}>
+          {renderView()}
+        </Suspense>
       </main>
 
       <Dock currentPath={currentHash.replace(/^#/, '') || '/'} />

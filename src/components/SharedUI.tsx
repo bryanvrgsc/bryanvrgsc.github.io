@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { settings, setLang, setTheme, applyTheme, type Language, type Theme } from '../store';
+import { settings, setLang, setTheme, applyTheme, performanceMode, type Language, type Theme } from '../store';
 import { Icons } from './Icons';
 import { UI_TEXT } from '../constants';
 
@@ -246,6 +246,7 @@ class DataPacket {
 
 export const CanvasBackground = () => {
     const { theme } = useStore(settings);
+    const { lite } = useStore(performanceMode);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const nodesRef = useRef<NetworkNode[]>([]);
     const packetsRef = useRef<DataPacket[]>([]);
@@ -254,6 +255,7 @@ export const CanvasBackground = () => {
 
     // Generate Static Noise (Texture)
     useEffect(() => {
+        if (lite) return; // Skip in lite mode
         const canvas = document.createElement('canvas');
         canvas.width = 128;
         canvas.height = 128;
@@ -267,9 +269,12 @@ export const CanvasBackground = () => {
             ctx.putImageData(idata, 0, 0);
             setNoiseDataUrl(canvas.toDataURL());
         }
-    }, []);
+    }, [lite]);
 
     useEffect(() => {
+        // Performance: Skip canvas rendering in Lite Mode
+        if (lite) return;
+
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -389,16 +394,35 @@ export const CanvasBackground = () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(init, 200);
         };
+        
+        // Pause animation when tab is not visible
+        const handleVisibilityChange = () => {
+             if (document.hidden && animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+             } else {
+                draw();
+             }
+        };
 
         window.addEventListener('resize', handleResize);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
         init();
         draw();
 
         return () => {
             window.removeEventListener('resize', handleResize);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
             if (animationRef.current) cancelAnimationFrame(animationRef.current);
         };
-    }, [theme]);
+    }, [theme, lite]);
+
+    // Render simple gradient for Lite Mode
+    if (lite) {
+      return (
+        <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-20 bg-gradient-to-br from-[var(--text-secondary)] to-transparent" />
+      );
+    }
 
     return (
         <>
