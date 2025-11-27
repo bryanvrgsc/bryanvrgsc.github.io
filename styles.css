@@ -89,6 +89,10 @@
     radial-gradient(circle at 15% 90%, rgba(34, 211, 238, 0.08) 0%, transparent 40%);
 }
 
+html {
+    min-height: 100svh;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
   background-color: var(--bg-primary);
@@ -97,6 +101,7 @@ body {
   background-image: var(--bg-gradient);
   background-attachment: fixed;
   transition: background-color 0.5s var(--apple-ease), color 0.5s var(--apple-ease);
+  min-height: 100svh; /* Stable height on mobile Safari */
 }
 
 /* Custom Scrollbar */

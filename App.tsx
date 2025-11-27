@@ -331,7 +331,8 @@ const Dock = ({ currentView, setView, lang }: { currentView: string, setView: (v
   ];
 
   return (
-    <nav className="fixed bottom-2 md:bottom-10 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center select-none" aria-label="Main Navigation">
+    // Fixed position with Safe Area Inset support for iPad/iOS
+    <nav className="fixed left-1/2 -translate-x-1/2 z-50 flex flex-col items-center select-none bottom-[calc(0.5rem+env(safe-area-inset-bottom))] md:bottom-[calc(2.5rem+env(safe-area-inset-bottom))]" aria-label="Main Navigation">
        <GlassDock>
             {navItems.map((item) => (
               <button
@@ -404,9 +405,10 @@ const ScrollToTop = () => {
   }, []);
 
   return (
+    // Updated positioning for Safe Area Inset support
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className={`fixed bottom-24 md:bottom-8 right-5 md:right-8 z-40 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[var(--button-shadow)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50
+      className={`fixed right-5 md:right-8 z-40 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[var(--button-shadow)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50 bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-[calc(2rem+env(safe-area-inset-bottom))]
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12 pointer-events-none'}`}
       aria-label="Scroll to top"
     >
@@ -659,11 +661,10 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
   useEffect(() => {
     // Apply styles to both HTML and BODY to ensure compatibility across browsers
     document.documentElement.style.scrollSnapType = 'y mandatory';
-    document.documentElement.style.scrollBehavior = 'smooth';
+    // Removed scrollBehavior: smooth to prevent conflict with snap-mandatory during manual scrolling
     
     return () => {
       document.documentElement.style.scrollSnapType = '';
-      document.documentElement.style.scrollBehavior = '';
     };
   }, []);
 
@@ -722,7 +723,8 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         {/* Step 1: Hero & Stats */}
         <section 
           ref={(el) => { sectionRefs.current[0] = el }} 
-          className="min-h-screen md:h-screen w-full flex flex-col justify-center items-center py-12 md:py-20 snap-center snap-always relative"
+          // iPad Optimization: using 100svh instead of screen/vh to respect Safari UI bars
+          className="min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start relative"
         >
           <div className="flex flex-col items-center text-center animate-slide-up max-w-5xl mx-auto w-full">
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[8rem] font-bold tracking-tighter mb-4 md:mb-6 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.9]">
@@ -786,7 +788,8 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         {/* Step 2: Mission */}
         <section 
           ref={(el) => { sectionRefs.current[1] = el }} 
-          className="min-h-screen md:h-screen w-full flex flex-col justify-center items-center py-12 md:py-20 snap-center snap-always"
+          // iPad Optimization: using 100svh instead of screen/vh
+          className="min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start"
         >
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
               <div className="order-2 md:order-1 h-full w-full">
@@ -824,7 +827,8 @@ const HomeView = ({ setView, lang }: { setView: (v: string) => void, lang: Langu
         {/* Step 3: Vision */}
         <section 
           ref={(el) => { sectionRefs.current[2] = el }} 
-          className="min-h-screen md:h-screen w-full flex flex-col justify-center items-center py-12 md:py-20 snap-center snap-always"
+          // iPad Optimization: using 100svh instead of screen/vh
+          className="min-h-[100svh] md:h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start"
         >
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
               <div className="order-1 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
@@ -917,7 +921,7 @@ const ServicesView = ({ lang }: { lang: Language }) => {
       </div>
 
       <div onMouseMove={handleMouseMove} className="mt-8 md:mt-12 p-5 md:p-10 bento-card rounded-[2rem] md:rounded-[2.5rem]">
-          <h3 className="text-2xl font-bold mb-6 md:mb-8 tracking-tight text-[var(--text-primary)] text-center">Engagement Models</h3>
+          <h3 className="text-2xl font-bold mb-6 md:mb-8 tracking-tight text-[var(--text-primary)] text-center">{t.engagementModels}</h3>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {ENGAGEMENT_MODELS[lang].map((m, i) => {
                  const Icon = Icons[m.iconName as keyof typeof Icons];
@@ -1241,7 +1245,7 @@ const PortfolioView = ({ lang, setSelectedProject }: { lang: Language, setSelect
                 {/* Click Hint Overlay */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center backdrop-blur-[2px]">
                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 text-white font-bold text-sm tracking-widest uppercase transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">
-                      View Details <Icons.ArrowRight className="w-4 h-4" />
+                      {t.viewDetails} <Icons.ArrowRight className="w-4 h-4" />
                    </div>
                 </div>
 

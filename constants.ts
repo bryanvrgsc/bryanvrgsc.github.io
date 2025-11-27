@@ -31,7 +31,8 @@ export const UI_TEXT = {
     services: {
       title: "Services",
       subtitle: "High-performance engineering solutions.",
-      impact: "Impact"
+      impact: "Impact",
+      engagementModels: "Engagement Models"
     },
     portfolio: {
       title: "Portfolio",
@@ -39,6 +40,7 @@ export const UI_TEXT = {
       result: "Result",
       challenge: "Challenge",
       solution: "Solution",
+      viewDetails: "View Details",
       modal: {
         caseStudy: "Case Study",
         overview: "Overview",
@@ -120,7 +122,8 @@ export const UI_TEXT = {
     services: {
       title: "Servicios",
       subtitle: "Soluciones de ingeniería de alto rendimiento.",
-      impact: "Impacto"
+      impact: "Impacto",
+      engagementModels: "Modelos de Trabajo"
     },
     portfolio: {
       title: "Portafolio",
@@ -128,6 +131,7 @@ export const UI_TEXT = {
       result: "Resultado",
       challenge: "Desafío",
       solution: "Solución",
+      viewDetails: "Ver Detalles",
       modal: {
         caseStudy: "Caso de Estudio",
         overview: "Resumen",
