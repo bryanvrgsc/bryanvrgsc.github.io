@@ -9,5 +9,20 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console logs in production
+        drop_debugger: true,
+      },
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split React core into a separate vendor chunk to cache it longer
+          vendor: ['react', 'react-dom', 'nanostores', '@nanostores/react'],
+        },
+      },
+    },
   }
 });

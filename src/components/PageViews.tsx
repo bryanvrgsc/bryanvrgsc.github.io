@@ -8,13 +8,27 @@ import { LiquidButton } from './SharedUI';
 import { UI_TEXT, SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS } from '../constants';
 
 // --- UTILS ---
+// Optimized hook using requestAnimationFrame to avoid Reflow/Repaint thrashing
 const useMousePosition = () => {
+  const frameRef = useRef<number>(0);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const { currentTarget: target } = e;
-    const rect = target.getBoundingClientRect();
-    target.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
-    target.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+    const target = e.currentTarget;
+    const clientX = e.clientX;
+    const clientY = e.clientY;
+
+    // Cancel previous frame to avoid stacking updates
+    cancelAnimationFrame(frameRef.current);
+
+    frameRef.current = requestAnimationFrame(() => {
+      const rect = target.getBoundingClientRect();
+      target.style.setProperty("--mouse-x", `${clientX - rect.left}px`);
+      target.style.setProperty("--mouse-y", `${clientY - rect.top}px`);
+    });
   };
+  
+  // Cleanup on unmount (though this is an event handler helper, good practice)
+  // Since it returns a function, the cleanup isn't automatic, but RAF is safe.
   return handleMouseMove;
 };
 
@@ -207,7 +221,7 @@ export const HomeView = () => {
               </div>
               <div className="order-1 md:order-2 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/60 via-transparent to-transparent z-10 mix-blend-multiply"></div>
-                 <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" alt="Mission Team" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
+                 <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1080&auto=format&fit=crop" alt="Mission Team" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
                  <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20">
                     <div className="bg-emerald-500/20 backdrop-blur-xl border border-emerald-500/30 text-emerald-100 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2"><div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-pulse"></div>{t.homeLabels.collaboration}</div>
                  </div>
@@ -219,7 +233,7 @@ export const HomeView = () => {
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
               <div className="order-1 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
                  <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/60 via-transparent to-transparent z-10 mix-blend-multiply"></div>
-                 <img src="https://images.unsplash.com/photo-1480694313141-fce5e697ee25?q=80&w=2070&auto=format&fit=crop" alt="Future Vision" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
+                 <img loading="lazy" decoding="async" src="https://images.unsplash.com/photo-1480694313141-fce5e697ee25?q=80&w=1080&auto=format&fit=crop" alt="Future Vision" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
                  <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-20">
                     <div className="bg-cyan-500/20 backdrop-blur-xl border border-cyan-500/30 text-cyan-100 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2"><div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-cyan-400 animate-pulse"></div>{t.homeLabels.future}</div>
                  </div>
@@ -328,7 +342,7 @@ export const PortfolioView = () => {
             <div onMouseMove={handleMouseMove} onClick={() => setSelectedProject(item)} key={i} className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer">
               <div className="h-[250px] md:h-[400px] overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"/>
+                <img loading="lazy" decoding="async" src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"/>
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center backdrop-blur-[2px]">
                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 text-white font-bold text-sm tracking-widest uppercase transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">{t.viewDetails} <Icons.ArrowRight className="w-4 h-4" /></div>
                 </div>
