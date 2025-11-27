@@ -1,4 +1,3 @@
-
 import React, { CSSProperties, ReactNode } from "react";
 
 type GlassElementProps = {

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useLayoutEffect } from 'react';
-import { GlassElement } from '../GlassElement/GlassElement';
+import { GlassElement } from './GlassElement';
 
 export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -11,10 +11,12 @@ export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
     // Compatibility check for older browsers (e.g., iOS < 13.4)
     if (typeof ResizeObserver === 'undefined') {
         // Fallback: Set size once and don't observe changes
-        setSize({
-            width: hiddenRef.current.offsetWidth,
-            height: hiddenRef.current.offsetHeight
-        });
+        if (hiddenRef.current) {
+          setSize({
+              width: hiddenRef.current.offsetWidth,
+              height: hiddenRef.current.offsetHeight
+          });
+        }
         return;
     }
 

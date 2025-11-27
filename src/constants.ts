@@ -1,5 +1,4 @@
 
-
 export type Language = 'en' | 'es';
 
 export const UI_TEXT = {
