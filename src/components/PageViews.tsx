@@ -1,16 +1,55 @@
 
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '@nanostores/react';
 import { settings, performanceMode } from '../store';
 import { Icons } from './Icons';
 import { LiquidButton } from './SharedUI';
 import { UI_TEXT, SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS } from '../constants';
+import { usePDFSlick } from '@pdfslick/react';
+import * as pdfjs from 'pdfjs-dist';
 
-// PDF Viewer Imports
-import { Worker, Viewer } from '@react-pdf-viewer/core';
-import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+// Configure PDF.js worker
+if (typeof window !== 'undefined') {
+  try {
+    // Robustly handle the default export or direct export
+    const pdfjsLib = (pdfjs as any).default || pdfjs;
+    if (pdfjsLib && !pdfjsLib.GlobalWorkerOptions?.workerSrc) {
+       pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
+    }
+  } catch (e) {
+    console.error("Failed to configure PDF worker", e);
+  }
+}
+
+// --- PDF VIEWER COMPONENT ---
+const PDFViewer = ({ url }: { url: string }) => {
+  const { viewerRef, usePDFSlickStore, PDFSlickViewer } = usePDFSlick(url, {
+    scaleValue: 'page-fit',
+  });
+
+  const { pageNumber, numPages } = usePDFSlickStore((state) => ({
+    pageNumber: state.pageNumber,
+    numPages: state.numPages,
+  }));
+
+  return (
+    <div className="relative w-full h-full bg-slate-100 dark:bg-slate-900 flex flex-col group/pdf pdfSlick">
+      <div className="absolute inset-0 overflow-hidden">
+         {/* Use PDFSlickViewer component as required by the library */}
+         <PDFSlickViewer {...{ viewerRef, usePDFSlickStore }} />
+      </div>
+      
+      {/* Page Indicator */}
+      {numPages > 0 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-xs flex items-center gap-2 pointer-events-none opacity-0 group-hover/pdf:opacity-100 transition-opacity duration-300 z-10 shadow-lg border border-white/10">
+           <span className="font-mono">{pageNumber} <span className="text-white/50">/</span> {numPages}</span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // --- UTILS ---
 const useMousePosition = () => {
@@ -286,15 +325,11 @@ export const ServicesView = () => {
   );
 };
 
-// Portfolio Modal with PDF Viewer
+// Portfolio Modal
 const PortfolioModal = ({ project, onClose, lang }: { project: any, onClose: () => void, lang: any }) => {
   const [activeScreenshot, setActiveScreenshot] = useState(0);
   const [currentPdf, setCurrentPdf] = useState<string | null>(project.presentationUrl || project.details?.documents?.[0]?.url || null);
   const t = UI_TEXT[lang].portfolio.modal;
-  
-  // CRITICAL FIX: Memoize the plugin instance to prevent "Cannot read properties of null (reading 'useMemo')"
-  // and crash loops. The plugin must be created once per component lifecycle.
-  const defaultLayoutPluginInstance = useMemo(() => defaultLayoutPlugin(), []);
 
   useEffect(() => { setCurrentPdf(project.presentationUrl || project.details?.documents?.[0]?.url || null); }, [project]);
   useEffect(() => { document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = ''; }; }, []);
@@ -302,8 +337,12 @@ const PortfolioModal = ({ project, onClose, lang }: { project: any, onClose: () 
   if (!project) return null;
   const images = project.screenshots && project.screenshots.length > 0 ? project.screenshots : [project.image];
   
-  // Clean URL to handle Google Drive vs Direct File
-  const isGoogleDrive = (url: string) => url && url.includes('drive.google.com');
+  // Basic check for PDF files (local or remote)
+  const isPdf = currentPdf?.toLowerCase().endsWith('.pdf');
+  
+  // Legacy embedding for Drive links if any remain (though updated to local now)
+  const getEmbedUrl = (url: string) => { if (url.includes('drive.google.com')) { if (url.includes('/preview')) return url; return url.replace(/\/view.*/, '/preview'); } return `${url}#view=FitH`; };
+  const pdfEmbedSrc = !isPdf && currentPdf ? getEmbedUrl(currentPdf) : null;
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 animate-fadeIn">
@@ -319,34 +358,28 @@ const PortfolioModal = ({ project, onClose, lang }: { project: any, onClose: () 
            <div className="space-y-8">
              <div><h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2"><Icons.Briefcase className="w-5 h-5 text-emerald-500"/> {t.overview}</h3><p className="text-[var(--text-secondary)] leading-relaxed text-sm md:text-base">{project.problem} {project.solution}</p></div>
              
-             {/* PDF VIEWER SECTION */}
+             {/* PDF Viewer Section */}
              {currentPdf && (
                <div className="mb-4">
                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
                    <Icons.Book className="w-5 h-5 text-indigo-500"/> {t.presentation}
                  </h3>
-                 <div className="w-full h-[400px] md:h-[500px] rounded-xl overflow-hidden border border-[var(--card-border)] shadow-sm bg-white text-black relative">
-                   {isGoogleDrive(currentPdf) ? (
-                      // Fallback for Google Drive Links (since they don't support CORS fetch for PDF.js)
-                      <iframe src={currentPdf.replace(/\/view.*/, '/preview')} title="Project Presentation" className="w-full h-full border-none"></iframe>
-                   ) : (
-                      // Native PDF Viewer for local files (Requires files in /public/docs/)
-                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                         <Viewer 
-                            fileUrl={currentPdf} 
-                            plugins={[defaultLayoutPluginInstance]}
-                            theme={settings.get().theme === 'dark' ? 'dark' : 'light'}
-                         />
-                      </Worker>
-                   )}
+                 <div className="w-full h-[300px] md:h-[450px] rounded-xl overflow-hidden border border-[var(--card-border)] shadow-sm bg-[var(--card-bg)] relative">
+                    {isPdf ? (
+                        <PDFViewer url={currentPdf} />
+                    ) : (
+                        <iframe src={pdfEmbedSrc!} title="Project Presentation" className="w-full h-full">
+                           <div className="flex flex-col items-center justify-center h-full">
+                               <p className="text-[var(--text-secondary)] mb-2">{t.pdfError}</p>
+                               <a href={currentPdf} target="_blank" rel="noreferrer" className="text-emerald-500 font-bold">{t.downloadPdf}</a>
+                           </div>
+                        </iframe>
+                    )}
                  </div>
-                 {isGoogleDrive(currentPdf) && (
-                     <p className="text-[10px] text-red-400 mt-2">* Use local file in /public/docs/ for native viewer</p>
-                 )}
                  <div className="mt-2 text-right">
-                   <a href={currentPdf} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-500 hover:underline flex items-center justify-end gap-1">
-                     {t.openTab} <Icons.ExternalLink className="w-3 h-3" />
-                   </a>
+                    <a href={currentPdf} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-500 hover:underline flex items-center justify-end gap-1">
+                      {t.openTab} <Icons.ExternalLink className="w-3 h-3" />
+                    </a>
                  </div>
                </div>
              )}
