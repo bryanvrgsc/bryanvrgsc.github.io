@@ -44,47 +44,50 @@ export const checkPerformance = () => {
   if (typeof window === 'undefined') return;
 
   const nav = navigator as any;
-  
-  // 1. Static Check: Hardware Concurrency & RAM
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isLowSpec = (nav.hardwareConcurrency && nav.hardwareConcurrency <= 4) || 
-                    (nav.deviceMemory && nav.deviceMemory <= 4);
 
-  // If statically low spec, enable immediately
-  if (prefersReducedMotion || isLowSpec) {
+  // 1. Preferencias del sistema:
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 2. Detectar iPad viejo (Safari limitado)
+  const isOldiPad = /iPad/.test(nav.userAgent) && nav.maxTouchPoints === 5;
+
+  // 3. Hardware Concurrency + RAM (cuando sí están disponibles)
+  const hasLowCores = nav.hardwareConcurrency && nav.hardwareConcurrency < 4;
+  const hasLowMemory = nav.deviceMemory && nav.deviceMemory < 4;
+
+  const isLowSpecStatic = prefersReducedMotion || isOldiPad || hasLowCores || hasLowMemory;
+
+  if (isLowSpecStatic) {
     enableLiteMode(true);
     return;
   }
 
-  // 2. Dynamic Check: Measure FPS for 1.5 seconds
-  // This catches powerful devices that are throttling (battery saver, heat)
+  // 4. Dynamic FPS check (3s)
   let frames = 0;
   let startTime = performance.now();
-  let checkActive = true;
+  let running = true;
 
   const measure = () => {
-      if (!checkActive) return;
-      frames++;
-      const now = performance.now();
-      
-      if (now - startTime >= 1500) { // Check for 1.5 seconds
-          checkActive = false;
-          const fps = Math.round((frames * 1000) / (now - startTime));
-          
-          // If FPS is below 45 consistently, downgrade to Lite Mode
-          if (fps < 45) {
-              console.log(`Low FPS detected (${fps}). Enabling Lite Mode.`);
-              enableLiteMode(true);
-          } else {
-              console.log(`High FPS detected (${fps}). Lite Mode disabled.`);
-              enableLiteMode(false);
-          }
-          return;
-      }
-      requestAnimationFrame(measure);
-  };
+    if (!running) return;
+    frames++;
+    const now = performance.now();
 
-  requestAnimationFrame(measure);
+    if (now - startTime >= 3000) {
+      running = false;
+      const fps = Math.round((frames * 1000) / (now - startTime));
+
+      if (fps < 45) {
+        console.log(`Low FPS (${fps}) – Lite Mode ON`);
+        enableLiteMode(true);
+      } else {
+        console.log(`High FPS (${fps}) – Lite Mode OFF`);
+        enableLiteMode(false);
+      }
+      return;
+    }
+
+    requestAnimationFrame(measure);
+  };
 };
 
 const enableLiteMode = (enable: boolean) => {
