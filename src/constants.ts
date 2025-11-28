@@ -291,7 +291,7 @@ export const PORTFOLIO = {
       tech: "SQL, ETL, PowerBI, Data Warehousing",
       result: "Integral vision & 360° impact analysis",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
-      presentationUrl: "https://drive.google.com/file/d/1OauLDXENNzBNTkMUJIbVB8aAfAtEk6ff/preview",
+      presentationUrl: "/docs/data_warehouse_final.pdf",
       screenshots: [
         "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
         "https://datablog.zeus.vision/wp-content/uploads/2017/05/datawarehouse.jpg",
@@ -305,10 +305,10 @@ export const PORTFOLIO = {
           "Satisfaction surveys & key indicators"
         ],
         documents: [
-            { label: "Protocol Presentation", url: "https://drive.google.com/file/d/11ADH9y-pT6UXNRyyk5o4U6tU0gmWvHK4/view?usp=sharing" },
-            { label: "First Partial Presentation", url: "https://drive.google.com/file/d/1Vs70UklnOSp8Lsa_LYClKJCdIIGORaH7/view?usp=sharing" },
-            { label: "Second Partial Presentation", url: "https://drive.google.com/file/d/17j3byjWpVAELKkmkp3TAeEOkYLBgFV_a/view?usp=sharing" },
-            { label: "Final Presentation", url: "https://drive.google.com/file/d/1OauLDXENNzBNTkMUJIbVB8aAfAtEk6ff/view?usp=sharing" }
+            { label: "Protocol Presentation", url: "/docs/data_warehouse_protocolo.pdf" },
+            { label: "First Partial Presentation", url: "/docs/data_warehouse_parcial1.pdf" },
+            { label: "Second Partial Presentation", url: "/docs/data_warehouse_parcial2.pdf" },
+            { label: "Final Presentation", url: "/docs/data_warehouse_final.pdf" }
         ]
       }
     },
@@ -343,7 +343,7 @@ export const PORTFOLIO = {
       result: "Full-stack mobile commerce",
       image: "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
       repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
-      presentationUrl: "https://drive.google.com/file/d/1zPVJDoTwf-qF96tzLYfjyfU_VN-EKvJv/preview",
+      presentationUrl: "/docs/ios_store_presentation.pdf",
       screenshots: [
         "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
         "https://splitmetrics.com/wp-content/uploads/2017/06/apple-app-store-1-1-1024x498.png",
@@ -374,7 +374,7 @@ export const PORTFOLIO = {
       image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
       repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
       videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
-      presentationUrl: "https://drive.google.com/file/d/1dbOOiEP8nNVQ8_Vptm4W59EfMWhpyWPL/preview",
+      presentationUrl: "/docs/appointment_app_presentation.pdf",
       screenshots: [
         "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1468&auto=format&fit=crop",
@@ -446,7 +446,7 @@ export const PORTFOLIO = {
       tech: "SQL, ETL, PowerBI, Data Warehousing",
       result: "Visión integral y análisis de impacto 360°",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
-      presentationUrl: "https://drive.google.com/file/d/1OauLDXENNzBNTkMUJIbVB8aAfAtEk6ff/preview",
+      presentationUrl: "/docs/data_warehouse_final.pdf",
       screenshots: [
         "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
         "https://datablog.zeus.vision/wp-content/uploads/2017/05/datawarehouse.jpg",
@@ -460,10 +460,10 @@ export const PORTFOLIO = {
           "Encuestas de satisfacción e indicadores clave"
         ],
         documents: [
-            { label: "Presentación Protocolo", url: "https://drive.google.com/file/d/11ADH9y-pT6UXNRyyk5o4U6tU0gmWvHK4/view?usp=sharing" },
-            { label: "Presentación Primer Parcial", url: "https://drive.google.com/file/d/1Vs70UklnOSp8Lsa_LYClKJCdIIGORaH7/view?usp=sharing" },
-            { label: "Presentación Segundo Parcial", url: "https://drive.google.com/file/d/17j3byjWpVAELKkmkp3TAeEOkYLBgFV_a/view?usp=sharing" },
-            { label: "Presentación Final", url: "https://drive.google.com/file/d/1OauLDXENNzBNTkMUJIbVB8aAfAtEk6ff/view?usp=sharing" }
+            { label: "Presentación Protocolo", url: "/docs/data_warehouse_protocolo.pdf" },
+            { label: "Presentación Primer Parcial", url: "/docs/data_warehouse_parcial1.pdf" },
+            { label: "Presentación Segundo Parcial", url: "/docs/data_warehouse_parcial2.pdf" },
+            { label: "Presentación Final", url: "/docs/data_warehouse_final.pdf" }
         ]
       }
     },
@@ -498,7 +498,7 @@ export const PORTFOLIO = {
       result: "Experiencia de compra completa",
       image: "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
       repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
-      presentationUrl: "https://drive.google.com/file/d/1zPVJDoTwf-qF96tzLYfjyfU_VN-EKvJv/preview",
+      presentationUrl: "/docs/ios_store_presentation.pdf",
       screenshots: [
         "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
         "https://splitmetrics.com/wp-content/uploads/2017/06/apple-app-store-1-1-1024x498.png",
@@ -529,7 +529,7 @@ export const PORTFOLIO = {
       image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
       repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
       videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
-      presentationUrl: "https://drive.google.com/file/d/1dbOOiEP8nNVQ8_Vptm4W59EfMWhpyWPL/preview",
+      presentationUrl: "/docs/appointment_app_presentation.pdf",
       screenshots: [
         "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1468&auto=format&fit=crop",

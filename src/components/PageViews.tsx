@@ -1,11 +1,16 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '@nanostores/react';
 import { settings, performanceMode } from '../store';
 import { Icons } from './Icons';
 import { LiquidButton } from './SharedUI';
 import { UI_TEXT, SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS } from '../constants';
+
+// PDF Viewer Imports
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 
 // --- UTILS ---
 const useMousePosition = () => {
@@ -281,19 +286,24 @@ export const ServicesView = () => {
   );
 };
 
-// Portfolio Modal
+// Portfolio Modal with PDF Viewer
 const PortfolioModal = ({ project, onClose, lang }: { project: any, onClose: () => void, lang: any }) => {
   const [activeScreenshot, setActiveScreenshot] = useState(0);
   const [currentPdf, setCurrentPdf] = useState<string | null>(project.presentationUrl || project.details?.documents?.[0]?.url || null);
   const t = UI_TEXT[lang].portfolio.modal;
+  
+  // CRITICAL FIX: Memoize the plugin instance to prevent "Cannot read properties of null (reading 'useMemo')"
+  // and crash loops. The plugin must be created once per component lifecycle.
+  const defaultLayoutPluginInstance = useMemo(() => defaultLayoutPlugin(), []);
 
   useEffect(() => { setCurrentPdf(project.presentationUrl || project.details?.documents?.[0]?.url || null); }, [project]);
   useEffect(() => { document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = ''; }; }, []);
 
   if (!project) return null;
   const images = project.screenshots && project.screenshots.length > 0 ? project.screenshots : [project.image];
-  const getEmbedUrl = (url: string) => { if (url.includes('drive.google.com')) { if (url.includes('/preview')) return url; return url.replace(/\/view.*/, '/preview'); } return `${url}#view=FitH`; };
-  const pdfSrc = currentPdf ? getEmbedUrl(currentPdf) : null;
+  
+  // Clean URL to handle Google Drive vs Direct File
+  const isGoogleDrive = (url: string) => url && url.includes('drive.google.com');
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 animate-fadeIn">
@@ -308,7 +318,39 @@ const PortfolioModal = ({ project, onClose, lang }: { project: any, onClose: () 
            <div className="mb-6"><span className="text-emerald-500 font-bold uppercase tracking-widest text-xs mb-2 block">{t.caseStudy}</span><h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-2 leading-tight">{project.title}</h2><div className="flex flex-wrap gap-2 mt-3">{project.tech.split(',').map((t: string, i: number) => (<span key={i} className="px-3 py-1 rounded-full bg-[var(--input-bg)] border border-[var(--card-border)] text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">{t.trim()}</span>))}</div></div>
            <div className="space-y-8">
              <div><h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2"><Icons.Briefcase className="w-5 h-5 text-emerald-500"/> {t.overview}</h3><p className="text-[var(--text-secondary)] leading-relaxed text-sm md:text-base">{project.problem} {project.solution}</p></div>
-             {pdfSrc && (<div className="mb-4"><h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2"><Icons.Book className="w-5 h-5 text-indigo-500"/> {t.presentation}</h3><div className="w-full h-[300px] md:h-[450px] rounded-xl overflow-hidden border border-[var(--card-border)] shadow-sm bg-[var(--card-bg)]"><iframe src={pdfSrc} title="Project Presentation" className="w-full h-full"><div className="flex flex-col items-center justify-center h-full"><p className="text-[var(--text-secondary)] mb-2">{t.pdfError}</p><a href={currentPdf || '#'} target="_blank" rel="noreferrer" className="text-emerald-500 font-bold">{t.downloadPdf}</a></div></iframe></div><div className="mt-2 text-right"><a href={currentPdf || '#'} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-500 hover:underline flex items-center justify-end gap-1">{t.openTab} <Icons.ExternalLink className="w-3 h-3" /></a></div></div>)}
+             
+             {/* PDF VIEWER SECTION */}
+             {currentPdf && (
+               <div className="mb-4">
+                 <h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2">
+                   <Icons.Book className="w-5 h-5 text-indigo-500"/> {t.presentation}
+                 </h3>
+                 <div className="w-full h-[400px] md:h-[500px] rounded-xl overflow-hidden border border-[var(--card-border)] shadow-sm bg-white text-black relative">
+                   {isGoogleDrive(currentPdf) ? (
+                      // Fallback for Google Drive Links (since they don't support CORS fetch for PDF.js)
+                      <iframe src={currentPdf.replace(/\/view.*/, '/preview')} title="Project Presentation" className="w-full h-full border-none"></iframe>
+                   ) : (
+                      // Native PDF Viewer for local files (Requires files in /public/docs/)
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                         <Viewer 
+                            fileUrl={currentPdf} 
+                            plugins={[defaultLayoutPluginInstance]}
+                            theme={settings.get().theme === 'dark' ? 'dark' : 'light'}
+                         />
+                      </Worker>
+                   )}
+                 </div>
+                 {isGoogleDrive(currentPdf) && (
+                     <p className="text-[10px] text-red-400 mt-2">* Use local file in /public/docs/ for native viewer</p>
+                 )}
+                 <div className="mt-2 text-right">
+                   <a href={currentPdf} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-500 hover:underline flex items-center justify-end gap-1">
+                     {t.openTab} <Icons.ExternalLink className="w-3 h-3" />
+                   </a>
+                 </div>
+               </div>
+             )}
+
              {project.videoUrl && (project.videoUrl.includes("embed") || project.videoUrl.includes("/preview")) && (<div className="mb-4"><h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2"><Icons.Video className="w-5 h-5 text-red-500"/> {t.demoVideo}</h3><div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden border border-[var(--card-border)] bg-black/50 shadow-lg group"><iframe src={project.videoUrl} title={project.title} className="absolute top-0 left-0 w-full h-full z-10" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen></iframe></div></div>)}
              {project.videoUrl && !(project.videoUrl.includes("embed") || project.videoUrl.includes("/preview")) && (<div className="mb-6"><a href={project.videoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 w-full p-4 rounded-xl bg-[var(--input-bg)] border border-[var(--card-border)] text-[var(--text-primary)] hover:border-red-500/50 hover:bg-red-500/5 transition-all group shadow-sm hover:shadow-md"><div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform"><Icons.Video className="w-5 h-5" /></div><div className="flex flex-col"><span className="text-sm font-bold">{t.watchDemo}</span><span className="text-xs text-[var(--text-secondary)]">{t.externalLink}</span></div><Icons.ExternalLink className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity ml-auto" /></a></div>)}
              {project.details?.currentFeatures && (<div><h3 className="text-lg font-bold text-[var(--text-primary)] mb-3 flex items-center gap-2"><Icons.Layers className="w-5 h-5 text-blue-500"/> {t.features}</h3><ul className="grid grid-cols-1 gap-2">{project.details.currentFeatures.map((f: string, i: number) => (<li key={i} className="flex items-start gap-3 text-sm text-[var(--text-secondary)] bg-[var(--input-bg)] p-3 rounded-xl border border-[var(--card-border)]"><Icons.CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" /><span>{f}</span></li>))}</ul></div>)}
