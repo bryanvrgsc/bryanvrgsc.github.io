@@ -74,38 +74,9 @@ export const checkPerformance = async () => {
       }
 
   } catch (error) {
-      console.warn('GPU Detection failed, falling back to static hardware checks', error);
-      
-      // 3. Fallback: Static Hardware Detection
-      const isLowSpec = !isHighPerformanceDeviceFallback();
-      enableLiteMode(isLowSpec);
-      console.log(`Hardware Fallback: ${isLowSpec ? 'Lite Mode' : 'Full Animation'}`);
+      console.warn('GPU Detection failed, defaulting to Lite Mode for safety.', error);
+      enableLiteMode(true);
   }
-};
-
-/**
- * Fallback Static Hardware Detection
- * Used if detect-gpu fails or times out.
- */
-const isHighPerformanceDeviceFallback = (): boolean => {
-  const nav = navigator as any;
-
-  // Hardware Concurrency (CPU Cores)
-  const logicalProcessors = nav.hardwareConcurrency || 4; 
-  if (logicalProcessors < 4) return false;
-
-  // Device Memory (RAM in GB)
-  if (nav.deviceMemory && nav.deviceMemory < 4) return false;
-
-  // Mobile Detection (Simplified)
-  const userAgent = nav.userAgent || "";
-  const isOldiOS = /iPhone OS [0-1]?[0-4]_/.test(userAgent); 
-  if (isOldiOS) return false;
-
-  // Data Saver
-  if ((nav.connection as any)?.saveData) return false;
-
-  return true;
 };
 
 const enableLiteMode = (enable: boolean) => {
