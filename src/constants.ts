@@ -1,4 +1,5 @@
 
+
 export type Language = 'en' | 'es';
 
 export const UI_TEXT = {
@@ -291,6 +292,11 @@ export const PORTFOLIO = {
       result: "Integral vision & 360° impact analysis",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
       presentationUrl: "https://drive.google.com/file/d/1OauLDXENNzBNTkMUJIbVB8aAfAtEk6ff/preview",
+      screenshots: [
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1543286386-713df548e9cc?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=1470&auto=format&fit=crop"
+      ],
       details: {
         currentFeatures: [
           "Multidimensional approach (Dimensions & Measures)",
@@ -315,6 +321,11 @@ export const PORTFOLIO = {
       image: "https://images.unsplash.com/photo-1617791160505-6f00504e3519?q=80&w=1470&auto=format&fit=crop",
       videoUrl: "https://youtu.be/0tyqM-I_Pr8?si=UrBlcPtQ-MtfW9RI",
       repoUrl: "https://github.com/FrancoGL20/Animacion-con-C-desde-Celular",
+      screenshots: [
+        "https://images.unsplash.com/photo-1617791160505-6f00504e3519?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1470&auto=format&fit=crop"
+      ],
       details: {
         currentFeatures: [
           "Motion capture via Flutter sensors",
@@ -333,6 +344,11 @@ export const PORTFOLIO = {
       image: "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
       repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
       presentationUrl: "https://drive.google.com/file/d/1zPVJDoTwf-qF96tzLYfjyfU_VN-EKvJv/preview",
+      screenshots: [
+        "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
+        "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1470&auto=format&fit=crop"
+      ],
       details: {
         currentFeatures: [
           "User Registration",
@@ -359,6 +375,11 @@ export const PORTFOLIO = {
       repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
       videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
       presentationUrl: "https://drive.google.com/file/d/1dbOOiEP8nNVQ8_Vptm4W59EfMWhpyWPL/preview",
+      screenshots: [
+        "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1468&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1595078475328-1ab05d0a6a0e?q=80&w=1374&auto=format&fit=crop"
+      ],
       details: {
         currentFeatures: [
            "Secure authentication with Firebase Auth",
@@ -381,7 +402,12 @@ export const PORTFOLIO = {
       solution: "Python algorithms for seasonal demand prediction.",
       tech: "Python, Pandas, Scikit-learn",
       result: "25% inventory optimization",
-      image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop",
+      screenshots: [
+        "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1415&auto=format&fit=crop"
+      ]
     }
   ],
   es: [
@@ -421,6 +447,11 @@ export const PORTFOLIO = {
       result: "Visión integral y análisis de impacto 360°",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
       presentationUrl: "https://drive.google.com/file/d/1OauLDXENNzBNTkMUJIbVB8aAfAtEk6ff/preview",
+      screenshots: [
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
+        "https://datablog.zeus.vision/wp-content/uploads/2017/05/datawarehouse.jpg",
+        "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=1470&auto=format&fit=crop"
+      ],
       details: {
         currentFeatures: [
           "Enfoque multidimensional (Dimensiones y medidas)",
@@ -445,6 +476,11 @@ export const PORTFOLIO = {
       image: "https://images.unsplash.com/photo-1617791160505-6f00504e3519?q=80&w=1470&auto=format&fit=crop",
       videoUrl: "https://youtu.be/0tyqM-I_Pr8?si=UrBlcPtQ-MtfW9RI",
       repoUrl: "https://github.com/FrancoGL20/Animacion-con-C-desde-Celular",
+      screenshots: [
+        "https://images.unsplash.com/photo-1617791160505-6f00504e3519?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1470&auto=format&fit=crop"
+      ],
       details: {
         currentFeatures: [
           "Captura de movimiento del celular mediante sensores Flutter",
@@ -463,6 +499,11 @@ export const PORTFOLIO = {
       image: "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
       repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
       presentationUrl: "https://drive.google.com/file/d/1zPVJDoTwf-qF96tzLYfjyfU_VN-EKvJv/preview",
+      screenshots: [
+        "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
+        "https://splitmetrics.com/wp-content/uploads/2017/06/apple-app-store-1-1-1024x498.png",
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1470&auto=format&fit=crop"
+      ],
       details: {
         currentFeatures: [
           "Registro de usuario",
@@ -489,6 +530,11 @@ export const PORTFOLIO = {
       repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
       videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
       presentationUrl: "https://drive.google.com/file/d/1dbOOiEP8nNVQ8_Vptm4W59EfMWhpyWPL/preview",
+      screenshots: [
+        "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1468&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1595078475328-1ab05d0a6a0e?q=80&w=1374&auto=format&fit=crop"
+      ],
       details: {
         currentFeatures: [
            "Autenticación segura con Firebase Auth",
@@ -512,7 +558,12 @@ export const PORTFOLIO = {
       solution: "Algoritmos en Python para predicción de demanda estacional.",
       tech: "Python, Pandas, Scikit-learn",
       result: "Optimización de inventario en un 25%",
-      image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop",
+      screenshots: [
+        "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1470&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1415&auto=format&fit=crop"
+      ]
     }
   ]
 };
