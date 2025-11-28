@@ -1,5 +1,5 @@
-
 import { map } from 'nanostores';
+import { getGPUTier } from 'detect-gpu';
 
 export type Language = 'en' | 'es';
 export type Theme = 'light' | 'dark' | 'system';
@@ -39,62 +39,74 @@ export const applyTheme = (theme: Theme) => {
   }
 };
 
-// Helper to detect device capabilities and enable Lite Mode
-export const checkPerformance = () => {
+// Helper to detect device capabilities and enable Lite Mode using detect-gpu
+export const checkPerformance = async () => {
   if (typeof window === 'undefined') return;
 
-  const nav = navigator as any;
-
-  // 1. Preferencias del sistema:
+  // 1. Accessibility Preference (User explicitly asked for less motion)
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // 2. Detectar iPad viejo (Safari limitado)
-  const isOldiPad = /iPad/.test(nav.userAgent) && nav.maxTouchPoints === 5;
-
-  // 3. Hardware Concurrency + RAM (cuando sí están disponibles)
-  // Aumentamos el requisito: menos de 4 núcleos es gama baja hoy en día para Canvas intensivo
-  const hasLowCores = nav.hardwareConcurrency && nav.hardwareConcurrency < 4;
-  const hasLowMemory = nav.deviceMemory && nav.deviceMemory < 4;
-
-  const isLowSpecStatic = prefersReducedMotion || isOldiPad || hasLowCores || hasLowMemory;
-
-  if (isLowSpecStatic) {
-    enableLiteMode(true);
-    return;
+  if (prefersReducedMotion) {
+      console.log('Performance: Lite Mode enabled (Prefers Reduced Motion)');
+      enableLiteMode(true);
+      return;
   }
 
-  // 4. Dynamic FPS check (1s)
-  // Optimization: If static checks pass, we assume high-end but verify briefly.
-  let frames = 0;
-  let startTime = performance.now();
-  let running = true;
-
-  const measure = () => {
-    if (!running) return;
-    frames++;
-    const now = performance.now();
-
-    if (now - startTime >= 1000) {
-      running = false;
-      const fps = Math.round((frames * 1000) / (now - startTime));
-
-      // LOWERED THRESHOLD: 60fps check is too strict (vsync often hits 58-59).
-      // If it drops below 45, it's actually lagging.
-      if (fps < 45) {
-        console.log(`Low FPS (${fps}) – Lite Mode ON`);
-        enableLiteMode(true);
+  // 2. Advanced GPU Detection
+  try {
+      const gpuTier = await getGPUTier();
+      
+      // Tier 0: Blocklisted/Fail
+      // Tier 1: Low-end (Integrated graphics, older mobile)
+      // Tier 2: Mid-range
+      // Tier 3: High-end
+      // FPS: Estimated framerate for heavy tasks
+      
+      const isLowEnd = gpuTier.tier < 2 || (gpuTier.fps !== undefined && gpuTier.fps < 50);
+      
+      console.log(`Hardware Detection (detect-gpu): Tier ${gpuTier.tier}, FPS: ${gpuTier.fps}, GPU: ${gpuTier.gpu}`);
+      
+      if (isLowEnd) {
+          console.log('Performance: Switching to Lite Mode (Device capability limit)');
+          enableLiteMode(true);
       } else {
-        console.log(`High FPS (${fps}) – Lite Mode OFF`);
-        enableLiteMode(false);
+          console.log('Performance: High Performance Mode enabled');
+          enableLiteMode(false);
       }
-      return;
-    }
 
-    requestAnimationFrame(measure);
-  };
-  requestAnimationFrame(measure);  
+  } catch (error) {
+      console.warn('GPU Detection failed, falling back to static hardware checks', error);
+      
+      // 3. Fallback: Static Hardware Detection
+      const isLowSpec = !isHighPerformanceDeviceFallback();
+      enableLiteMode(isLowSpec);
+      console.log(`Hardware Fallback: ${isLowSpec ? 'Lite Mode' : 'Full Animation'}`);
+  }
 };
 
+/**
+ * Fallback Static Hardware Detection
+ * Used if detect-gpu fails or times out.
+ */
+const isHighPerformanceDeviceFallback = (): boolean => {
+  const nav = navigator as any;
+
+  // Hardware Concurrency (CPU Cores)
+  const logicalProcessors = nav.hardwareConcurrency || 4; 
+  if (logicalProcessors < 4) return false;
+
+  // Device Memory (RAM in GB)
+  if (nav.deviceMemory && nav.deviceMemory < 4) return false;
+
+  // Mobile Detection (Simplified)
+  const userAgent = nav.userAgent || "";
+  const isOldiOS = /iPhone OS [0-1]?[0-4]_/.test(userAgent); 
+  if (isOldiOS) return false;
+
+  // Data Saver
+  if ((nav.connection as any)?.saveData) return false;
+
+  return true;
+};
 
 const enableLiteMode = (enable: boolean) => {
     performanceMode.setKey('lite', enable);

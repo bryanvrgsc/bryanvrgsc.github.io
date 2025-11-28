@@ -231,7 +231,7 @@ class DataPacket {
         this.from = startNode;
         this.to = endNode;
         // Slightly faster to make them visible but short lived
-        this.speed = Math.random() * 0.01 + 0.008; 
+        this.speed = Math.random() * 0.01 + 0.012; // Increased base speed slightly
     }
 
     update() {
@@ -343,19 +343,20 @@ export const CanvasBackground = () => {
             configRef.current.canvasWidth = width;
             configRef.current.canvasHeight = height;
             
-            // INCREASED DENSITY: More nodes
+            // INCREASED DENSITY DRASTICALLY: More nodes
             const area = width * height;
             let nodeCount;
             
+            // Divisor reduced from 30000 to 15000 approx to double density
             if (width > 1920 || height > 1080) {
-                nodeCount = Math.min(Math.floor(area / 25000), 50); // Was 50000
+                nodeCount = Math.min(Math.floor(area / 15000), 80); 
             } else if (dpr > 1.5) {
-                nodeCount = Math.min(Math.floor(area / 20000), 60); // Was 45000
+                nodeCount = Math.min(Math.floor(area / 12000), 90); 
             } else {
-                nodeCount = Math.min(Math.floor(area / 15000), 70); // Was 30000
+                nodeCount = Math.min(Math.floor(area / 10000), 100); 
             }
             
-            nodeCount = Math.max(nodeCount, 25);
+            nodeCount = Math.max(nodeCount, 40); // Minimum 40 nodes
             
             nodesRef.current = [];
             packetsRef.current = [];
@@ -410,9 +411,9 @@ export const CanvasBackground = () => {
                     }
 
                     // Reduced Max Dist slightly to accommodate higher node count (prevent hairball)
-                    const maxDist = 140; 
+                    const maxDist = 120; // Reduced from 140
                     const maxDistSq = maxDist * maxDist;
-                    const maxConnections = 5;
+                    const maxConnections = 6; // Increased connections slightly
                     const connectionCounts = new Int8Array(nodeCount).fill(0);
 
                     for (let i = 0; i < nodeCount; i++) {
@@ -479,9 +480,9 @@ export const CanvasBackground = () => {
                     if (!packet.active) {
                         const current = packet.to;
                         
-                        // DECREASED HOP CHANCE (0.4 -> 0.2): "Lleguen menos lejos"
-                        // Packets die sooner, allowing new ones to spawn more often.
-                        if (current.neighbors.length > 0 && Math.random() < 0.2) {
+                        // DECREASED HOP CHANCE drastically (0.2 -> 0.15): "Lleguen menos lejos"
+                        // Packets die much sooner, creating "short bursts" of traffic.
+                        if (current.neighbors.length > 0 && Math.random() < 0.15) {
                             const next = current.neighbors[Math.floor(Math.random() * current.neighbors.length)];
                             packets.push(new DataPacket(current, next));
                         }
@@ -490,8 +491,8 @@ export const CanvasBackground = () => {
                 }
 
                 // INCREASED PACKET COUNT & SPAWN RATE: "Salgan más paquetes"
-                const maxPackets = 25; // Was 6
-                const spawnRate = 0.15; // Was 0.02
+                const maxPackets = 50; // Increased significantly
+                const spawnRate = 0.25; // Very high spawn rate
                 
                 if (packets.length < maxPackets && Math.random() < spawnRate) {
                     const randomNode = nodes[Math.floor(Math.random() * nodeCount)];
