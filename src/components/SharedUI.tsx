@@ -7,9 +7,29 @@ import { UI_TEXT } from '../constants';
 
 // Helper for SPA navigation (Hash Mode for GitHub Pages)
 const navigateTo = (path: string) => {
+  // MOBILE FIX: Temporarily disable scroll snapping globally.
+  // This prevents the browser (especially iOS Safari) from "fighting" the scrollTo animation
+  // and snapping back down to the previous section while scrolling up.
+  document.documentElement.style.scrollSnapType = 'none';
+
   // Update hash which triggers the router in App.tsx
   window.location.hash = path;
+  
+  // Force scroll to top with smooth animation
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Re-enable scroll snapping after the animation has likely finished (1s).
+  // This ensures the "magnetic" feel returns once the user is settled at the top.
+  setTimeout(() => {
+      // Only restore snap if we are effectively on the Home/Root view
+      const currentHash = window.location.hash;
+      if (currentHash === '' || currentHash === '#/' || currentHash === '#') {
+          document.documentElement.style.scrollSnapType = 'y mandatory';
+      } else {
+          // Keep it disabled for other pages that don't use snap
+          document.documentElement.style.scrollSnapType = '';
+      }
+  }, 1000);
 };
 
 // --- PRIMITIVE COMPONENTS (Consolidated) ---
@@ -589,7 +609,7 @@ export const ScrollToTop = () => {
 
   return (
     <button
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={() => navigateTo(window.location.hash.replace(/^#/, '') || '/')}
       className={`fixed right-5 md:right-8 z-40 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-[var(--card-bg)] backdrop-blur-2xl border border-[var(--card-border)] shadow-[var(--button-shadow)] transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] group hover:bg-[var(--card-hover-bg)] hover:scale-110 hover:border-[var(--glass-glow)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50 bottom-[calc(6rem+env(safe-area-inset-bottom))] md:bottom-[calc(2rem+env(safe-area-inset-bottom))]
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12 pointer-events-none'}`}
     >
