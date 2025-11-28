@@ -276,200 +276,300 @@ export const CanvasBackground = () => {
     const packetsRef = useRef<DataPacket[]>([]);
     const animationRef = useRef<number | undefined>(undefined);
     const [noiseDataUrl, setNoiseDataUrl] = useState('');
+    
+    // Cache para colores y configuración
+    const colorsRef = useRef({ nodeColor: '', lineColor: '', packetColor: '' });
+    const configRef = useRef({ isDark: false, canvasWidth: 0, canvasHeight: 0 });
 
-    // Generate Static Noise (Texture)
+    // Generate Static Noise (Optimizado)
     useEffect(() => {
-        if (lite) return; // Skip in lite mode
-        const canvas = document.createElement('canvas');
-        canvas.width = 128;
-        canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-            const idata = ctx.createImageData(128, 128);
-            const buffer32 = new Uint32Array(idata.data.buffer);
-            for (let i = 0; i < buffer32.length; i++) {
-                if (Math.random() < 0.5) buffer32[i] = 0x08000000;
+        if (lite) return;
+        
+        const createNoise = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            if (ctx) {
+                const idata = ctx.createImageData(128, 128);
+                const buffer32 = new Uint32Array(idata.data.buffer);
+                const len = buffer32.length;
+                for (let i = 0; i < len; i++) {
+                    if (Math.random() < 0.5) buffer32[i] = 0x08000000;
+                }
+                ctx.putImageData(idata, 0, 0);
+                setNoiseDataUrl(canvas.toDataURL());
             }
-            ctx.putImageData(idata, 0, 0);
-            setNoiseDataUrl(canvas.toDataURL());
-        }
+        };
+        
+        createNoise();
     }, [lite]);
 
     useEffect(() => {
-        // Performance: Skip canvas rendering in Lite Mode
         if (lite) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+        
+        const ctx = canvas.getContext('2d', { 
+            alpha: false,
+            desynchronized: true
+        });
         if (!ctx) return;
 
-        // Determine Theme Colors
+        // Detectar tema y cachear colores
         const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
         
-        const nodeColor = isDark ? "rgba(16, 185, 129, " : "rgba(71, 85, 105, "; // Emerald vs Slate
-        const lineColor = isDark ? "rgba(16, 185, 129, 0.15)" : "rgba(71, 85, 105, 0.1)";
-        // We pass hex for core, but the drawer handles glow manually
-        const packetColor = isDark ? "#34d399" : "#059669"; 
+        colorsRef.current = {
+            nodeColor: isDark ? "rgba(16, 185, 129, " : "rgba(71, 85, 105, ",
+            lineColor: isDark ? "rgba(16, 185, 129, 0.15)" : "rgba(71, 85, 105, 0.1)",
+            packetColor: isDark ? "#34d399" : "#059669"
+        };
+        
+        configRef.current.isDark = isDark;
 
-        // Initialization
+        // Initialization con límites optimizados
         const init = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            // Limit node count for performance on high-res screens
-            const area = canvas.width * canvas.height;
-            const nodeCount = Math.min(Math.floor(area / 15000), 70); // Slightly reduced cap
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            // Reducir resolución en pantallas Retina
+            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.scale(dpr, dpr);
+            
+            configRef.current.canvasWidth = width;
+            configRef.current.canvasHeight = height;
+            
+            // Ajuste conservador de nodos
+            const area = width * height;
+            let nodeCount;
+            
+            if (width > 1920 || height > 1080) {
+                nodeCount = Math.min(Math.floor(area / 40000), 30);
+            } else if (dpr > 1.5) {
+                nodeCount = Math.min(Math.floor(area / 35000), 35);
+            } else {
+                nodeCount = Math.min(Math.floor(area / 25000), 45);
+            }
+            
+            nodeCount = Math.max(nodeCount, 15);
+            
+            console.log(`🎨 Canvas inicializado: ${nodeCount} nodos | ${width}x${height} | DPR: ${dpr.toFixed(1)}`);
             
             nodesRef.current = [];
             packetsRef.current = [];
             
             for (let i = 0; i < nodeCount; i++) {
-                nodesRef.current.push(new NetworkNode(canvas.width, canvas.height));
+                nodesRef.current.push(new NetworkNode(width, height));
             }
         };
 
-        const draw = () => {
-            if (!canvas || !ctx) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // OPTIMIZATION: Lighter composite operation makes overlapping things glow practically free
-            // Note: In light mode, 'lighter' might blow out to white, so use 'source-over' normally
-            // or 'lighter' only for dark mode.
-            if (isDark) {
-                ctx.globalCompositeOperation = 'lighter';
-            } else {
-                ctx.globalCompositeOperation = 'source-over';
-            }
+        // Variables para 30 FPS
+        let lastFrameTime = 0;
+        let frameCount = 0;
+        let lastFpsCheck = 0;
+        const targetFPS = 30;
+        const frameInterval = 1000 / targetFPS;
+        
+        const draw = (time: number) => {
+            animationRef.current = requestAnimationFrame(draw);
 
-            // 1. Update Nodes & Calculate Connections
-            const nodes = nodesRef.current;
-            const maxDist = 200; // Increased distance for more webs
-            const maxDistSq = maxDist * maxDist; 
+            const elapsed = time - lastFrameTime;
 
-            // OPTIMIZATION: Batch draw lines
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = lineColor;
-            ctx.beginPath(); // Start ONE path for all lines
+            if (elapsed > frameInterval) {
+                lastFrameTime = time - (elapsed % frameInterval);
 
-            for (let i = 0; i < nodes.length; i++) {
-                const nodeA = nodes[i];
-                nodeA.update(canvas.width, canvas.height);
-
-                // Check connections
-                for (let j = i + 1; j < nodes.length; j++) {
-                    const nodeB = nodes[j];
-                    const dx = nodeA.x - nodeB.x;
-                    const dy = nodeA.y - nodeB.y;
+                if (!canvas || !ctx) return;
+                
+                // Monitor FPS cada 3 segundos
+                frameCount++;
+                if (time - lastFpsCheck > 3000) {
+                    const fps = (frameCount / 3).toFixed(1);
+                    frameCount = 0;
+                    lastFpsCheck = time;
                     
-                    const distSq = dx * dx + dy * dy;
+                    console.log(`🎯 FPS: ${fps} | Nodos: ${nodesRef.current.length} | Packets: ${packetsRef.current.length}`);
+                }
+                
+                const { canvasWidth, canvasHeight, isDark } = configRef.current;
+                
+                // Clear con color de fondo
+                ctx.fillStyle = isDark ? '#0a0a0a' : '#ffffff';
+                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                
+                // Composite operation
+                ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
 
-                    if (distSq < maxDistSq) {
-                        nodeA.neighbors.push(nodeB);
-                        nodeB.neighbors.push(nodeA);
+                const nodes = nodesRef.current;
+                const nodeCount = nodes.length;
+                
+                // Distancia optimizada
+                const maxDist = 150;
+                const maxDistSq = maxDist * maxDist;
 
-                        // Only draw if relatively close to save fill rate
-                        if (distSq < maxDistSq * 0.8) {
+                // Limpiar vecinos (evita memory leak)
+                for (let i = 0; i < nodeCount; i++) {
+                    nodes[i].neighbors = [];
+                }
+
+                // Batch drawing de líneas
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = colorsRef.current.lineColor;
+                ctx.beginPath();
+
+                // Límite de conexiones por nodo
+                const maxConnectionsPerNode = 4;
+                const connectionCounts = new Array(nodeCount).fill(0);
+
+                for (let i = 0; i < nodeCount; i++) {
+                    const nodeA = nodes[i];
+                    nodeA.update(canvasWidth, canvasHeight);
+
+                    if (connectionCounts[i] >= maxConnectionsPerNode) continue;
+
+                    for (let j = i + 1; j < nodeCount; j++) {
+                        if (connectionCounts[j] >= maxConnectionsPerNode) continue;
+                        
+                        const nodeB = nodes[j];
+                        
+                        const dx = nodeA.x - nodeB.x;
+                        if (Math.abs(dx) > maxDist) continue;
+                        
+                        const dy = nodeA.y - nodeB.y;
+                        if (Math.abs(dy) > maxDist) continue;
+                        
+                        const distSq = dx * dx + dy * dy;
+
+                        if (distSq < maxDistSq) {
+                            nodeA.neighbors.push(nodeB);
+                            nodeB.neighbors.push(nodeA);
+                            connectionCounts[i]++;
+                            connectionCounts[j]++;
+
                             ctx.moveTo(nodeA.x, nodeA.y);
                             ctx.lineTo(nodeB.x, nodeB.y);
+                            
+                            if (connectionCounts[i] >= maxConnectionsPerNode) break;
                         }
                     }
                 }
-            }
-            ctx.stroke(); // Draw all lines at once
+                ctx.stroke();
 
-            // Draw Nodes
-            for (let i = 0; i < nodes.length; i++) {
-                const node = nodes[i];
-                ctx.fillStyle = nodeColor + node.opacity + ")";
-                ctx.beginPath();
-                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
+                // Draw Nodes
+                for (let i = 0; i < nodeCount; i++) {
+                    const node = nodes[i];
+                    ctx.fillStyle = colorsRef.current.nodeColor + node.opacity + ")";
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
 
-            // 2. Manage Packets
-            const packets = packetsRef.current;
-            
-            // Cleanup & Routing
-            for (let i = packets.length - 1; i >= 0; i--) {
-                if (!packets[i].active) {
-                    const consumeData = Math.random() < 0.4;
-
-                    if (!consumeData) {
-                        const current = packets[i].to;
-                        if (current.neighbors.length > 0) {
-                            let next = current.neighbors[Math.floor(Math.random() * current.neighbors.length)];
+                // Gestión de Packets
+                const packets = packetsRef.current;
+                
+                for (let i = packets.length - 1; i >= 0; i--) {
+                    const packet = packets[i];
+                    if (!packet.active) {
+                        const current = packet.to;
+                        
+                        // 40% probabilidad de continuar
+                        if (current.neighbors.length > 0 && Math.random() < 0.4) {
+                            const next = current.neighbors[Math.floor(Math.random() * current.neighbors.length)];
                             packets.push(new DataPacket(current, next));
                         }
+                        packets.splice(i, 1);
                     }
-                    packets.splice(i, 1);
                 }
-            }
 
-            // Spawn new packets
-            const maxPackets = 15; // Limit active packets
-            if (packets.length < maxPackets && Math.random() < 0.03) { 
-                const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-                if (randomNode.neighbors.length > 0) {
-                    const target = randomNode.neighbors[Math.floor(Math.random() * randomNode.neighbors.length)];
-                    packets.push(new DataPacket(randomNode, target));
+                // Spawn packets
+                const maxPackets = 10;
+                const spawnRate = 0.03;
+                
+                if (packets.length < maxPackets && Math.random() < spawnRate) {
+                    const randomNode = nodes[Math.floor(Math.random() * nodeCount)];
+                    if (randomNode.neighbors.length > 0) {
+                        const target = randomNode.neighbors[Math.floor(Math.random() * randomNode.neighbors.length)];
+                        packets.push(new DataPacket(randomNode, target));
+                    }
                 }
-            }
 
-            // Update & Draw Packets
-            for (const p of packets) {
-                p.update();
-                p.draw(ctx, packetColor);
+                // Update y Draw Packets
+                const packetCount = packets.length;
+                for (let i = 0; i < packetCount; i++) {
+                    packets[i].update();
+                    packets[i].draw(ctx, colorsRef.current.packetColor);
+                }
+                
+                ctx.globalCompositeOperation = 'source-over';
             }
-            
-            // Reset composite op
-            ctx.globalCompositeOperation = 'source-over';
-
-            animationRef.current = requestAnimationFrame(draw);
         };
 
         // Debounce resize
         let resizeTimeout: ReturnType<typeof setTimeout>;
         const handleResize = () => {
             clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(init, 200);
+            resizeTimeout = setTimeout(init, 300);
         };
         
-        // Pause animation when tab is not visible
+        // Pause/resume con cleanup
         const handleVisibilityChange = () => {
-             if (document.hidden && animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
-             } else {
-                draw();
-             }
+            if (document.hidden) {
+                if (animationRef.current) {
+                    cancelAnimationFrame(animationRef.current);
+                    animationRef.current = undefined;
+                }
+            } else {
+                lastFrameTime = performance.now();
+                frameCount = 0;
+                lastFpsCheck = performance.now();
+                animationRef.current = requestAnimationFrame(draw);
+            }
         };
 
-        window.addEventListener('resize', handleResize);
+        window.addEventListener('resize', handleResize, { passive: true });
         document.addEventListener('visibilitychange', handleVisibilityChange);
         
         init();
-        draw();
+        animationRef.current = requestAnimationFrame(draw);
 
         return () => {
             window.removeEventListener('resize', handleResize);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
-            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+            if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+            }
         };
     }, [theme, lite]);
 
-    // Lite Mode: Simple gradient
+    // Lite Mode
     if (lite) {
-      return (
-        <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)]" />
-      );
+        return (
+            <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)]" />
+        );
     }
 
     return (
         <>
-            {/* FIXED BACKGROUND: Moving gradient here to avoid body-scroll jitters on iOS */}
-            <div className="fixed top-0 left-0 w-full h-full -z-10 bg-[var(--bg-gradient)]" style={{ backgroundAttachment: 'fixed' }}></div>
+            <div 
+                className="fixed top-0 left-0 w-full h-full -z-10 bg-[var(--bg-gradient)]" 
+                style={{ backgroundAttachment: 'fixed' }}
+            />
             
-            <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-60 dark:opacity-100" />
-            <div className="bg-noise" style={{ backgroundImage: `url(${noiseDataUrl})` }} />
+            <canvas 
+                ref={canvasRef} 
+                className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-60 dark:opacity-100"
+            />
+            
+            {noiseDataUrl && (
+                <div 
+                    className="bg-noise fixed top-0 left-0 w-full h-full z-0 pointer-events-none" 
+                    style={{ backgroundImage: `url(${noiseDataUrl})` }} 
+                />
+            )}
         </>
     );
 };
