@@ -437,15 +437,18 @@ export const CanvasBackground = () => {
         };
     }, [theme, lite]);
 
-    // Render simple gradient for Lite Mode
+    // Lite Mode: Simple gradient
     if (lite) {
       return (
-        <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-20 bg-gradient-to-br from-[var(--text-secondary)] to-transparent" />
+        <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)]" />
       );
     }
 
     return (
         <>
+            {/* FIXED BACKGROUND: Moving gradient here to avoid body-scroll jitters on iOS */}
+            <div className="fixed top-0 left-0 w-full h-full -z-10 bg-[var(--bg-gradient)]" style={{ backgroundAttachment: 'fixed' }}></div>
+            
             <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-60 dark:opacity-100" />
             <div className="bg-noise" style={{ backgroundImage: `url(${noiseDataUrl})` }} />
         </>

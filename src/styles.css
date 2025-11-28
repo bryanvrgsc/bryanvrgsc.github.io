@@ -1,6 +1,5 @@
 
 
-
 /* Global Config */
 :root {
   --apple-ease: cubic-bezier(0.25, 1, 0.3, 1); /* Smoother spring feel */
@@ -100,9 +99,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  /* Deep, rich ambient background with transition */
-  background-image: var(--bg-gradient);
-  background-attachment: fixed;
+  /* Fixed: Removed background-image from body to prevent iOS jitter. Now handled in SharedUI.tsx */
   transition: background-color 0.5s var(--apple-ease), color 0.5s var(--apple-ease);
   min-height: 100vh; /* Compatibility fallback */
   min-height: 100svh; /* Stable height on mobile Safari */

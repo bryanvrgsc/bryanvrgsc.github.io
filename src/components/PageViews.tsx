@@ -146,8 +146,17 @@ export const HomeView = () => {
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
-    document.documentElement.style.scrollSnapType = 'y mandatory';
-    return () => { document.documentElement.style.scrollSnapType = ''; };
+    // CRITICAL FIX: Delay enabling scroll snapping to prevent conflict with "scrollTo(0)" animation
+    // coming from other pages. If we enable it immediately, the browser fights the scroll 
+    // and bounces back.
+    const timer = setTimeout(() => {
+        document.documentElement.style.scrollSnapType = 'y mandatory';
+    }, 800);
+    
+    return () => { 
+        document.documentElement.style.scrollSnapType = ''; 
+        clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {

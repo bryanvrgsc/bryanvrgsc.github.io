@@ -17,11 +17,15 @@ export default function App() {
   // This prevents 404 errors when refreshing pages on static hosting.
   const [currentHash, setCurrentHash] = useState(window.location.hash || '#/');
 
+  // Effect for Theme - Runs when theme changes
   useEffect(() => {
     applyTheme(theme);
-    // Initialize performance check (Lite Mode detection)
-    checkPerformance();
   }, [theme]);
+
+  // Effect for Performance - Runs ONCE on mount
+  useEffect(() => {
+    checkPerformance();
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
