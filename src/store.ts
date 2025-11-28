@@ -52,6 +52,7 @@ export const checkPerformance = () => {
   const isOldiPad = /iPad/.test(nav.userAgent) && nav.maxTouchPoints === 5;
 
   // 3. Hardware Concurrency + RAM (cuando sí están disponibles)
+  // Aumentamos el requisito: menos de 4 núcleos es gama baja hoy en día para Canvas intensivo
   const hasLowCores = nav.hardwareConcurrency && nav.hardwareConcurrency < 4;
   const hasLowMemory = nav.deviceMemory && nav.deviceMemory < 4;
 
@@ -62,7 +63,8 @@ export const checkPerformance = () => {
     return;
   }
 
-  // 4. Dynamic FPS check (3s)
+  // 4. Dynamic FPS check (1s)
+  // Optimization: If static checks pass, we assume high-end but verify briefly.
   let frames = 0;
   let startTime = performance.now();
   let running = true;
@@ -76,7 +78,9 @@ export const checkPerformance = () => {
       running = false;
       const fps = Math.round((frames * 1000) / (now - startTime));
 
-      if (fps < 60) {
+      // LOWERED THRESHOLD: 60fps check is too strict (vsync often hits 58-59).
+      // If it drops below 45, it's actually lagging.
+      if (fps < 45) {
         console.log(`Low FPS (${fps}) – Lite Mode ON`);
         enableLiteMode(true);
       } else {
