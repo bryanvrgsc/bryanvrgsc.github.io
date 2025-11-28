@@ -294,7 +294,7 @@ export const PORTFOLIO = {
       presentationUrl: "https://drive.google.com/file/d/1OauLDXENNzBNTkMUJIbVB8aAfAtEk6ff/preview",
       screenshots: [
         "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1543286386-713df548e9cc?q=80&w=1470&auto=format&fit=crop",
+        "https://datablog.zeus.vision/wp-content/uploads/2017/05/datawarehouse.jpg",
         "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=1470&auto=format&fit=crop"
       ],
       details: {
@@ -346,7 +346,7 @@ export const PORTFOLIO = {
       presentationUrl: "https://drive.google.com/file/d/1zPVJDoTwf-qF96tzLYfjyfU_VN-EKvJv/preview",
       screenshots: [
         "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
-        "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=1470&auto=format&fit=crop",
+        "https://splitmetrics.com/wp-content/uploads/2017/06/apple-app-store-1-1-1024x498.png",
         "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1470&auto=format&fit=crop"
       ],
       details: {
