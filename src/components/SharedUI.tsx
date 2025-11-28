@@ -194,9 +194,9 @@ class NetworkNode {
     constructor(w: number, h: number) {
         this.x = Math.random() * w;
         this.y = Math.random() * h;
-        // Moderate speed for organic feel
-        this.vx = (Math.random() - 0.5) * 0.5; 
-        this.vy = (Math.random() - 0.5) * 0.5;
+        // REDUCED SPEED: Slower movement is smoother and easier to appreciate
+        this.vx = (Math.random() - 0.5) * 0.25; 
+        this.vy = (Math.random() - 0.5) * 0.25;
         this.radius = Math.random() * 1.5 + 1;
         this.opacity = Math.random() * 0.5 + 0.1;
         this.targetOpacity = this.opacity;
@@ -231,8 +231,8 @@ class DataPacket {
     constructor(startNode: NetworkNode, endNode: NetworkNode) {
         this.from = startNode;
         this.to = endNode;
-        // Faster speed to appreciate 60hz smoothness (Range 0.01 to 0.03)
-        this.speed = Math.random() * 0.02 + 0.01; 
+        // Slower packets to be more visible
+        this.speed = Math.random() * 0.01 + 0.005; 
     }
 
     update() {
@@ -247,19 +247,23 @@ class DataPacket {
         const x = this.from.x + (this.to.x - this.from.x) * this.progress;
         const y = this.from.y + (this.to.y - this.from.y) * this.progress;
 
-        // Draw Glow
-        ctx.shadowBlur = 6;
-        ctx.shadowColor = color;
-        ctx.fillStyle = color; // Colored core
+        // OPTIMIZATION: Removed shadowBlur (Expensive).
+        // Instead, draw a larger transparent circle to simulate glow cheaply.
+        
+        // Fake Glow (Large, Low Opacity)
+        ctx.fillStyle = color.replace('1)', '0.3)').replace(')', ', 0.3)'); 
+        // If color is hex, this simple replace might fail, but we pass RGBA usually. 
+        // Fallback to simple opacity change:
+        ctx.globalAlpha = 0.3;
         ctx.beginPath();
-        ctx.arc(x, y, 2, 0, Math.PI * 2); 
+        ctx.arc(x, y, 4, 0, Math.PI * 2); 
         ctx.fill();
         
-        // White center for pop
-        ctx.shadowBlur = 0;
+        // Core (Small, High Opacity)
+        ctx.globalAlpha = 1.0;
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.arc(x, y, 1, 0, Math.PI * 2);
+        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
         ctx.fill();
     }
 }
@@ -305,6 +309,7 @@ export const CanvasBackground = () => {
         
         const nodeColor = isDark ? "rgba(16, 185, 129, " : "rgba(71, 85, 105, "; // Emerald vs Slate
         const lineColor = isDark ? "rgba(16, 185, 129, 0.15)" : "rgba(71, 85, 105, 0.1)";
+        // We pass hex for core, but the drawer handles glow manually
         const packetColor = isDark ? "#34d399" : "#059669"; 
 
         // Initialization
@@ -313,7 +318,7 @@ export const CanvasBackground = () => {
             canvas.height = window.innerHeight;
             // Limit node count for performance on high-res screens
             const area = canvas.width * canvas.height;
-            const nodeCount = Math.min(Math.floor(area / 15000), 80); // Cap at 80 nodes
+            const nodeCount = Math.min(Math.floor(area / 15000), 70); // Slightly reduced cap
             
             nodesRef.current = [];
             packetsRef.current = [];
@@ -326,11 +331,20 @@ export const CanvasBackground = () => {
         const draw = () => {
             if (!canvas || !ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // OPTIMIZATION: Lighter composite operation makes overlapping things glow practically free
+            // Note: In light mode, 'lighter' might blow out to white, so use 'source-over' normally
+            // or 'lighter' only for dark mode.
+            if (isDark) {
+                ctx.globalCompositeOperation = 'lighter';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+            }
 
             // 1. Update Nodes & Calculate Connections
             const nodes = nodesRef.current;
-            const maxDist = 180;
-            const maxDistSq = maxDist * maxDist; // OPTIMIZATION: Compare squared distance
+            const maxDist = 200; // Increased distance for more webs
+            const maxDistSq = maxDist * maxDist; 
 
             // OPTIMIZATION: Batch draw lines
             ctx.lineWidth = 1;
@@ -346,22 +360,24 @@ export const CanvasBackground = () => {
                     const nodeB = nodes[j];
                     const dx = nodeA.x - nodeB.x;
                     const dy = nodeA.y - nodeB.y;
-                    // OPTIMIZATION: Avoid Math.sqrt
+                    
                     const distSq = dx * dx + dy * dy;
 
                     if (distSq < maxDistSq) {
                         nodeA.neighbors.push(nodeB);
                         nodeB.neighbors.push(nodeA);
 
-                        // Queue line for drawing
-                        ctx.moveTo(nodeA.x, nodeA.y);
-                        ctx.lineTo(nodeB.x, nodeB.y);
+                        // Only draw if relatively close to save fill rate
+                        if (distSq < maxDistSq * 0.8) {
+                            ctx.moveTo(nodeA.x, nodeA.y);
+                            ctx.lineTo(nodeB.x, nodeB.y);
+                        }
                     }
                 }
             }
             ctx.stroke(); // Draw all lines at once
 
-            // Draw Nodes (Separate pass needed for opacity variation)
+            // Draw Nodes
             for (let i = 0; i < nodes.length; i++) {
                 const node = nodes[i];
                 ctx.fillStyle = nodeColor + node.opacity + ")";
@@ -390,8 +406,8 @@ export const CanvasBackground = () => {
             }
 
             // Spawn new packets
-            const maxPackets = 20;
-            if (packets.length < maxPackets && Math.random() < 0.05) { 
+            const maxPackets = 15; // Limit active packets
+            if (packets.length < maxPackets && Math.random() < 0.03) { 
                 const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
                 if (randomNode.neighbors.length > 0) {
                     const target = randomNode.neighbors[Math.floor(Math.random() * randomNode.neighbors.length)];
@@ -404,6 +420,9 @@ export const CanvasBackground = () => {
                 p.update();
                 p.draw(ctx, packetColor);
             }
+            
+            // Reset composite op
+            ctx.globalCompositeOperation = 'source-over';
 
             animationRef.current = requestAnimationFrame(draw);
         };

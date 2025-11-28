@@ -72,11 +72,11 @@ export const checkPerformance = () => {
     frames++;
     const now = performance.now();
 
-    if (now - startTime >= 3000) {
+    if (now - startTime >= 1000) {
       running = false;
       const fps = Math.round((frames * 1000) / (now - startTime));
 
-      if (fps < 45) {
+      if (fps < 60) {
         console.log(`Low FPS (${fps}) – Lite Mode ON`);
         enableLiteMode(true);
       } else {
@@ -88,7 +88,9 @@ export const checkPerformance = () => {
 
     requestAnimationFrame(measure);
   };
+  requestAnimationFrame(measure);  
 };
+
 
 const enableLiteMode = (enable: boolean) => {
     performanceMode.setKey('lite', enable);
