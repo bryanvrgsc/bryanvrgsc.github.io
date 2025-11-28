@@ -13,6 +13,7 @@
     "@nanostores/react": "^1.0.0",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
+    "detect-gpu": "^5.0.70",
     "nanostores": "^1.1.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
