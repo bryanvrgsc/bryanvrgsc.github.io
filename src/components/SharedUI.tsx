@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { settings, setLang, setTheme, applyTheme, performanceMode, type Language, type Theme } from '../store';
+import { settings, setLang, setTheme, performanceMode } from '../store';
 import { Icons } from './Icons';
 import { UI_TEXT } from '../constants';
 
@@ -194,9 +194,9 @@ class NetworkNode {
     constructor(w: number, h: number) {
         this.x = Math.random() * w;
         this.y = Math.random() * h;
-        // REDUCED SPEED: Slower movement is smoother and easier to appreciate
-        this.vx = (Math.random() - 0.5) * 0.25; 
-        this.vy = (Math.random() - 0.5) * 0.25;
+        // REDUCED SPEED: Slower movement is smoother and less chaotic
+        this.vx = (Math.random() - 0.5) * 0.15; 
+        this.vy = (Math.random() - 0.5) * 0.15;
         this.radius = Math.random() * 1.5 + 1;
         this.opacity = Math.random() * 0.5 + 0.1;
         this.targetOpacity = this.opacity;
@@ -216,8 +216,7 @@ class NetworkNode {
         }
         this.opacity += (this.targetOpacity - this.opacity) * 0.05;
         
-        // OPTIMIZATION: Clear neighbors array instead of reallocating
-        this.neighbors.length = 0;
+        // Note: Neighbors are updated centrally now to allow throttling
     }
 }
 
@@ -247,14 +246,10 @@ class DataPacket {
         const x = this.from.x + (this.to.x - this.from.x) * this.progress;
         const y = this.from.y + (this.to.y - this.from.y) * this.progress;
 
-        // OPTIMIZATION: Removed shadowBlur (Expensive).
-        // Instead, draw a larger transparent circle to simulate glow cheaply.
-        
         // Fake Glow (Large, Low Opacity)
-        ctx.fillStyle = color.replace('1)', '0.3)').replace(')', ', 0.3)'); 
-        // If color is hex, this simple replace might fail, but we pass RGBA usually. 
-        // Fallback to simple opacity change:
+        // Optimization: Use globalAlpha instead of parsing color string
         ctx.globalAlpha = 0.3;
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(x, y, 4, 0, Math.PI * 2); 
         ctx.fill();
@@ -274,6 +269,8 @@ export const CanvasBackground = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const nodesRef = useRef<NetworkNode[]>([]);
     const packetsRef = useRef<DataPacket[]>([]);
+    const linksRef = useRef<{a: NetworkNode, b: NetworkNode}[]>([]);
+    const lastTopologyUpdate = useRef<number>(0);
     const animationRef = useRef<number | undefined>(undefined);
     const [noiseDataUrl, setNoiseDataUrl] = useState('');
     
@@ -335,6 +332,8 @@ export const CanvasBackground = () => {
             
             // Reducir resolución en pantallas Retina
             const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            
+            // Setting width/height clears context and resets state
             canvas.width = width * dpr;
             canvas.height = height * dpr;
             canvas.style.width = width + 'px';
@@ -344,35 +343,33 @@ export const CanvasBackground = () => {
             configRef.current.canvasWidth = width;
             configRef.current.canvasHeight = height;
             
-            // Ajuste conservador de nodos
+            // Ajuste conservador de nodos (Reduced node count)
             const area = width * height;
             let nodeCount;
             
             if (width > 1920 || height > 1080) {
-                nodeCount = Math.min(Math.floor(area / 40000), 30);
+                nodeCount = Math.min(Math.floor(area / 50000), 25);
             } else if (dpr > 1.5) {
-                nodeCount = Math.min(Math.floor(area / 35000), 35);
+                nodeCount = Math.min(Math.floor(area / 45000), 30);
             } else {
-                nodeCount = Math.min(Math.floor(area / 25000), 45);
+                nodeCount = Math.min(Math.floor(area / 30000), 35);
             }
             
-            nodeCount = Math.max(nodeCount, 15);
-            
-            console.log(`🎨 Canvas inicializado: ${nodeCount} nodos | ${width}x${height} | DPR: ${dpr.toFixed(1)}`);
+            nodeCount = Math.max(nodeCount, 12);
             
             nodesRef.current = [];
             packetsRef.current = [];
+            linksRef.current = [];
+            lastTopologyUpdate.current = 0; // Force update immediately
             
             for (let i = 0; i < nodeCount; i++) {
                 nodesRef.current.push(new NetworkNode(width, height));
             }
         };
 
-        // Variables para 30 FPS
+        // Variables para 60 FPS
         let lastFrameTime = 0;
-        let frameCount = 0;
-        let lastFpsCheck = 0;
-        const targetFPS = 30;
+        const targetFPS = 60;
         const frameInterval = 1000 / targetFPS;
         
         const draw = (time: number) => {
@@ -385,79 +382,84 @@ export const CanvasBackground = () => {
 
                 if (!canvas || !ctx) return;
                 
-                // Monitor FPS cada 3 segundos
-                frameCount++;
-                if (time - lastFpsCheck > 3000) {
-                    const fps = (frameCount / 3).toFixed(1);
-                    frameCount = 0;
-                    lastFpsCheck = time;
-                    
-                    console.log(`🎯 FPS: ${fps} | Nodos: ${nodesRef.current.length} | Packets: ${packetsRef.current.length}`);
-                }
-                
                 const { canvasWidth, canvasHeight, isDark } = configRef.current;
                 
                 // Clear con color de fondo
                 ctx.fillStyle = isDark ? '#0a0a0a' : '#ffffff';
                 ctx.fillRect(0, 0, canvasWidth, canvasHeight);
                 
-                // Composite operation
-                ctx.globalCompositeOperation = isDark ? 'lighter' : 'source-over';
+                // Optimization: Avoid 'lighter' composite as it is expensive
+                ctx.globalCompositeOperation = 'source-over';
 
                 const nodes = nodesRef.current;
                 const nodeCount = nodes.length;
-                
-                // Distancia optimizada
-                const maxDist = 150;
-                const maxDistSq = maxDist * maxDist;
 
-                // Limpiar vecinos (evita memory leak)
+                // Update Node Positions
                 for (let i = 0; i < nodeCount; i++) {
-                    nodes[i].neighbors = [];
+                    nodes[i].update(canvasWidth, canvasHeight);
                 }
+                
+                // Update Topology (Links) Throttled to every 300ms
+                if (time - lastTopologyUpdate.current > 300) {
+                    lastTopologyUpdate.current = time;
+                    linksRef.current = [];
+                    
+                    // Clear neighbors for routing
+                    for(let i=0; i<nodeCount; i++) {
+                        nodes[i].neighbors = [];
+                    }
 
-                // Batch drawing de líneas
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = colorsRef.current.lineColor;
-                ctx.beginPath();
+                    const maxDist = 160; 
+                    const maxDistSq = maxDist * maxDist;
+                    const maxConnections = 4;
+                    const connectionCounts = new Int8Array(nodeCount).fill(0);
 
-                // Límite de conexiones por nodo
-                const maxConnectionsPerNode = 4;
-                const connectionCounts = new Array(nodeCount).fill(0);
-
-                for (let i = 0; i < nodeCount; i++) {
-                    const nodeA = nodes[i];
-                    nodeA.update(canvasWidth, canvasHeight);
-
-                    if (connectionCounts[i] >= maxConnectionsPerNode) continue;
-
-                    for (let j = i + 1; j < nodeCount; j++) {
-                        if (connectionCounts[j] >= maxConnectionsPerNode) continue;
+                    for (let i = 0; i < nodeCount; i++) {
+                        if (connectionCounts[i] >= maxConnections) continue;
+                        const nodeA = nodes[i];
                         
-                        const nodeB = nodes[j];
-                        
-                        const dx = nodeA.x - nodeB.x;
-                        if (Math.abs(dx) > maxDist) continue;
-                        
-                        const dy = nodeA.y - nodeB.y;
-                        if (Math.abs(dy) > maxDist) continue;
-                        
-                        const distSq = dx * dx + dy * dy;
+                        for (let j = i + 1; j < nodeCount; j++) {
+                            if (connectionCounts[j] >= maxConnections) continue;
+                            const nodeB = nodes[j];
 
-                        if (distSq < maxDistSq) {
-                            nodeA.neighbors.push(nodeB);
-                            nodeB.neighbors.push(nodeA);
-                            connectionCounts[i]++;
-                            connectionCounts[j]++;
+                            const dx = nodeA.x - nodeB.x;
+                            if (Math.abs(dx) > maxDist) continue;
+                            const dy = nodeA.y - nodeB.y;
+                            if (Math.abs(dy) > maxDist) continue;
 
-                            ctx.moveTo(nodeA.x, nodeA.y);
-                            ctx.lineTo(nodeB.x, nodeB.y);
-                            
-                            if (connectionCounts[i] >= maxConnectionsPerNode) break;
+                            const distSq = dx*dx + dy*dy;
+
+                            if (distSq < maxDistSq) {
+                                // Add Link
+                                linksRef.current.push({ a: nodeA, b: nodeB });
+                                
+                                // Add Neighbors (for packets)
+                                nodeA.neighbors.push(nodeB);
+                                nodeB.neighbors.push(nodeA);
+                                
+                                connectionCounts[i]++;
+                                connectionCounts[j]++;
+                                
+                                if (connectionCounts[i] >= maxConnections) break;
+                            }
                         }
                     }
                 }
-                ctx.stroke();
+
+                // Batch drawing de líneas
+                const links = linksRef.current;
+                if (links.length > 0) {
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = colorsRef.current.lineColor;
+                    ctx.beginPath();
+                    
+                    for(let i = 0; i < links.length; i++) {
+                        const link = links[i];
+                        ctx.moveTo(link.a.x, link.a.y);
+                        ctx.lineTo(link.b.x, link.b.y);
+                    }
+                    ctx.stroke();
+                }
 
                 // Draw Nodes
                 for (let i = 0; i < nodeCount; i++) {
@@ -485,9 +487,9 @@ export const CanvasBackground = () => {
                     }
                 }
 
-                // Spawn packets
-                const maxPackets = 10;
-                const spawnRate = 0.03;
+                // Spawn packets (Reduced count)
+                const maxPackets = 6;
+                const spawnRate = 0.02;
                 
                 if (packets.length < maxPackets && Math.random() < spawnRate) {
                     const randomNode = nodes[Math.floor(Math.random() * nodeCount)];
@@ -503,8 +505,6 @@ export const CanvasBackground = () => {
                     packets[i].update();
                     packets[i].draw(ctx, colorsRef.current.packetColor);
                 }
-                
-                ctx.globalCompositeOperation = 'source-over';
             }
         };
 
@@ -524,8 +524,7 @@ export const CanvasBackground = () => {
                 }
             } else {
                 lastFrameTime = performance.now();
-                frameCount = 0;
-                lastFpsCheck = performance.now();
+                lastTopologyUpdate.current = 0; // Force update on resume
                 animationRef.current = requestAnimationFrame(draw);
             }
         };
