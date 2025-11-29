@@ -49,10 +49,10 @@ export const LiquidButton: React.FC<LiquidButtonProps> = ({ children, onClick, c
       type={type}
       onClick={onClick}
       style={style}
-      className={`relative group inline-flex items-center justify-center font-medium transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] active:scale-95 border-none outline-none focus:outline-none ${className}`}
+      className={`relative group inline-flex items-center justify-center font-medium transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] active:scale-95 border-none outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)] focus-visible:scale-105 ${className}`}
     >
       {/* Outer Glow (Spills out) */}
-      <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-60 transition-opacity duration-500 bg-[var(--glass-glow)] blur-xl"></div>
+      <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-60 group-focus-visible:opacity-60 transition-opacity duration-500 bg-[var(--glass-glow)] blur-xl"></div>
 
       {/* Clipped Internal Layer */}
       <div className="absolute inset-0 overflow-hidden rounded-full liquid-glass-wrapper">
@@ -672,7 +672,7 @@ export const Header = () => {
       <a
         href="#/"
         onClick={(e) => { e.preventDefault(); navigateTo('/'); }}
-        className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-full
+        className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-full
           w-auto px-6 h-[44px]
           ${scrolled
             ? 'bg-[var(--bg-primary)]/80 backdrop-blur-xl border border-[var(--card-border)] shadow-2xl opacity-100 translate-y-0'
@@ -724,10 +724,10 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
             key={item.id}
             href={`#${item.href}`}
             onClick={(e) => { e.preventDefault(); navigateTo(item.href); }}
-            className={`dock-item group relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full transition-all duration-300 ease-[cubic-bezier(0.25,1,0.3,1)]
+            className={`dock-item group relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full transition-all duration-300 ease-[cubic-bezier(0.25,1,0.3,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:scale-125
                   ${activeId === item.id
                 ? 'text-[var(--text-primary)]'
-                : 'text-[var(--dock-text)] hover:text-[var(--text-primary)] hover:scale-125'}`}
+                : 'text-[var(--dock-text)] hover:text-[var(--text-primary)] hover:scale-125 focus-visible:text-[var(--text-primary)]'}`}
           >
             {activeId === item.id && (
               <div className="absolute -bottom-1.5 w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,1)]"></div>

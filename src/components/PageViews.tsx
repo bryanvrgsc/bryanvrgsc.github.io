@@ -368,7 +368,7 @@ export const HomeView = () => {
                 </div>
               ))}
             </div>
-            <button onClick={() => scrollToSection(2)} className="mt-8 md:mt-10 lg:mt-16 animate-bounce p-2 md:p-3 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors backdrop-blur-md shadow-sm"><Icons.ArrowUp className="w-4 h-4 md:w-5 md:h-5 rotate-180" /></button>
+            <button onClick={() => scrollToSection(2)} className="mt-8 md:mt-10 lg:mt-16 animate-bounce p-2 md:p-3 rounded-full border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors backdrop-blur-md shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:scale-110"><Icons.ArrowUp className="w-4 h-4 md:w-5 md:h-5 rotate-180" /></button>
           </div>
         </section>
 
@@ -556,7 +556,16 @@ export const PortfolioView = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
           {PORTFOLIO[lang].map((item, i) => (
-            <div onMouseMove={handleMouseMove} onClick={() => setSelectedProject(item)} key={i} className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer">
+            <div
+              onMouseMove={handleMouseMove}
+              onClick={() => setSelectedProject(item)}
+              key={i}
+              className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer h-[300px] md:h-[350px] relative shadow-2xl transition-all duration-500 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:scale-[1.02]"
+              tabIndex={0}
+              role="button"
+              aria-label={`View ${item.title} details`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedProject(item); } }}
+            >
               <div className="h-[250px] md:h-[400px] overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
                 <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105" />
