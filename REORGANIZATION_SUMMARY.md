@@ -32,16 +32,16 @@ src/
 │   │   └── index.ts             ✅ CREADO
 │   │
 │   ├── 🏗️ layout/          ← Estructura de la app
-│   │   ├── Header.tsx           ⏳ Pendiente
-│   │   ├── Dock.tsx             ⏳ Pendiente
-│   │   ├── CanvasBackground.tsx ⏳ Pendiente
-│   │   └── ScrollToTop.tsx      ⏳ Pendiente
+│   │   ├── Header.tsx           ✅ CREADO
+│   │   ├── Dock.tsx             ✅ CREADO
+│   │   ├── CanvasBackground.tsx ✅ CREADO
+│   │   └── ScrollToTop.tsx      ✅ CREADO
 │   │
 │   ├── 🎨 ui/              ← Componentes de UI
-│   │   ├── ThemeToggle.tsx      ⏳ Pendiente
-│   │   ├── LanguageToggle.tsx   ⏳ Pendiente
-│   │   ├── TechCard.tsx         ⏳ Pendiente
-│   │   └── PDFViewer.tsx        ⏳ Pendiente
+│   │   ├── ThemeToggle.tsx      ✅ CREADO
+│   │   ├── LanguageToggle.tsx   ✅ CREADO
+│   │   ├── TechCard.tsx         ✅ CREADO
+│   │   └── PDFViewer.tsx        ✅ CREADO
 │   │
 │   ├── 🪟 modals/          ← Ventanas modales
 │   │   └── PortfolioModal.tsx   ⏳ Pendiente
