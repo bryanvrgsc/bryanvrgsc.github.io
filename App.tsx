@@ -3,6 +3,9 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings, applyTheme, checkPerformance } from './src/store';
 import { CanvasBackground, Header, Dock, ThemeToggle, LanguageToggle, ScrollToTop } from './src/components/SharedUI';
+import { PageSkeleton } from './src/components/Skeleton';
+import { initWebVitals, trackPageView } from './src/utils/analytics';
+import { reportError } from './src/utils/errorReporting';
 
 // Lazy load views for Code Splitting
 const HomeView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.HomeView })));
@@ -24,6 +27,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
   componentDidCatch(error: any, errorInfo: any) {
     console.error("View loading error:", error, errorInfo);
+    reportError(error, errorInfo);
   }
 
   render() {
@@ -32,7 +36,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
         <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 text-center">
           <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-4">Something went wrong</h2>
           <p className="text-[var(--text-secondary)] mb-6">We couldn't load this section. Please try refreshing the page.</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-6 py-3 bg-emerald-500 text-white rounded-full font-medium hover:bg-emerald-600 transition-colors"
           >
@@ -57,22 +61,32 @@ export default function App() {
     applyTheme(theme);
   }, [theme]);
 
-  // Effect for Performance - Runs ONCE on mount
+  // Effect for Performance & Analytics - Runs ONCE on mount
   useEffect(() => {
     checkPerformance();
+    initWebVitals();
   }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
       // Default to '#/' if empty
-      setCurrentHash(window.location.hash || '#/');
+      const newHash = window.location.hash || '#/';
+      setCurrentHash(newHash);
+
+      // Track page view
+      const path = newHash.replace(/^#/, '') || '/';
+      trackPageView(path);
     };
 
     // Listen for hash changes specifically
     window.addEventListener('hashchange', handleHashChange);
-    
+
     // Set initial state in case it changed before load
     setCurrentHash(window.location.hash || '#/');
+
+    // Track initial page view
+    const initialPath = (window.location.hash || '#/').replace(/^#/, '') || '/';
+    trackPageView(initialPath);
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
@@ -80,7 +94,7 @@ export default function App() {
   const renderView = () => {
     // Clean the hash to get the path (e.g., "#/services" -> "/services")
     const path = currentHash.replace(/^#/, '') || '/';
-    
+
     if (path === '/' || path === '') return <HomeView />;
     if (path.startsWith('/services')) return <ServicesView />;
     if (path.startsWith('/portfolio')) return <PortfolioView />;
@@ -95,10 +109,10 @@ export default function App() {
       <Header />
       <ThemeToggle />
       <LanguageToggle />
-      
+
       <main className="relative z-10 w-full">
         <ErrorBoundary>
-          <Suspense fallback={<div className="min-h-screen w-full flex items-center justify-center opacity-50 text-[var(--text-secondary)]">Loading...</div>}>
+          <Suspense fallback={<PageSkeleton />}>
             {renderView()}
           </Suspense>
         </ErrorBoundary>

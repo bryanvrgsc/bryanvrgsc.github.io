@@ -14,10 +14,12 @@
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
     "detect-gpu": "^5.0.70",
+    "focus-trap-react": "^11.0.4",
     "nanostores": "^1.1.0",
     "pdfjs-dist": "^5.4.394",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "web-vitals": "^5.1.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.7",
