@@ -560,26 +560,52 @@ export const PortfolioView = () => {
               onMouseMove={handleMouseMove}
               onClick={() => setSelectedProject(item)}
               key={i}
-              className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer h-[300px] md:h-[350px] relative shadow-2xl transition-all duration-500 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:scale-[1.02]"
+              className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer relative shadow-2xl transition-all duration-500 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:scale-[1.02]"
               tabIndex={0}
               role="button"
               aria-label={`View ${item.title} details`}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedProject(item); } }}
             >
-              <div className="h-[250px] md:h-[400px] overflow-hidden relative">
+              <div className="h-[200px] md:h-[250px] overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
                 <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center backdrop-blur-[2px]">
                   <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 text-white font-bold text-sm tracking-widest uppercase transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">{t.viewDetails} <Icons.ArrowRight className="w-4 h-4" /></div>
                 </div>
-                <div className="absolute top-6 right-6 md:top-8 md:right-8 z-20 pointer-events-none"><span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[var(--text-primary)] backdrop-blur-xl shadow-xl">{item.tech.split(',')[0]}</span></div>
               </div>
-              <div className="p-6 md:p-10 relative z-20 -mt-16 md:-mt-24 pointer-events-none">
-                <h3 className="text-2xl md:text-4xl font-bold text-[var(--text-primary)] mb-3 drop-shadow-lg tracking-tight">{item.title}</h3>
-                <p className="text-emerald-500 font-semibold mb-6 md:mb-8 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider"><Icons.CheckCircle className="w-4 h-4 md:w-5 md:h-5" /> {item.result}</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm text-[var(--text-secondary)]">
-                  <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.challenge}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.problem}</span></div>
-                  <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.solution}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.solution}</span></div>
+              <div className="p-6 md:p-8 relative z-20 pointer-events-none">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-xl md:text-2xl font-bold text-[var(--text-primary)] tracking-tight flex-1">{item.title}</h3>
+                </div>
+                <p className="text-emerald-500 font-semibold mb-4 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider"><Icons.CheckCircle className="w-4 h-4" /> {item.result}</p>
+
+                {/* Tech Stack Badges */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {item.tech.split(',').slice(0, 3).map((tech: string, idx: number) => (
+                    <span key={idx} className="px-2.5 py-1 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)] backdrop-blur-xl">
+                      {tech.trim()}
+                    </span>
+                  ))}
+                  {item.tech.split(',').length > 3 && (
+                    <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider text-emerald-500">
+                      +{item.tech.split(',').length - 3}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 text-sm text-[var(--text-secondary)]">
+                  <div className="bg-[var(--input-bg)] p-4 rounded-xl border border-[var(--card-border)]">
+                    <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 font-bold">
+                      {t.challenge}
+                    </span>
+                    <span className="text-xs md:text-sm leading-relaxed block">{item.problem}</span>
+                  </div>
+                  <div className="bg-[var(--input-bg)] p-4 rounded-xl border border-[var(--card-border)]">
+                    <span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 font-bold">
+                      {t.solution}
+                    </span>
+                    <span className="text-xs md:text-sm leading-relaxed block">{item.solution}</span>
+                  </div>
                 </div>
               </div>
             </div>
