@@ -1,6 +1,6 @@
 # bryanvrgsc.github.io
 
-This project showcases my skills, projects, and experience in web development.
+This project showcases my skills, projects, and experience in web development. It features a modern design with glassmorphism, dark/light themes, bilingual support (English/Spanish), and a responsive layout.
 
 ## 🚀 Run Locally
 
