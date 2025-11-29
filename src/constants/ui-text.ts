@@ -67,9 +67,11 @@ export const UI_TEXT = {
             successMessage: "Thank you for reaching out, {name}. We'll analyze your request and get back to you within 2 hours.",
             sendAnother: "Send another message",
             placeholders: {
-                name: "Name",
+                name: "Name / Company",
                 email: "Email",
-                message: "Tell us about your project..."
+                message: "Tell us about your project...",
+                budget: "Estimated Budget (Optional)",
+                phone: "Phone (Optional)"
             },
             button: {
                 default: "Schedule Call",
@@ -158,9 +160,11 @@ export const UI_TEXT = {
             successMessage: "Gracias por contactarnos, {name}. Analizaremos tu solicitud y te responderemos en menos de 2 horas.",
             sendAnother: "Enviar otro mensaje",
             placeholders: {
-                name: "Nombre",
+                name: "Nombre / Empresa",
                 email: "Correo electrónico",
-                message: "Cuéntanos sobre tu proyecto..."
+                message: "Cuéntanos sobre tu proyecto...",
+                budget: "Presupuesto estimado (Opcional)",
+                phone: "Teléfono (Opcional)"
             },
             button: {
                 default: "Agendar Llamada",

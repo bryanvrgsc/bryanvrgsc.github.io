@@ -672,20 +672,20 @@ export const ContactView = () => {
     });
   }, [lang]);
 
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', budget: '', phone: '', countryCode: '+1' });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const [fieldErrors, setFieldErrors] = useState({ name: false, email: false, message: false });
+  const [fieldErrors, setFieldErrors] = useState({ name: false, email: false, message: false, budget: false, phone: false, countryCode: false });
 
-  useEffect(() => { setErrorMessage(''); setFieldErrors({ name: false, email: false, message: false }); }, [lang]);
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const field = e.target.id as 'name' | 'email' | 'message';
+  useEffect(() => { setErrorMessage(''); setFieldErrors({ name: false, email: false, message: false, budget: false, phone: false, countryCode: false }); }, [lang]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const field = e.target.id as keyof typeof formData;
     setFormData(prev => ({ ...prev, [field]: e.target.value }));
     if (errorMessage) setErrorMessage('');
-    if (fieldErrors[field]) setFieldErrors(prev => ({ ...prev, [field]: false }));
+    if (fieldErrors[field as keyof typeof fieldErrors]) setFieldErrors(prev => ({ ...prev, [field]: false }));
   };
   const validate = () => {
-    const errors = { name: false, email: false, message: false };
+    const errors = { name: false, email: false, message: false, budget: false, phone: false, countryCode: false };
     let errorMsg = '';
     if (!formData.name.trim()) { errors.name = true; errorMsg = t.errors.name; }
     else if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { errors.email = true; errorMsg = t.errors.email; }
@@ -698,7 +698,12 @@ export const ContactView = () => {
     setStatus('submitting'); setErrorMessage('');
     try { const response = await fetch("https://formspree.io/f/xzzwknze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) }); if (response.ok) setStatus('success'); else { setStatus('error'); setErrorMessage(t.errors.generic); } } catch (error) { setStatus('error'); setErrorMessage(t.errors.network); }
   };
-  const handleReset = () => { setStatus('idle'); setFormData({ name: '', email: '', message: '' }); };
+  const handleReset = () => { setStatus('idle'); setFormData({ name: '', email: '', message: '', budget: '', phone: '', countryCode: '+1' }); };
+  const countryCodes = [
+    { code: '+1', label: '🇺🇸 +1' }, { code: '+52', label: '🇲🇽 +52' }, { code: '+34', label: '🇪🇸 +34' },
+    { code: '+57', label: '🇨🇴 +57' }, { code: '+54', label: '🇦🇷 +54' }, { code: '+56', label: '🇨🇱 +56' },
+    { code: '+51', label: '🇵🇪 +51' }, { code: '+506', label: '🇨🇷 +506' }, { code: '+507', label: '🇵🇦 +507' }
+  ];
   const socialLinks = [{ icon: Icons.LinkedIn, url: "https://www.linkedin.com/in/bryanvrgsc", label: "LinkedIn", color: "hover:text-[#0077b5] hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30" }, { icon: Icons.GitHub, url: "https://github.com/bryanvrgsc", label: "GitHub", color: "hover:text-[#333] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20" }, { icon: Icons.WhatsApp, url: "https://api.whatsapp.com/send?phone=12533687369", label: "WhatsApp", color: "hover:text-[#25D366] hover:bg-[#25D366]/10 hover:border-[#25D366]/30" }, { icon: Icons.Instagram, url: "https://www.instagram.com/bryanvrgsc/", label: "Instagram", color: "hover:text-[#E4405F] hover:bg-[#E4405F]/10 hover:border-[#E4405F]/30" }, { icon: Icons.Mail, url: "mailto:bryanvrgsc@gmail.com", label: "Email", color: "hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30" }];
 
   if (status === 'success') {
@@ -732,6 +737,16 @@ export const ContactView = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               <div className="relative group"><input id="name" type="text" placeholder={t.placeholders.name} value={formData.name} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.name ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
               <div className="relative group"><input id="email" type="email" placeholder={t.placeholders.email} value={formData.email} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+              <div className="relative group"><input id="budget" type="text" placeholder={t.placeholders.budget} value={formData.budget} onChange={handleChange} disabled={status === 'submitting'} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50" /></div>
+              <div className="relative group flex gap-2">
+                <select id="countryCode" value={formData.countryCode} onChange={handleChange} disabled={status === 'submitting'} className="w-[100px] bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-2 py-5 text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 appearance-none text-center cursor-pointer">
+                  {countryCodes.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
+                </select>
+                <input id="phone" type="tel" placeholder={t.placeholders.phone} value={formData.phone} onChange={handleChange} disabled={status === 'submitting'} className="flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50" />
+              </div>
             </div>
             <div className="relative group"><textarea id="message" placeholder={t.placeholders.message} rows={4} value={formData.message} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all resize-none text-sm disabled:opacity-50 ${fieldErrors.message ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`}></textarea></div>
             {errorMessage && (<div className="text-red-500 text-sm text-center font-medium bg-red-500/10 py-2 rounded-xl border border-red-500/20 animate-pulse">{errorMessage}</div>)}
