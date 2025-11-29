@@ -67,8 +67,8 @@ export const updateMetaTags = (meta: MetaTagsConfig) => {
 
 // Default meta tags
 export const DEFAULT_META: MetaTagsConfig = {
-    title: 'TechSolutions | Desarrollo Web & Apps Móviles',
-    description: 'Soluciones tecnológicas profesionales: desarrollo web, aplicaciones móviles, y consultoría IT. Transformamos ideas en productos digitales de alto rendimiento.',
-    keywords: 'desarrollo web, apps móviles, consultoría IT, React, TypeScript, soluciones digitales',
+    title: 'bryanvrgsc | Engineering & Development',
+    description: 'Engineering & Development portfolio. High-performance digital solutions, mobile apps, and advanced analytics.',
+    keywords: 'software engineering, mobile development, web development, data analytics, iOS, Flutter, React',
     ogUrl: 'https://bryanvrgsc.github.io',
 };

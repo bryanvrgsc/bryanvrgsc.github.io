@@ -313,7 +313,7 @@ export const HomeView = () => {
   // SEO Meta Tags
   useEffect(() => {
     updateMetaTags({
-      title: 'TechSolutions | Desarrollo Web & Apps Móviles',
+      title: 'bryanvrgsc | Engineering & Development',
       description: t.heroSubtitle,
       keywords: t.heroTags
     });
@@ -418,7 +418,7 @@ export const ServicesView = () => {
   // SEO Meta Tags
   useEffect(() => {
     updateMetaTags({
-      title: `${t.title} | TechSolutions`,
+      title: `${t.title} | bryanvrgsc`,
       description: t.subtitle
     });
   }, [lang]);
@@ -459,14 +459,7 @@ const PortfolioModal = ({ project, onClose, lang }: { project: any, onClose: () 
   useEffect(() => { setCurrentPdf(project.presentationUrl || project.details?.documents?.[0]?.url || null); }, [project]);
   useEffect(() => { document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = ''; }; }, []);
 
-  // Handle Escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
+  useEffect(() => { document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = ''; }; }, []);
 
   if (!project) return null;
   const images = project.screenshots && project.screenshots.length > 0 ? project.screenshots : [project.image];
@@ -479,11 +472,16 @@ const PortfolioModal = ({ project, onClose, lang }: { project: any, onClose: () 
   const pdfEmbedSrc = !isPdf && currentPdf ? getEmbedUrl(currentPdf) : null;
 
   return createPortal(
-    <FocusTrap>
+    <FocusTrap focusTrapOptions={{
+      onDeactivate: onClose,
+      clickOutsideDeactivates: true,
+      escapeDeactivates: true,
+      fallbackFocus: '#modal-close-btn' // Fallback if no other focusable element found
+    }}>
       <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
         <div className="bg-[var(--card-bg)] backdrop-blur-3xl border border-[var(--card-border)] w-full max-w-6xl max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden relative flex flex-col md:flex-row animate-slide-up">
-          <button onClick={onClose} className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md transition-colors border border-white/10"><Icons.X className="w-6 h-6" /></button>
+          <button id="modal-close-btn" onClick={onClose} className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md transition-colors border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Close modal"><Icons.X className="w-6 h-6" /></button>
           <div className="w-full md:w-1/2 h-[40vh] md:h-auto bg-black relative flex flex-col">
             <div className="flex-grow relative overflow-hidden group"><img src={images[activeScreenshot]} alt="Project Screenshot" className="w-full h-full object-cover object-center transition-transform duration-700 hover:scale-105" /><div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-50"></div></div>
             {images.length > 1 && (<div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 px-4 z-20">{images.map((img: string, idx: number) => (<button key={idx} onClick={() => setActiveScreenshot(idx)} className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${activeScreenshot === idx ? 'border-emerald-500 scale-110' : 'border-white/30 opacity-70 hover:opacity-100'}`}><img src={img} alt="thumb" className="w-full h-full object-cover" /></button>))}</div>)}
@@ -544,7 +542,7 @@ export const PortfolioView = () => {
   // SEO Meta Tags
   useEffect(() => {
     updateMetaTags({
-      title: `${t.title} | TechSolutions`,
+      title: `${t.title} | bryanvrgsc`,
       description: t.subtitle
     });
   }, [lang]);
@@ -592,7 +590,7 @@ export const BlogView = () => {
   // SEO Meta Tags
   useEffect(() => {
     updateMetaTags({
-      title: `${t.title} | TechSolutions`,
+      title: `${t.title} | bryanvrgsc`,
       description: t.subtitle
     });
   }, [lang]);
@@ -634,7 +632,7 @@ export const ContactView = () => {
   // SEO Meta Tags
   useEffect(() => {
     updateMetaTags({
-      title: `${t.title} | TechSolutions`,
+      title: `${t.title} | bryanvrgsc`,
       description: t.subtitle
     });
   }, [lang]);
