@@ -746,7 +746,7 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
 
         <LiquidButton
           type="button"
-          className={`rounded-full px-5 py-3 md:px-7 md:py-3.5 text-xs md:text-sm font-semibold transition-all duration-500
+          className={`rounded-full px-5 py-3 md:px-7 md:py-3.5 text-xs md:text-sm font-semibold transition-all duration-500 whitespace-nowrap
                 ${activeId === 'contact'
               ? 'scale-105 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
               : 'hover:scale-105 opacity-90 hover:opacity-100'}`}

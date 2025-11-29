@@ -673,20 +673,27 @@ export const ContactView = () => {
     });
   }, [lang]);
 
-  const [formData, setFormData] = useState({ name: '', email: '', message: '', budget: '', phone: '', countryCode: '+1' });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', budget: '', phone: '', countryIso2: 'ca', currency: 'USD' });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const [fieldErrors, setFieldErrors] = useState({ name: false, email: false, message: false, budget: false, phone: false, countryCode: false });
+  const [fieldErrors, setFieldErrors] = useState({ name: false, email: false, message: false, budget: false, phone: false, countryIso2: false, currency: false });
 
-  useEffect(() => { setErrorMessage(''); setFieldErrors({ name: false, email: false, message: false, budget: false, phone: false, countryCode: false }); }, [lang]);
+  useEffect(() => { setErrorMessage(''); setFieldErrors({ name: false, email: false, message: false, budget: false, phone: false, countryIso2: false, currency: false }); }, [lang]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const field = e.target.id as keyof typeof formData;
-    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+    let value = e.target.value;
+
+    // Restrict phone and budget to numbers only
+    if (field === 'phone' || field === 'budget') {
+      value = value.replace(/[^0-9]/g, '');
+    }
+
+    setFormData(prev => ({ ...prev, [field]: value }));
     if (errorMessage) setErrorMessage('');
     if (fieldErrors[field as keyof typeof fieldErrors]) setFieldErrors(prev => ({ ...prev, [field]: false }));
   };
   const validate = () => {
-    const errors = { name: false, email: false, message: false, budget: false, phone: false, countryCode: false };
+    const errors = { name: false, email: false, message: false, budget: false, phone: false, countryIso2: false, currency: false };
     let errorMsg = '';
     if (!formData.name.trim()) { errors.name = true; errorMsg = t.errors.name; }
     else if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { errors.email = true; errorMsg = t.errors.email; }
@@ -697,9 +704,12 @@ export const ContactView = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); const error = validate(); if (error) { setErrorMessage(error); return; }
     setStatus('submitting'); setErrorMessage('');
-    try { const response = await fetch("https://formspree.io/f/xzzwknze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) }); if (response.ok) setStatus('success'); else { setStatus('error'); setErrorMessage(t.errors.generic); } } catch (error) { setStatus('error'); setErrorMessage(t.errors.network); }
+    const country = countryCodes.find(c => c.iso2 === formData.countryIso2);
+    const fullPhone = formData.phone ? `${country?.code || ''} ${formData.phone}` : '';
+    const submissionData = { ...formData, phone: fullPhone, countryCode: country?.code || '', countryName: country?.name || '', budgetWithCurrency: formData.budget ? `${formData.currency} ${formData.budget}` : '' };
+    try { const response = await fetch("https://formspree.io/f/xzzwknze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(submissionData) }); if (response.ok) setStatus('success'); else { setStatus('error'); setErrorMessage(t.errors.generic); } } catch (error) { setStatus('error'); setErrorMessage(t.errors.network); }
   };
-  const handleReset = () => { setStatus('idle'); setFormData({ name: '', email: '', message: '', budget: '', phone: '', countryCode: '+1' }); };
+  const handleReset = () => { setStatus('idle'); setFormData({ name: '', email: '', message: '', budget: '', phone: '', countryIso2: 'ca' }); };
 
   const getFlagEmoji = (iso2: string) => {
     return iso2.toUpperCase().replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt(0)));
@@ -732,7 +742,7 @@ export const ContactView = () => {
     c.label.toLowerCase().includes(countrySearch.toLowerCase())
   );
 
-  const selectedCountry = countryCodes.find(c => c.code === formData.countryCode) || countryCodes[0];
+  const selectedCountry = countryCodes.find(c => c.iso2 === formData.countryIso2) || countryCodes[0];
   const socialLinks = [{ icon: Icons.LinkedIn, url: "https://www.linkedin.com/in/bryanvrgsc", label: "LinkedIn", color: "hover:text-[#0077b5] hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30" }, { icon: Icons.GitHub, url: "https://github.com/bryanvrgsc", label: "GitHub", color: "hover:text-[#333] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20" }, { icon: Icons.WhatsApp, url: "https://api.whatsapp.com/send?phone=12533687369", label: "WhatsApp", color: "hover:text-[#25D366] hover:bg-[#25D366]/10 hover:border-[#25D366]/30" }, { icon: Icons.Instagram, url: "https://www.instagram.com/bryanvrgsc/", label: "Instagram", color: "hover:text-[#E4405F] hover:bg-[#E4405F]/10 hover:border-[#E4405F]/30" }, { icon: Icons.Mail, url: "mailto:bryanvrgsc@gmail.com", label: "Email", color: "hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30" }];
 
   if (status === 'success') {
@@ -764,14 +774,17 @@ export const ContactView = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4 md:mb-6 relative z-10 tracking-tight">{t.title}</h2><p className="text-lg md:text-xl text-[var(--text-secondary)] mb-8 md:mb-12 leading-relaxed relative z-10 max-w-xl mx-auto font-light">{t.subtitle}</p>
           <form className="space-y-4 md:space-y-5 text-left mb-8 md:mb-12 relative z-10 max-w-lg mx-auto" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-              <div className="relative group"><input id="name" type="text" placeholder={t.placeholders.name} value={formData.name} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.name ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
-              <div className="relative group"><input id="email" type="email" placeholder={t.placeholders.email} value={formData.email} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
+              <div className="relative group"><input id="name" name="name" type="text" placeholder={t.placeholders.name} value={formData.name} onChange={handleChange} disabled={status === 'submitting'} autoComplete="name" className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.name ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
+              <div className="relative group"><input id="email" name="email" type="email" placeholder={t.placeholders.email} value={formData.email} onChange={handleChange} disabled={status === 'submitting'} autoComplete="email" className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
             </div>
 
             <div className="relative group flex gap-3">
               <div className="relative w-[140px]" ref={countryDropdownRef}>
                 <button type="button" onClick={() => setIsCountryOpen(!isCountryOpen)} disabled={status === 'submitting'} className="w-full h-[62px] bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-3 text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 flex items-center justify-between gap-2">
-                  <span className="truncate">{selectedCountry.label}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-2xl">{getFlagEmoji(selectedCountry.iso2)}</span>
+                    <span className="font-medium">{selectedCountry.code}</span>
+                  </span>
                   <svg className={`w-4 h-4 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -794,7 +807,7 @@ export const ContactView = () => {
                           key={idx}
                           type="button"
                           onClick={() => {
-                            setFormData(prev => ({ ...prev, countryCode: c.code }));
+                            setFormData(prev => ({ ...prev, countryIso2: c.iso2 }));
                             setIsCountryOpen(false);
                             setCountrySearch('');
                           }}
@@ -812,12 +825,12 @@ export const ContactView = () => {
                   </div>
                 )}
               </div>
-              <input id="phone" type="tel" placeholder={t.placeholders.phone} value={formData.phone} onChange={handleChange} disabled={status === 'submitting'} className="flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 h-[62px]" />
+              <input id="phone" name="tel" type="tel" inputMode="numeric" pattern="[0-9]*" placeholder={t.placeholders.phone} value={formData.phone} onChange={handleChange} disabled={status === 'submitting'} autoComplete="tel" className="flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 h-[62px]" />
             </div>
 
-            <div className="relative group"><textarea id="message" placeholder={t.placeholders.message} rows={4} value={formData.message} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all resize-none text-sm disabled:opacity-50 ${fieldErrors.message ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`}></textarea></div>
+            <div className="relative group"><textarea id="message" name="message" placeholder={t.placeholders.message} rows={4} value={formData.message} onChange={handleChange} disabled={status === 'submitting'} autoComplete="off" className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all resize-none text-sm disabled:opacity-50 ${fieldErrors.message ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`}></textarea></div>
 
-            <div className="relative group"><input id="budget" type="text" placeholder={t.placeholders.budget} value={formData.budget} onChange={handleChange} disabled={status === 'submitting'} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 h-[62px]" /></div>
+            <div className="relative group"><input id="budget" name="budget" type="text" inputMode="numeric" pattern="[0-9]*" placeholder={t.placeholders.budget} value={formData.budget} onChange={handleChange} disabled={status === 'submitting'} autoComplete="off" className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 h-[62px]" /></div>
             {errorMessage && (<div className="text-red-500 text-sm text-center font-medium bg-red-500/10 py-2 rounded-xl border border-red-500/20 animate-pulse">{errorMessage}</div>)}
             <LiquidButton type="submit" className="w-full py-5 md:py-6 text-lg md:text-xl font-bold tracking-wide rounded-full" style={{ '--card-bg': 'rgba(16, 185, 129, 0.15)', '--card-hover-bg': 'rgba(16, 185, 129, 0.25)', '--card-border': 'rgba(16, 185, 129, 0.5)', '--glass-glow': 'rgba(16, 185, 129, 0.6)', '--highlight-color': 'rgba(16, 185, 129, 0.2)' } as React.CSSProperties}>{status === 'submitting' ? t.button.sending : t.button.default}</LiquidButton>
           </form>
