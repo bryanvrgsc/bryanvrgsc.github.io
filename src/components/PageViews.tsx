@@ -6,7 +6,7 @@ import { useStore } from '@nanostores/react';
 import { settings, performanceMode } from '../store';
 import { Icons } from './Icons';
 import { LiquidButton } from './SharedUI';
-import { UI_TEXT, SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS, Language } from '../constants';
+import { UI_TEXT, SERVICES, PORTFOLIO, getArticles, ENGAGEMENT_MODELS, Language, Article } from '../constants';
 import * as pdfjsLib from 'pdfjs-dist';
 import FocusTrap from 'focus-trap-react';
 import { allCountries } from 'country-telephone-data';
@@ -16,9 +16,35 @@ import CurrencyInput from 'react-currency-input-field';
 // @ts-ignore - Vite will handle this import
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
-// Configure PDF.js worker
+// Configure PDF.js worker and suppress verbose logging
 if (typeof window !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+  // Suppress PDF.js console warnings and errors
+  const originalWarn = console.warn;
+  const originalError = console.error;
+
+  console.warn = (...args: any[]) => {
+    // Filter out PDF.js warnings
+    const message = args[0]?.toString() || '';
+    if (message.includes('getHexString') ||
+      message.includes('PDF') ||
+      message.includes('Indexing all PDF objects')) {
+      return;
+    }
+    originalWarn.apply(console, args);
+  };
+
+  console.error = (...args: any[]) => {
+    // Filter out PDF.js errors
+    const message = args[0]?.toString() || '';
+    if (message.includes('InvalidPDFException') ||
+      message.includes('PDF') ||
+      message.includes('Error rendering thumbnail')) {
+      return;
+    }
+    originalError.apply(console, args);
+  };
 }
 
 // --- PDF VIEWER COMPONENT ---
@@ -74,6 +100,7 @@ const PDFViewer = ({ url }: { url: string }) => {
         const renderContext = {
           canvasContext: context,
           viewport: scaledViewport,
+          canvas: canvas,
         };
 
         await page.render(renderContext).promise;
@@ -112,50 +139,126 @@ const PDFViewer = ({ url }: { url: string }) => {
     return (
       <div className="relative w-full h-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center p-4">
-          <p className="text-[var(--text-secondary)] mb-4">No se pudo cargar el PDF</p>
-          <a href={url} target="_blank" rel="noreferrer" className="text-emerald-500 font-bold hover:underline">
-            Descargar PDF
-          </a>
+          <Icons.X className="w-12 h-12 mb-4 opacity-50 mx-auto" />
+          <p className="text-[var(--text-secondary)]">Error loading PDF</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-full bg-slate-100 dark:bg-slate-900 flex flex-col">
-      {/* PDF Canvas */}
-      <div className="flex-1 overflow-auto flex items-center justify-center p-4">
-        <canvas ref={canvasRef} className="max-w-full h-auto shadow-lg" />
+    <div className="flex flex-col h-full">
+      <div className="flex-1 bg-[var(--input-bg)] overflow-auto flex justify-center p-4 relative">
+        <canvas ref={canvasRef} className="shadow-2xl max-w-full" />
       </div>
 
-      {/* Navigation Controls */}
-      <div className="flex items-center justify-center gap-4 p-4 bg-slate-200 dark:bg-slate-800 border-t border-slate-300 dark:border-slate-700">
+      {/* Controls */}
+      <div className="bg-[var(--card-bg)] border-t border-[var(--card-border)] p-4 flex items-center justify-center gap-6">
         <button
           onClick={goToPrevPage}
-          disabled={currentPage === 1}
-          className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          disabled={currentPage <= 1}
+          className="p-2 rounded-full hover:bg-[var(--input-bg)] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
         >
-          <Icons.ArrowUp className="w-4 h-4 rotate-[-90deg]" />
-          Anterior
+          <Icons.ArrowRight className="w-5 h-5 rotate-180" />
         </button>
-
-        <div className="px-4 py-2 rounded-lg bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600">
-          <span className="font-mono text-sm">
-            <span className="font-bold text-[var(--text-primary)]">{currentPage}</span>
-            <span className="text-[var(--text-secondary)]"> / </span>
-            <span className="text-[var(--text-secondary)]">{totalPages}</span>
-          </span>
-        </div>
-
+        <span className="text-sm font-medium text-[var(--text-primary)]">
+          Page {currentPage} of {totalPages}
+        </span>
         <button
           onClick={goToNextPage}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          disabled={currentPage >= totalPages}
+          className="p-2 rounded-full hover:bg-[var(--input-bg)] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
         >
-          Siguiente
-          <Icons.ArrowUp className="w-4 h-4 rotate-90" />
+          <Icons.ArrowRight className="w-5 h-5" />
         </button>
       </div>
+    </div>
+  );
+};
+
+// --- PDF THUMBNAIL COMPONENT ---
+const PDFThumbnail = ({ url }: { url: string }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const renderThumbnail = async () => {
+      try {
+        setLoading(true);
+        setError(false);
+
+        // Suppress PDF.js warnings by temporarily overriding console.warn
+        const originalWarn = console.warn;
+        console.warn = () => { };
+
+        const loadingTask = pdfjsLib.getDocument({
+          url,
+          verbosity: 0, // Suppress PDF.js internal logging
+        });
+        const pdf = await loadingTask.promise;
+
+        if (!isMounted) return;
+
+        const page = await pdf.getPage(1);
+
+        if (!isMounted || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        if (!context) return;
+
+        // Render at a reasonable thumbnail quality
+        const viewport = page.getViewport({ scale: 1.5 });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+          canvas: canvas,
+        };
+
+        await page.render(renderContext).promise;
+
+        // Restore console.warn
+        console.warn = originalWarn;
+
+        if (isMounted) setLoading(false);
+      } catch (err) {
+        // Silently handle errors - just show fallback UI
+        if (isMounted) {
+          setLoading(false);
+          setError(true);
+        }
+      }
+    };
+
+    renderThumbnail();
+
+    return () => { isMounted = false; };
+  }, [url]);
+
+  return (
+    <div className="w-full h-full relative bg-white dark:bg-slate-800">
+      {!error && (
+        <canvas
+          ref={canvasRef}
+          className={`w-full h-full object-cover object-top transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
+        />
+      )}
+      {loading && !error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[var(--input-bg)]">
+          <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900">
+          <Icons.Book className="w-16 h-16 text-slate-400 dark:text-slate-600" />
+        </div>
+      )}
     </div>
   );
 };
@@ -619,10 +722,12 @@ export const PortfolioView = () => {
   );
 };
 
-export const BlogView = () => {
+export const ArticlesView = () => {
   const { lang } = useStore(settings);
   const handleMouseMove = useMousePosition();
   const t = UI_TEXT[lang].blog;
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const articles = getArticles();
 
   // SEO Meta Tags
   useEffect(() => {
@@ -633,31 +738,106 @@ export const BlogView = () => {
   }, [lang]);
 
   return (
-    <div className="max-w-5xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
-      <div className="mb-8 md:mb-16 text-center">
-        <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
-        <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
-      </div>
-      <div className="space-y-6 md:space-y-8">
-        {BLOG_POSTS[lang].map((post, i) => {
-          const theme = getCategoryTheme(post.category);
-          return (
-            <article onMouseMove={handleMouseMove} key={i} className="bento-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8 cursor-pointer group" style={theme.colors as React.CSSProperties}>
-              <div className="h-20 w-20 md:h-28 md:w-28 rounded-3xl bg-[var(--input-bg)] flex-shrink-0 flex flex-col items-center justify-center border border-[var(--card-border)] group-hover:scale-105 transition-all duration-500 group-hover:border-emerald-500/30 group-hover:shadow-[0_0_30px_rgba(52,211,153,0.1)]">
-                <span className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tracking-tighter">{post.date.split(' ')[1].replace(',', '')}</span>
-                <span className="text-[10px] md:text-[11px] uppercase text-[var(--text-secondary)] font-bold tracking-widest mt-1">{post.date.split(' ')[0]}</span>
+    <>
+      <div className="max-w-7xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
+        <div className="mb-8 md:mb-16 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2>
+          <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {articles.map((article, i) => (
+            <div
+              onMouseMove={handleMouseMove}
+              onClick={() => setSelectedArticle(article)}
+              key={i}
+              className="bento-card rounded-[2rem] md:rounded-[2.5rem] overflow-hidden group p-0 border-0 cursor-pointer relative shadow-2xl transition-all duration-500 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:scale-[1.02]"
+              tabIndex={0}
+              role="button"
+              aria-label={`Read ${article.title}`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedArticle(article); } }}
+            >
+              {/* PDF Thumbnail */}
+              <div className="h-[200px] md:h-[250px] bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+                <PDFThumbnail url={article.path} />
+
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-60"></div>
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center backdrop-blur-[2px]">
+                  <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 text-white font-bold text-sm tracking-widest uppercase transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">
+                    Leer Artículo <Icons.ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
               </div>
-              <div className="flex-grow">
-                <div className="flex items-center gap-3 mb-3"><span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border ${theme.text} ${theme.bg} border-current opacity-70`}>{post.category}</span></div>
-                <h3 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-3 group-hover:text-[var(--text-primary)] transition-colors tracking-tight">{post.title}</h3>
-                <p className="text-[var(--text-secondary)] leading-relaxed text-sm md:text-base font-light">{post.excerpt}</p>
+
+              {/* Article Info */}
+              <div className="p-6 md:p-8 relative z-20">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-lg md:text-xl font-bold text-[var(--text-primary)] tracking-tight leading-tight flex-1">{article.title}</h3>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-[var(--text-tertiary)] uppercase tracking-wider font-bold">
+                  <Icons.Book className="w-4 h-4" />
+                  <span>PDF Article</span>
+                </div>
               </div>
-              <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-[var(--input-bg)] text-[var(--text-primary)] flex items-center justify-center group-hover:bg-[var(--text-primary)] group-hover:text-[var(--bg-primary)] transition-all duration-300 transform group-hover:translate-x-2 border border-[var(--card-border)]"><Icons.ArrowRight className="w-4 h-4 md:w-5 md:h-5" /></div>
-            </article>
-          );
-        })}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Article PDF Modal */}
+      {selectedArticle && (
+        <ArticleModal article={selectedArticle} onClose={() => setSelectedArticle(null)} lang={lang} />
+      )}
+    </>
+  );
+};
+
+// Article Modal Component
+const ArticleModal = ({ article, onClose, lang }: { article: Article, onClose: () => void, lang: Language }) => {
+  const t = UI_TEXT[lang].portfolio.modal;
+
+  useEffect(() => { document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = ''; }; }, []);
+
+  return createPortal(
+    <FocusTrap focusTrapOptions={{
+      onDeactivate: onClose,
+      clickOutsideDeactivates: true,
+      escapeDeactivates: true,
+      fallbackFocus: '#article-modal-close-btn'
+    }}>
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="article-modal-title">
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
+        <div className="bg-[var(--card-bg)] backdrop-blur-3xl border border-[var(--card-border)] w-full max-w-6xl max-h-[90vh] rounded-[2rem] shadow-2xl overflow-hidden relative flex flex-col animate-slide-up">
+          <button id="article-modal-close-btn" onClick={onClose} className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md transition-colors border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-500" aria-label="Close modal"><Icons.X className="w-6 h-6" /></button>
+
+          {/* Header */}
+          <div className="p-6 md:p-8 border-b border-[var(--card-border)]">
+            <span className="text-emerald-500 font-bold uppercase tracking-widest text-xs mb-2 block">PDF Article</span>
+            <h2 id="article-modal-title" className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] leading-tight">{article.title}</h2>
+          </div>
+
+          {/* PDF Viewer */}
+          <div className="flex-1 overflow-hidden">
+            <PDFViewer url={article.path} />
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 md:p-6 border-t border-[var(--card-border)] flex justify-between items-center bg-[var(--card-bg)]">
+            <a href={article.path} download className="text-sm font-bold text-emerald-500 hover:underline flex items-center gap-2">
+              <Icons.Download className="w-4 h-4" />
+              {t.downloadPdf}
+            </a>
+            <a href={article.path} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-500 hover:underline flex items-center gap-1">
+              {t.openTab} <Icons.ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </FocusTrap>,
+    document.body
   );
 };
 

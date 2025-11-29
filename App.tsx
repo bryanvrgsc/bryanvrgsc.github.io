@@ -11,7 +11,7 @@ import { reportError } from './src/utils/errorReporting';
 const HomeView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.HomeView })));
 const ServicesView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.ServicesView })));
 const PortfolioView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.PortfolioView })));
-const BlogView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.BlogView })));
+const ArticlesView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.ArticlesView })));
 const ContactView = React.lazy(() => import('./src/components/PageViews').then(module => ({ default: module.ContactView })));
 
 // Simple Error Boundary to catch lazy loading errors
@@ -98,7 +98,7 @@ export default function App() {
     if (path === '/' || path === '') return <HomeView />;
     if (path.startsWith('/services')) return <ServicesView />;
     if (path.startsWith('/portfolio')) return <PortfolioView />;
-    if (path.startsWith('/blog')) return <BlogView />;
+    if (path.startsWith('/blog')) return <ArticlesView />;
     if (path.startsWith('/contact')) return <ContactView />;
     return <HomeView />;
   };

@@ -57,8 +57,8 @@ export const UI_TEXT = {
             }
         },
         blog: {
-            title: "Insights",
-            subtitle: "Strategic thinking and tech deep dives."
+            title: "Articles",
+            subtitle: "Technical insights and industry analysis."
         },
         contact: {
             title: "Let's talk business.",
@@ -90,7 +90,7 @@ export const UI_TEXT = {
             home: "Home",
             services: "Services",
             work: "Work",
-            blog: "Blog",
+            blog: "Articles",
             contact: "Contact Me"
         }
     },
@@ -150,8 +150,8 @@ export const UI_TEXT = {
             }
         },
         blog: {
-            title: "Insights",
-            subtitle: "Pensamiento estratégico y tecnología profunda."
+            title: "Artículos",
+            subtitle: "Análisis técnico y perspectivas de la industria."
         },
         contact: {
             title: "Hablemos de negocios.",
@@ -183,7 +183,7 @@ export const UI_TEXT = {
             home: "Inicio",
             services: "Servicios",
             work: "Portafolio",
-            blog: "Blog",
+            blog: "Artículos",
             contact: "Contáctame"
         }
     }
