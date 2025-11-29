@@ -9,6 +9,7 @@ import { LiquidButton } from './SharedUI';
 import { UI_TEXT, SERVICES, PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS, Language } from '../constants';
 import * as pdfjsLib from 'pdfjs-dist';
 import FocusTrap from 'focus-trap-react';
+import { allCountries } from 'country-telephone-data';
 import { updateMetaTags } from '../utils/seo';
 
 // @ts-ignore - Vite will handle this import
@@ -699,11 +700,39 @@ export const ContactView = () => {
     try { const response = await fetch("https://formspree.io/f/xzzwknze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) }); if (response.ok) setStatus('success'); else { setStatus('error'); setErrorMessage(t.errors.generic); } } catch (error) { setStatus('error'); setErrorMessage(t.errors.network); }
   };
   const handleReset = () => { setStatus('idle'); setFormData({ name: '', email: '', message: '', budget: '', phone: '', countryCode: '+1' }); };
-  const countryCodes = [
-    { code: '+1', label: '🇺🇸 +1' }, { code: '+52', label: '🇲🇽 +52' }, { code: '+34', label: '🇪🇸 +34' },
-    { code: '+57', label: '🇨🇴 +57' }, { code: '+54', label: '🇦🇷 +54' }, { code: '+56', label: '🇨🇱 +56' },
-    { code: '+51', label: '🇵🇪 +51' }, { code: '+506', label: '🇨🇷 +506' }, { code: '+507', label: '🇵🇦 +507' }
-  ];
+
+  const getFlagEmoji = (iso2: string) => {
+    return iso2.toUpperCase().replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt(0)));
+  };
+
+  const countryCodes = allCountries.map((c) => ({
+    code: `+${c.dialCode}`,
+    label: `${getFlagEmoji(c.iso2)} +${c.dialCode}`,
+    name: c.name.split(' (')[0], // Clean up name if it has local script
+    iso2: c.iso2
+  }));
+
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
+        setIsCountryOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredCountries = countryCodes.filter(c =>
+    c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+    c.code.includes(countrySearch) ||
+    c.label.toLowerCase().includes(countrySearch.toLowerCase())
+  );
+
+  const selectedCountry = countryCodes.find(c => c.code === formData.countryCode) || countryCodes[0];
   const socialLinks = [{ icon: Icons.LinkedIn, url: "https://www.linkedin.com/in/bryanvrgsc", label: "LinkedIn", color: "hover:text-[#0077b5] hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30" }, { icon: Icons.GitHub, url: "https://github.com/bryanvrgsc", label: "GitHub", color: "hover:text-[#333] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20" }, { icon: Icons.WhatsApp, url: "https://api.whatsapp.com/send?phone=12533687369", label: "WhatsApp", color: "hover:text-[#25D366] hover:bg-[#25D366]/10 hover:border-[#25D366]/30" }, { icon: Icons.Instagram, url: "https://www.instagram.com/bryanvrgsc/", label: "Instagram", color: "hover:text-[#E4405F] hover:bg-[#E4405F]/10 hover:border-[#E4405F]/30" }, { icon: Icons.Mail, url: "mailto:bryanvrgsc@gmail.com", label: "Email", color: "hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30" }];
 
   if (status === 'success') {
@@ -739,16 +768,56 @@ export const ContactView = () => {
               <div className="relative group"><input id="email" type="email" placeholder={t.placeholders.email} value={formData.email} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-              <div className="relative group"><input id="budget" type="text" placeholder={t.placeholders.budget} value={formData.budget} onChange={handleChange} disabled={status === 'submitting'} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50" /></div>
-              <div className="relative group flex gap-2">
-                <select id="countryCode" value={formData.countryCode} onChange={handleChange} disabled={status === 'submitting'} className="w-[100px] bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-2 py-5 text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 appearance-none text-center cursor-pointer">
-                  {countryCodes.map(c => <option key={c.code} value={c.code}>{c.label}</option>)}
-                </select>
-                <input id="phone" type="tel" placeholder={t.placeholders.phone} value={formData.phone} onChange={handleChange} disabled={status === 'submitting'} className="flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50" />
+            <div className="relative group flex gap-3">
+              <div className="relative w-[140px]" ref={countryDropdownRef}>
+                <button type="button" onClick={() => setIsCountryOpen(!isCountryOpen)} disabled={status === 'submitting'} className="w-full h-[62px] bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-3 text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 flex items-center justify-between gap-2">
+                  <span className="truncate">{selectedCountry.label}</span>
+                  <svg className={`w-4 h-4 transition-transform ${isCountryOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isCountryOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-[280px] max-h-[300px] overflow-y-auto bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl shadow-xl z-50 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-2 sticky top-0 bg-[var(--card-bg)] border-b border-[var(--card-border)] z-10">
+                      <input
+                        type="text"
+                        placeholder="Search country..."
+                        value={countrySearch}
+                        onChange={(e) => setCountrySearch(e.target.value)}
+                        className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="p-1">
+                      {filteredCountries.map((c, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setFormData(prev => ({ ...prev, countryCode: c.code }));
+                            setIsCountryOpen(false);
+                            setCountrySearch('');
+                          }}
+                          className="w-full text-left px-4 py-3 hover:bg-[var(--input-bg)] rounded-xl transition-colors flex items-center gap-3 text-sm text-[var(--text-primary)]"
+                        >
+                          <span className="text-lg">{c.label.split(' ')[0]}</span>
+                          <span className="font-medium">{c.name}</span>
+                          <span className="ml-auto text-[var(--text-tertiary)]">{c.code}</span>
+                        </button>
+                      ))}
+                      {filteredCountries.length === 0 && (
+                        <div className="p-4 text-center text-[var(--text-tertiary)] text-sm">No countries found</div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
+              <input id="phone" type="tel" placeholder={t.placeholders.phone} value={formData.phone} onChange={handleChange} disabled={status === 'submitting'} className="flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 h-[62px]" />
             </div>
+
             <div className="relative group"><textarea id="message" placeholder={t.placeholders.message} rows={4} value={formData.message} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all resize-none text-sm disabled:opacity-50 ${fieldErrors.message ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`}></textarea></div>
+
+            <div className="relative group"><input id="budget" type="text" placeholder={t.placeholders.budget} value={formData.budget} onChange={handleChange} disabled={status === 'submitting'} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 h-[62px]" /></div>
             {errorMessage && (<div className="text-red-500 text-sm text-center font-medium bg-red-500/10 py-2 rounded-xl border border-red-500/20 animate-pulse">{errorMessage}</div>)}
             <LiquidButton type="submit" className="w-full py-5 md:py-6 text-lg md:text-xl font-bold tracking-wide rounded-full" style={{ '--card-bg': 'rgba(16, 185, 129, 0.15)', '--card-hover-bg': 'rgba(16, 185, 129, 0.25)', '--card-border': 'rgba(16, 185, 129, 0.5)', '--glass-glow': 'rgba(16, 185, 129, 0.6)', '--highlight-color': 'rgba(16, 185, 129, 0.2)' } as React.CSSProperties}>{status === 'submitting' ? t.button.sending : t.button.default}</LiquidButton>
           </form>
