@@ -3,7 +3,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings, applyTheme, checkPerformance } from './src/store';
 import { CanvasBackground, Header, Dock, ThemeToggle, LanguageToggle, ScrollToTop } from './src/components/SharedUI';
-import { PageSkeleton } from './src/components/Skeleton';
+import { LoadingAnimation } from './src/components/Loading';
 import { initWebVitals, trackPageView } from './src/utils/analytics';
 import { reportError } from './src/utils/errorReporting';
 
@@ -112,7 +112,7 @@ export default function App() {
 
       <main className="relative z-10 w-full">
         <ErrorBoundary>
-          <Suspense fallback={<PageSkeleton />}>
+          <Suspense fallback={<LoadingAnimation />}>
             {renderView()}
           </Suspense>
         </ErrorBoundary>
