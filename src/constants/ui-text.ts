@@ -89,7 +89,7 @@ export const UI_TEXT = {
             services: "Services",
             work: "Work",
             blog: "Blog",
-            contact: "Contact"
+            contact: "Contact Me"
         }
     },
     es: {
@@ -180,7 +180,7 @@ export const UI_TEXT = {
             services: "Servicios",
             work: "Portafolio",
             blog: "Blog",
-            contact: "Contacto"
+            contact: "Contáctame"
         }
     }
 };

@@ -21,7 +21,6 @@ export default defineConfig({
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'nanostores', '@nanostores/react'],
           'pdf-vendor': ['pdfjs-dist'],
-          'particles-vendor': ['@tsparticles/react', '@tsparticles/slim', '@tsparticles/engine'],
         },
       },
     },

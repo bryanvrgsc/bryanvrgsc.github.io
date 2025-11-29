@@ -675,10 +675,24 @@ export const ContactView = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({ name: false, email: false, message: false });
 
-  useEffect(() => { setErrorMessage(''); }, [lang]);
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setFormData(prev => ({ ...prev, [e.target.id]: e.target.value })); if (errorMessage) setErrorMessage(''); };
-  const validate = () => { if (!formData.name.trim()) return t.errors.name; if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return t.errors.email; if (!formData.message.trim()) return t.errors.message; return null; };
+  useEffect(() => { setErrorMessage(''); setFieldErrors({ name: false, email: false, message: false }); }, [lang]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const field = e.target.id as 'name' | 'email' | 'message';
+    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+    if (errorMessage) setErrorMessage('');
+    if (fieldErrors[field]) setFieldErrors(prev => ({ ...prev, [field]: false }));
+  };
+  const validate = () => {
+    const errors = { name: false, email: false, message: false };
+    let errorMsg = '';
+    if (!formData.name.trim()) { errors.name = true; errorMsg = t.errors.name; }
+    else if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { errors.email = true; errorMsg = t.errors.email; }
+    else if (!formData.message.trim()) { errors.message = true; errorMsg = t.errors.message; }
+    setFieldErrors(errors);
+    return errorMsg || null;
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); const error = validate(); if (error) { setErrorMessage(error); return; }
     setStatus('submitting'); setErrorMessage('');
@@ -692,7 +706,12 @@ export const ContactView = () => {
       <div className="max-w-3xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
         <div onMouseMove={handleMouseMove} className="bento-card p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px]">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none"></div>
-          <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(52,211,153,0.5)] animate-pulse"><Icons.CheckCircle className="w-10 h-10 md:w-12 md:h-12 text-white" /></div>
+          <div className="w-24 h-24 md:w-28 md:h-28 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mb-6 shadow-[0_0_60px_rgba(52,211,153,0.6)] relative">
+            <div className="absolute inset-0 bg-emerald-500 rounded-full animate-ping opacity-20"></div>
+            <svg className="w-14 h-14 md:w-16 md:h-16 text-white relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
           <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4 tracking-tight">{t.successTitle}</h2><p className="text-lg md:text-xl text-[var(--text-secondary)] mb-10 max-w-md">{t.successMessage.replace('{name}', formData.name)}</p>
           <LiquidButton onClick={handleReset} className="px-8 py-4 md:px-8 md:py-4 text-base md:text-lg rounded-full" style={{ '--card-bg': 'rgba(16, 185, 129, 0.15)', '--card-border': 'rgba(16, 185, 129, 0.5)', '--glass-glow': 'rgba(16, 185, 129, 0.6)' } as React.CSSProperties}>{t.sendAnother}</LiquidButton>
         </div>
@@ -711,10 +730,10 @@ export const ContactView = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4 md:mb-6 relative z-10 tracking-tight">{t.title}</h2><p className="text-lg md:text-xl text-[var(--text-secondary)] mb-8 md:mb-12 leading-relaxed relative z-10 max-w-xl mx-auto font-light">{t.subtitle}</p>
           <form className="space-y-4 md:space-y-5 text-left mb-8 md:mb-12 relative z-10 max-w-lg mx-auto" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-              <div className="relative group"><input id="name" type="text" placeholder={t.placeholders.name} value={formData.name} onChange={handleChange} disabled={status === 'submitting'} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50" /></div>
-              <div className="relative group"><input id="email" type="email" placeholder={t.placeholders.email} value={formData.email} onChange={handleChange} disabled={status === 'submitting'} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50" /></div>
+              <div className="relative group"><input id="name" type="text" placeholder={t.placeholders.name} value={formData.name} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.name ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
+              <div className="relative group"><input id="email" type="email" placeholder={t.placeholders.email} value={formData.email} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm disabled:opacity-50 ${fieldErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`} /></div>
             </div>
-            <div className="relative group"><textarea id="message" placeholder={t.placeholders.message} rows={4} value={formData.message} onChange={handleChange} disabled={status === 'submitting'} className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all resize-none text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50"></textarea></div>
+            <div className="relative group"><textarea id="message" placeholder={t.placeholders.message} rows={4} value={formData.message} onChange={handleChange} disabled={status === 'submitting'} className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all resize-none text-sm disabled:opacity-50 ${fieldErrors.message ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`}></textarea></div>
             {errorMessage && (<div className="text-red-500 text-sm text-center font-medium bg-red-500/10 py-2 rounded-xl border border-red-500/20 animate-pulse">{errorMessage}</div>)}
             <LiquidButton type="submit" className="w-full py-5 md:py-6 text-lg md:text-xl font-bold tracking-wide rounded-full" style={{ '--card-bg': 'rgba(16, 185, 129, 0.15)', '--card-hover-bg': 'rgba(16, 185, 129, 0.25)', '--card-border': 'rgba(16, 185, 129, 0.5)', '--glass-glow': 'rgba(16, 185, 129, 0.6)', '--highlight-color': 'rgba(16, 185, 129, 0.2)' } as React.CSSProperties}>{status === 'submitting' ? t.button.sending : t.button.default}</LiquidButton>
           </form>
