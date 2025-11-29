@@ -49,7 +49,7 @@ export const LiquidButton: React.FC<LiquidButtonProps> = ({ children, onClick, c
       type={type}
       onClick={onClick}
       style={style}
-      className={`relative group inline-flex items-center justify-center font-medium transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] active:scale-95 border-none outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)] focus-visible:scale-105 ${className}`}
+      className={`relative group inline-flex items-center justify-center font-medium transition-all duration-500 ease-[cubic-bezier(0.25,1,0.3,1)] active:scale-95 border-none outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)] focus-visible:scale-105 overflow-hidden ${className}`}
     >
       {/* Outer Glow (Spills out) */}
       <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-60 group-focus-visible:opacity-60 transition-opacity duration-500 bg-[var(--glass-glow)] blur-xl"></div>

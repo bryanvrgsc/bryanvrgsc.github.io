@@ -11,6 +11,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import FocusTrap from 'focus-trap-react';
 import { allCountries } from 'country-telephone-data';
 import { updateMetaTags } from '../utils/seo';
+import CurrencyInput from 'react-currency-input-field';
 
 // @ts-ignore - Vite will handle this import
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -674,6 +675,7 @@ export const ContactView = () => {
   }, [lang]);
 
   const [formData, setFormData] = useState({ name: '', email: '', message: '', budget: '', phone: '', countryIso2: 'ca', currency: 'USD' });
+  const [budgetValue, setBudgetValue] = useState<string | undefined>();
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState({ name: false, email: false, message: false, budget: false, phone: false, countryIso2: false, currency: false });
@@ -709,7 +711,7 @@ export const ContactView = () => {
     const submissionData = { ...formData, phone: fullPhone, countryCode: country?.code || '', countryName: country?.name || '', budgetWithCurrency: formData.budget ? `${formData.currency} ${formData.budget}` : '' };
     try { const response = await fetch("https://formspree.io/f/xzzwknze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(submissionData) }); if (response.ok) setStatus('success'); else { setStatus('error'); setErrorMessage(t.errors.generic); } } catch (error) { setStatus('error'); setErrorMessage(t.errors.network); }
   };
-  const handleReset = () => { setStatus('idle'); setFormData({ name: '', email: '', message: '', budget: '', phone: '', countryIso2: 'ca' }); };
+  const handleReset = () => { setStatus('idle'); setFormData({ name: '', email: '', message: '', budget: '', phone: '', countryIso2: 'ca', currency: 'USD' }); setBudgetValue(undefined); };
 
   const getFlagEmoji = (iso2: string) => {
     return iso2.toUpperCase().replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt(0)));
@@ -726,10 +728,17 @@ export const ContactView = () => {
   const [countrySearch, setCountrySearch] = useState('');
   const countryDropdownRef = useRef<HTMLDivElement>(null);
 
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+  const [currencySearch, setCurrencySearch] = useState('');
+  const currencyDropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target as Node)) {
         setIsCountryOpen(false);
+      }
+      if (currencyDropdownRef.current && !currencyDropdownRef.current.contains(event.target as Node)) {
+        setIsCurrencyOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -742,7 +751,34 @@ export const ContactView = () => {
     c.label.toLowerCase().includes(countrySearch.toLowerCase())
   );
 
+  const currencies = [
+    { code: 'USD', symbol: '$', label: 'USD - US Dollar', country: 'us' },
+    { code: 'CAD', symbol: 'C$', label: 'CAD - Canadian Dollar', country: 'ca' },
+    { code: 'MXN', symbol: 'MX$', label: 'MXN - Mexican Peso', country: 'mx' },
+    { code: 'EUR', symbol: '€', label: 'EUR - Euro', country: 'eu' },
+    { code: 'GBP', symbol: '£', label: 'GBP - British Pound', country: 'gb' },
+    { code: 'JPY', symbol: '¥', label: 'JPY - Japanese Yen', country: 'jp' },
+    { code: 'CNY', symbol: '¥', label: 'CNY - Chinese Yuan', country: 'cn' },
+    { code: 'AUD', symbol: 'A$', label: 'AUD - Australian Dollar', country: 'au' },
+    { code: 'CHF', symbol: 'CHF', label: 'CHF - Swiss Franc', country: 'ch' },
+    { code: 'INR', symbol: '₹', label: 'INR - Indian Rupee', country: 'in' },
+    { code: 'BRL', symbol: 'R$', label: 'BRL - Brazilian Real', country: 'br' },
+    { code: 'KRW', symbol: '₩', label: 'KRW - South Korean Won', country: 'kr' },
+    { code: 'RUB', symbol: '₽', label: 'RUB - Russian Ruble', country: 'ru' },
+    { code: 'ARS', symbol: 'AR$', label: 'ARS - Argentine Peso', country: 'ar' },
+    { code: 'CLP', symbol: 'CL$', label: 'CLP - Chilean Peso', country: 'cl' },
+    { code: 'COP', symbol: 'CO$', label: 'COP - Colombian Peso', country: 'co' },
+    { code: 'PEN', symbol: 'S/', label: 'PEN - Peruvian Sol', country: 'pe' },
+  ];
+
+  const filteredCurrencies = currencies.filter(c =>
+    c.label.toLowerCase().includes(currencySearch.toLowerCase()) ||
+    c.code.toLowerCase().includes(currencySearch.toLowerCase()) ||
+    c.symbol.includes(currencySearch)
+  );
+
   const selectedCountry = countryCodes.find(c => c.iso2 === formData.countryIso2) || countryCodes[0];
+  const selectedCurrency = currencies.find(c => c.code === formData.currency) || currencies[0];
   const socialLinks = [{ icon: Icons.LinkedIn, url: "https://www.linkedin.com/in/bryanvrgsc", label: "LinkedIn", color: "hover:text-[#0077b5] hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30" }, { icon: Icons.GitHub, url: "https://github.com/bryanvrgsc", label: "GitHub", color: "hover:text-[#333] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20" }, { icon: Icons.WhatsApp, url: "https://api.whatsapp.com/send?phone=12533687369", label: "WhatsApp", color: "hover:text-[#25D366] hover:bg-[#25D366]/10 hover:border-[#25D366]/30" }, { icon: Icons.Instagram, url: "https://www.instagram.com/bryanvrgsc/", label: "Instagram", color: "hover:text-[#E4405F] hover:bg-[#E4405F]/10 hover:border-[#E4405F]/30" }, { icon: Icons.Mail, url: "mailto:bryanvrgsc@gmail.com", label: "Email", color: "hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30" }];
 
   if (status === 'success') {
@@ -830,7 +866,68 @@ export const ContactView = () => {
 
             <div className="relative group"><textarea id="message" name="message" placeholder={t.placeholders.message} rows={4} value={formData.message} onChange={handleChange} disabled={status === 'submitting'} autoComplete="off" className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all resize-none text-sm disabled:opacity-50 ${fieldErrors.message ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/50' : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-1 focus:ring-emerald-500/50'}`}></textarea></div>
 
-            <div className="relative group"><input id="budget" name="budget" type="text" inputMode="numeric" pattern="[0-9]*" placeholder={t.placeholders.budget} value={formData.budget} onChange={handleChange} disabled={status === 'submitting'} autoComplete="off" className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 h-[62px]" /></div>
+            <div className="relative group flex gap-3">
+              <div className="relative w-[100px]" ref={currencyDropdownRef}>
+                <button type="button" onClick={() => setIsCurrencyOpen(!isCurrencyOpen)} disabled={status === 'submitting'} className="w-full h-[62px] bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-3 text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-lg">{getFlagEmoji(selectedCurrency.country)}</span>
+                    <span className="font-bold text-sm">{selectedCurrency.symbol}</span>
+                  </span>
+                  <svg className={`w-4 h-4 transition-transform ${isCurrencyOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isCurrencyOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-[240px] max-h-[300px] overflow-y-auto bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl shadow-xl z-50 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-2 sticky top-0 bg-[var(--card-bg)] border-b border-[var(--card-border)] z-10">
+                      <input
+                        type="text"
+                        placeholder="Search currency..."
+                        value={currencySearch}
+                        onChange={(e) => setCurrencySearch(e.target.value)}
+                        className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="p-1">
+                      {filteredCurrencies.map((c, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setFormData(prev => ({ ...prev, currency: c.code }));
+                            setIsCurrencyOpen(false);
+                            setCurrencySearch('');
+                          }}
+                          className="w-full text-left px-4 py-3 hover:bg-[var(--input-bg)] rounded-xl transition-colors flex items-center gap-3 text-sm text-[var(--text-primary)]"
+                        >
+                          <span className="text-lg">{getFlagEmoji(c.country)}</span>
+                          <span className="font-bold text-base w-8">{c.symbol}</span>
+                          <span className="font-medium">{c.label}</span>
+                        </button>
+                      ))}
+                      {filteredCurrencies.length === 0 && (
+                        <div className="p-4 text-center text-[var(--text-tertiary)] text-sm">No currencies found</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <CurrencyInput
+                id="budget"
+                name="budget"
+                placeholder={t.placeholders.budget}
+                value={budgetValue}
+                decimalsLimit={2}
+                onValueChange={(value) => {
+                  setBudgetValue(value);
+                  setFormData(prev => ({ ...prev, budget: value || '' }));
+                }}
+                prefix={selectedCurrency.symbol + ' '}
+                disabled={status === 'submitting'}
+                className="flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 h-[62px]"
+              />
+            </div>
             {errorMessage && (<div className="text-red-500 text-sm text-center font-medium bg-red-500/10 py-2 rounded-xl border border-red-500/20 animate-pulse">{errorMessage}</div>)}
             <LiquidButton type="submit" className="w-full py-5 md:py-6 text-lg md:text-xl font-bold tracking-wide rounded-full" style={{ '--card-bg': 'rgba(16, 185, 129, 0.15)', '--card-hover-bg': 'rgba(16, 185, 129, 0.25)', '--card-border': 'rgba(16, 185, 129, 0.5)', '--glass-glow': 'rgba(16, 185, 129, 0.6)', '--highlight-color': 'rgba(16, 185, 129, 0.2)' } as React.CSSProperties}>{status === 'submitting' ? t.button.sending : t.button.default}</LiquidButton>
           </form>
