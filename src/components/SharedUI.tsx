@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, useLayoutEffect, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings, setLang, setTheme, performanceMode } from '../store';
 import { Icons } from './Icons';
@@ -179,126 +179,329 @@ export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
   );
 };
 
-// --- CUSTOM CANVAS BACKGROUND (Network Data Traffic) ---
+// --- OPTIMIZED CANVAS BACKGROUND (Spatial Grid) ---
 
-import Particles, { initParticlesEngine } from "@tsparticles/react";
-import { loadSlim } from "@tsparticles/slim";
-import { type ISourceOptions } from "@tsparticles/engine";
+class Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  opacity: number;
+  targetOpacity: number;
+  neighbors: Particle[] = [];
+
+  constructor(w: number, h: number) {
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+    // Slow, smooth movement
+    this.vx = (Math.random() - 0.5) * 0.2;
+    this.vy = (Math.random() - 0.5) * 0.2;
+    this.radius = Math.random() * 1.5 + 1;
+    this.opacity = Math.random() * 0.5 + 0.1;
+    this.targetOpacity = this.opacity;
+  }
+
+  update(w: number, h: number) {
+    this.x += this.vx;
+    this.y += this.vy;
+
+    // Bounce
+    if (this.x < 0 || this.x > w) this.vx *= -1;
+    if (this.y < 0 || this.y > h) this.vy *= -1;
+
+    // Pulse
+    if (Math.random() < 0.01) {
+      this.targetOpacity = Math.random() * 0.6 + 0.1;
+    }
+    this.opacity += (this.targetOpacity - this.opacity) * 0.05;
+  }
+}
+
+class Packet {
+  from: Particle;
+  to: Particle;
+  progress: number = 0;
+  speed: number;
+  active: boolean = true;
+
+  constructor(from: Particle, to: Particle) {
+    this.from = from;
+    this.to = to;
+    this.speed = 0.02 + Math.random() * 0.02; // Fast packets
+  }
+
+  update() {
+    this.progress += this.speed;
+    if (this.progress >= 1) {
+      this.progress = 1;
+      this.active = false;
+    }
+  }
+
+  draw(ctx: CanvasRenderingContext2D, color: string) {
+    const x = this.from.x + (this.to.x - this.from.x) * this.progress;
+    const y = this.from.y + (this.to.y - this.from.y) * this.progress;
+
+    ctx.globalAlpha = 0.8;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+class SpatialGrid {
+  cellSize: number;
+  cols: number;
+  rows: number;
+  cells: Particle[][]; // Fixed type: Array of arrays of Particles
+
+  constructor(width: number, height: number, cellSize: number) {
+    this.cellSize = cellSize;
+    this.cols = Math.ceil(width / cellSize);
+    this.rows = Math.ceil(height / cellSize);
+    this.cells = [];
+    for (let i = 0; i < this.cols * this.rows; i++) {
+      this.cells[i] = [];
+    }
+  }
+
+  clear() {
+    for (let i = 0; i < this.cells.length; i++) {
+      this.cells[i] = [];
+    }
+  }
+
+  add(particle: Particle) {
+    const col = Math.floor(particle.x / this.cellSize);
+    const row = Math.floor(particle.y / this.cellSize);
+    // Boundary checks
+    if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {
+      this.cells[row * this.cols + col].push(particle);
+    }
+  }
+
+  // Get potential neighbors from current and surrounding cells
+  getNeighbors(particle: Particle): Particle[] {
+    const col = Math.floor(particle.x / this.cellSize);
+    const row = Math.floor(particle.y / this.cellSize);
+    const neighbors: Particle[] = [];
+
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        const c = col + i;
+        const r = row + j;
+        if (c >= 0 && c < this.cols && r >= 0 && r < this.rows) {
+          const cell = this.cells[r * this.cols + c];
+          for (let k = 0; k < cell.length; k++) {
+            neighbors.push(cell[k]);
+          }
+        }
+      }
+    }
+    return neighbors;
+  }
+}
 
 export const CanvasBackground = () => {
   const { theme } = useStore(settings);
   const { lite } = useStore(performanceMode);
-  const [init, setInit] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Initialize tsparticles engine
+  // Refs for animation state
+  const particlesRef = useRef<Particle[]>([]);
+  const packetsRef = useRef<Packet[]>([]);
+  const gridRef = useRef<SpatialGrid | null>(null);
+  const animationRef = useRef<number | undefined>(undefined);
+  const [noiseDataUrl, setNoiseDataUrl] = useState('');
+
+  // Generate Noise
   useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    }).then(() => {
-      setInit(true);
-    });
-  }, []);
+    if (lite) return;
+    const createNoise = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const idata = ctx.createImageData(128, 128);
+        const buffer32 = new Uint32Array(idata.data.buffer);
+        for (let i = 0; i < buffer32.length; i++) {
+          if (Math.random() < 0.5) buffer32[i] = 0x08000000;
+        }
+        ctx.putImageData(idata, 0, 0);
+        setNoiseDataUrl(canvas.toDataURL());
+      }
+    };
+    createNoise();
+  }, [lite]);
 
-  const particlesLoaded = async (): Promise<void> => {
-    // Optional: Do something when particles are loaded
-  };
+  useEffect(() => {
+    if (lite) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+    if (!ctx) return;
 
-  const options: ISourceOptions = useMemo(
-    () => ({
-      background: {
-        color: {
-          value: "transparent",
-        },
-      },
-      fpsLimit: 60, // Limit FPS for performance
-      interactivity: {
-        events: {
-          onClick: {
-            enable: true,
-            mode: "push",
-          },
-          onHover: {
-            enable: true,
-            mode: "grab",
-          },
-        },
-        modes: {
-          push: {
-            quantity: 4,
-          },
-          grab: {
-            distance: 140,
-            links: {
-              opacity: 0.5,
-            },
-          },
-        },
-      },
-      particles: {
-        color: {
-          value: theme === 'dark' ? "#10b981" : "#475569", // Emerald for dark, Slate for light
-        },
-        links: {
-          color: theme === 'dark' ? "#10b981" : "#475569",
-          distance: 150,
-          enable: true,
-          opacity: theme === 'dark' ? 0.2 : 0.15,
-          width: 1,
-        },
-        move: {
-          direction: "none",
-          enable: true,
-          outModes: {
-            default: "bounce",
-          },
-          random: false,
-          speed: 1, // Optimized speed
-          straight: false,
-        },
-        number: {
-          density: {
-            enable: true,
-            width: 800,
-            height: 800,
-          },
-          value: lite ? 40 : 80, // Reduce particles in Lite mode
-        },
-        opacity: {
-          value: 0.5,
-        },
-        shape: {
-          type: "circle",
-        },
-        size: {
-          value: { min: 1, max: 3 },
-        },
-      },
-      detectRetina: true,
-    }),
-    [theme, lite],
-  );
+    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const nodeColor = isDark ? "rgba(16, 185, 129, " : "rgba(71, 85, 105, ";
+    const lineColor = isDark ? "rgba(16, 185, 129, 0.15)" : "rgba(71, 85, 105, 0.1)";
+    const packetColor = isDark ? "#34d399" : "#059669";
+    const bgColor = isDark ? '#0a0a0a' : '#ffffff';
 
-  if (lite && !init) {
-    return (
-      <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)]" />
-    );
+    const maxDist = 130;
+    const maxDistSq = maxDist * maxDist;
+
+    const init = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      ctx.scale(dpr, dpr);
+
+      // Grid setup
+      gridRef.current = new SpatialGrid(width, height, maxDist);
+
+      // High density: 1 particle per ~9000px^2
+      const area = width * height;
+      const count = Math.min(Math.floor(area / 9000), 250); // Cap at 250 for safety
+
+      particlesRef.current = [];
+      packetsRef.current = [];
+      for (let i = 0; i < count; i++) {
+        particlesRef.current.push(new Particle(width, height));
+      }
+    };
+
+    const draw = () => {
+      animationRef.current = requestAnimationFrame(draw);
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const grid = gridRef.current;
+      if (!grid) return;
+
+      // Clear
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, width, height);
+
+      // Update particles & fill grid
+      grid.clear();
+      const particles = particlesRef.current;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.update(width, height);
+        grid.add(p);
+        p.neighbors = []; // Reset neighbors
+      }
+
+      // Draw Lines & Find Neighbors
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = lineColor;
+      ctx.beginPath();
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        // Only check nearby particles from grid
+        const potentialNeighbors = grid.getNeighbors(p);
+
+        for (let j = 0; j < potentialNeighbors.length; j++) {
+          const n = potentialNeighbors[j];
+          if (p === n) continue; // Skip self
+
+          // Optimization: Only draw connection if p index < n index to avoid duplicates
+          // But since we don't have indices easily in grid, we can check x coordinate or id
+          // Simple check: only connect if n.x > p.x to avoid double drawing roughly
+          if (n.x <= p.x) continue;
+
+          const dx = p.x - n.x;
+          const dy = p.y - n.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq < maxDistSq) {
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(n.x, n.y);
+
+            // Register neighbors for packets
+            if (p.neighbors.length < 5) p.neighbors.push(n);
+            if (n.neighbors.length < 5) n.neighbors.push(p);
+          }
+        }
+      }
+      ctx.stroke();
+
+      // Draw Nodes
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        ctx.fillStyle = nodeColor + p.opacity + ")";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Packets Logic
+      const packets = packetsRef.current;
+
+      // Spawn new packets
+      // High traffic: spawn multiple packets per frame if needed
+      if (packets.length < 100 && Math.random() < 0.3) {
+        const source = particles[Math.floor(Math.random() * particles.length)];
+        if (source.neighbors.length > 0) {
+          const dest = source.neighbors[Math.floor(Math.random() * source.neighbors.length)];
+          packets.push(new Packet(source, dest));
+        }
+      }
+
+      // Update & Draw Packets
+      for (let i = packets.length - 1; i >= 0; i--) {
+        const pkt = packets[i];
+        pkt.update();
+        if (!pkt.active) {
+          // Chance to hop to next node
+          if (pkt.to.neighbors.length > 0 && Math.random() < 0.5) {
+            const next = pkt.to.neighbors[Math.floor(Math.random() * pkt.to.neighbors.length)];
+            // Don't go back immediately if possible
+            if (next !== pkt.from || pkt.to.neighbors.length === 1) {
+              packets.push(new Packet(pkt.to, next));
+            }
+          }
+          packets.splice(i, 1);
+        } else {
+          pkt.draw(ctx, packetColor);
+        }
+      }
+    };
+
+    let resizeTimeout: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(init, 200);
+    };
+
+    window.addEventListener('resize', handleResize);
+    init();
+    draw();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [theme, lite]);
+
+  if (lite) {
+    return <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)]" />;
   }
 
   return (
     <>
-      <div
-        className="fixed top-0 left-0 w-full h-full -z-10 bg-[var(--bg-gradient)]"
-        style={{ backgroundAttachment: 'fixed' }}
-      />
-
-      {init && (
-        <Particles
-          id="tsparticles"
-          particlesLoaded={particlesLoaded}
-          options={options}
-          className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-60 dark:opacity-100"
-        />
-      )}
+      <div className="fixed top-0 left-0 w-full h-full -z-10 bg-[var(--bg-gradient)]" style={{ backgroundAttachment: 'fixed' }} />
+      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-60 dark:opacity-100" />
+      {noiseDataUrl && <div className="bg-noise fixed top-0 left-0 w-full h-full z-0 pointer-events-none" style={{ backgroundImage: `url(${noiseDataUrl})` }} />}
     </>
   );
 };
