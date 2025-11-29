@@ -15,5 +15,15 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
+    chunkSizeWarningLimit: 1000, // Increase limit to avoid warnings for slightly larger chunks
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'nanostores', '@nanostores/react'],
+          'pdf-vendor': ['pdfjs-dist'],
+          'particles-vendor': ['@tsparticles/react', '@tsparticles/slim', '@tsparticles/engine'],
+        },
+      },
+    },
   }
 });
