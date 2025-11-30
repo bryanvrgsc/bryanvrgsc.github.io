@@ -11,6 +11,9 @@ export type { LiquidButtonProps } from './LiquidButton';
 export { GlassElement, GlassDock } from './GlassElement';
 export type { GlassElementProps } from './GlassElement';
 
+export { PhoneInput } from './PhoneInput';
+export { BudgetInput } from './BudgetInput';
+
 export { Typewriter } from './Typewriter';
 export type { TypewriterProps } from './Typewriter';
 

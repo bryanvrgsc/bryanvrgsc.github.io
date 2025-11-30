@@ -106,7 +106,9 @@ export interface UIText {
         placeholders: {
             name: string;
             email: string;
+            phone: string;
             message: string;
+            budget: string;
         };
         button: {
             default: string;

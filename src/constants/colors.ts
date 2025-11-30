@@ -95,7 +95,7 @@ export const NETWORK_COLORS = {
         canvasBg: '#ffffff',
 
         // Nodes (darker green for visibility on light background)
-        nodeColor: 'rgba(71, 85, 105, ',  // Base color, opacity added dynamically
+        nodeColor: 'rgba(71, 85, 105, 0.1) ',  // Base color, opacity added dynamically
 
         // Lines connecting nodes
         lineColor: 'rgba(71, 85, 105, 0.1)',
@@ -110,10 +110,10 @@ export const NETWORK_COLORS = {
         canvasBg: '#0a0a0a',
 
         // Nodes (lighter green for visibility on dark background)
-        nodeColor: 'rgba(16, 185, 129, ',  // Base color, opacity added dynamically
+        nodeColor: 'rgba(16, 185, 129, 1)',  // Base color, opacity added dynamically
 
         // Lines connecting nodes
-        lineColor: 'rgba(16, 185, 129, 0.15)',
+        lineColor: 'rgba(16, 185, 129, 1)',
 
         // Data packets traveling between nodes
         packetColor: '#34d399',  // Emerald-400
