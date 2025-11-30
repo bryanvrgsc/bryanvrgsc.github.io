@@ -4,6 +4,7 @@ import { settings } from '../../store';
 import { Icons } from '../Icons';
 import { LiquidButton } from '../common/LiquidButton';
 import { UI_TEXT } from '../../constants/ui-text';
+import { SOCIAL_COLORS } from '../../constants/colors';
 
 /**
  * ContactView Component
@@ -77,10 +78,10 @@ export const ContactView = () => {
     };
 
     const socialLinks = [
-        { icon: Icons.LinkedIn, url: "https://www.linkedin.com/in/bryanvrgsc", label: "LinkedIn", color: "hover:text-[#0077b5] hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30" },
-        { icon: Icons.GitHub, url: "https://github.com/bryanvrgsc", label: "GitHub", color: "hover:text-[#333] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20" },
-        { icon: Icons.WhatsApp, url: "https://api.whatsapp.com/send?phone=12533687369", label: "WhatsApp", color: "hover:text-[#25D366] hover:bg-[#25D366]/10 hover:border-[#25D366]/30" },
-        { icon: Icons.Instagram, url: "https://www.instagram.com/bryanvrgsc/", label: "Instagram", color: "hover:text-[#E4405F] hover:bg-[#E4405F]/10 hover:border-[#E4405F]/30" },
+        { icon: Icons.LinkedIn, url: "https://www.linkedin.com/in/bryanvrgsc", label: "LinkedIn", color: SOCIAL_COLORS.linkedin.hover },
+        { icon: Icons.GitHub, url: "https://github.com/bryanvrgsc", label: "GitHub", color: SOCIAL_COLORS.github.hover },
+        { icon: Icons.WhatsApp, url: "https://api.whatsapp.com/send?phone=12533687369", label: "WhatsApp", color: SOCIAL_COLORS.whatsapp.hover },
+        { icon: Icons.Instagram, url: "https://www.instagram.com/bryanvrgsc/", label: "Instagram", color: SOCIAL_COLORS.instagram.hover },
         { icon: Icons.Mail, url: "mailto:bryanvrgsc@gmail.com", label: "Email", color: "hover:text-red-500 hover:bg-red-500/10 hover:border-red-500/30" }
     ];
 

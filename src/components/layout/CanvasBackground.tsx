@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings, performanceMode } from '../../store';
+import { NETWORK_COLORS } from '../../constants/colors';
 
 /**
  * SpatialGrid Class
@@ -257,10 +258,13 @@ export const CanvasBackground = () => {
         // Detectar tema y cachear colores
         const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
+        // Use centralized color constants
+        const networkColors = isDark ? NETWORK_COLORS.dark : NETWORK_COLORS.light;
+
         colorsRef.current = {
-            nodeColor: isDark ? "rgba(16, 185, 129, " : "rgba(71, 85, 105, ",
-            lineColor: isDark ? "rgba(16, 185, 129, 0.15)" : "rgba(71, 85, 105, 0.1)",
-            packetColor: isDark ? "#34d399" : "#059669"
+            nodeColor: networkColors.nodeColor,
+            lineColor: networkColors.lineColor,
+            packetColor: networkColors.packetColor
         };
 
         configRef.current.isDark = isDark;

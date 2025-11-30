@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings } from '../../store';
 import { Icons } from '../Icons';
+import { LOGO_COLORS, GLOW_EFFECTS } from '../../constants/colors';
 import { navigateTo } from '../../utils/navigation';
 
 /**
@@ -39,10 +40,10 @@ export const Header = () => {
                 aria-label="Go to Homepage"
             >
                 <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-3 mr-3">
-                        <Icons.Windows className="w-5 h-5 text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                        <Icons.Apple className={`w-5 h-5 transition-colors duration-300 ${isDark ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-black drop-shadow-[0_0_6px_rgba(0,0,0,0.5)]'}`} />
-                        <Icons.Linux className="w-5 h-5 text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <Icons.Windows className={`w-5 h-5 ${LOGO_COLORS.windows.color} ${LOGO_COLORS.windows.glow}`} />
+                        <Icons.Apple className={`w-5 h-5 transition-colors duration-300 ${isDark ? `${LOGO_COLORS.apple.dark} ${LOGO_COLORS.apple.glowDark}` : `${LOGO_COLORS.apple.light} ${LOGO_COLORS.apple.glowLight}`}`} />
+                        <Icons.Linux className={`w-5 h-5 ${LOGO_COLORS.linux.color} ${LOGO_COLORS.linux.glow}`} />
                     </div>
                     <span className="font-mono text-base md:text-lg font-bold tracking-tight text-[var(--text-primary)] flex items-center">
                         <span className="text-[var(--text-tertiary)] mr-[1px]">@</span>
