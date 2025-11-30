@@ -3,6 +3,101 @@ import { useStore } from '@nanostores/react';
 import { settings, performanceMode } from '../../store';
 
 /**
+ * SpatialGrid Class
+ * 
+ * Optimizes neighbor detection from O(n²) to O(n) by partitioning space into cells.
+ * Each node only checks neighbors in its cell and adjacent cells.
+ */
+class SpatialGrid {
+    private cellSize: number;
+    private cols: number;
+    private rows: number;
+    private grid: Map<string, NetworkNode[]>;
+    private _width: number;
+    private _height: number;
+
+    constructor(width: number, height: number, cellSize: number) {
+        this._width = width;
+        this._height = height;
+        this.cellSize = cellSize;
+        this.cols = Math.ceil(width / cellSize);
+        this.rows = Math.ceil(height / cellSize);
+        this.grid = new Map();
+    }
+
+    /**
+     * Clear all cells in the grid
+     */
+    clear() {
+        this.grid.clear();
+    }
+
+    /**
+     * Get cell key for coordinates
+     */
+    private getCellKey(x: number, y: number): string {
+        const col = Math.floor(x / this.cellSize);
+        const row = Math.floor(y / this.cellSize);
+        return `${col},${row}`;
+    }
+
+    /**
+     * Insert a node into the grid
+     */
+    insert(node: NetworkNode) {
+        const key = this.getCellKey(node.x, node.y);
+        if (!this.grid.has(key)) {
+            this.grid.set(key, []);
+        }
+        this.grid.get(key)!.push(node);
+    }
+
+    /**
+     * Get all nodes in the same cell and adjacent cells (9 cells total)
+     * This is the key optimization: instead of checking all n nodes,
+     * we only check nodes in nearby cells.
+     */
+    getNearby(node: NetworkNode): NetworkNode[] {
+        const col = Math.floor(node.x / this.cellSize);
+        const row = Math.floor(node.y / this.cellSize);
+        const nearby: NetworkNode[] = [];
+
+        // Check 3x3 grid of cells (current cell + 8 adjacent cells)
+        for (let dc = -1; dc <= 1; dc++) {
+            for (let dr = -1; dr <= 1; dr++) {
+                const checkCol = col + dc;
+                const checkRow = row + dr;
+
+                // Skip out of bounds cells
+                if (checkCol < 0 || checkCol >= this.cols || checkRow < 0 || checkRow >= this.rows) {
+                    continue;
+                }
+
+                const key = `${checkCol},${checkRow}`;
+                const cellNodes = this.grid.get(key);
+
+                if (cellNodes) {
+                    nearby.push(...cellNodes);
+                }
+            }
+        }
+
+        return nearby;
+    }
+
+    /**
+     * Update grid dimensions (call on resize)
+     */
+    resize(width: number, height: number) {
+        this._width = width;
+        this._height = height;
+        this.cols = Math.ceil(width / this.cellSize);
+        this.rows = Math.ceil(height / this.cellSize);
+        this.clear();
+    }
+}
+
+/**
  * NetworkNode Class
  * 
  * Represents a node in the network visualization.
@@ -114,6 +209,7 @@ export const CanvasBackground = () => {
     const nodesRef = useRef<NetworkNode[]>([]);
     const packetsRef = useRef<DataPacket[]>([]);
     const linksRef = useRef<{ a: NetworkNode, b: NetworkNode }[]>([]);
+    const spatialGridRef = useRef<SpatialGrid | null>(null);
     const lastTopologyUpdate = useRef<number>(0);
     const animationRef = useRef<number | undefined>(undefined);
     const [noiseDataUrl, setNoiseDataUrl] = useState('');
@@ -210,6 +306,11 @@ export const CanvasBackground = () => {
             for (let i = 0; i < nodeCount; i++) {
                 nodesRef.current.push(new NetworkNode(width, height));
             }
+
+            // Initialize Spatial Grid with cell size = maxDist for optimal performance
+            // This ensures each cell covers exactly the connection range
+            const maxDist = 120;
+            spatialGridRef.current = new SpatialGrid(width, height, maxDist);
         };
 
         // Variables para 60 FPS
@@ -245,6 +346,7 @@ export const CanvasBackground = () => {
                 }
 
                 // Update Topology (Links) Throttled to every 300ms
+                // NOW USING SPATIAL GRID: O(n) instead of O(n²)
                 if (time - lastTopologyUpdate.current > 300) {
                     lastTopologyUpdate.current = time;
                     linksRef.current = [];
@@ -254,39 +356,62 @@ export const CanvasBackground = () => {
                         nodes[i].neighbors = [];
                     }
 
-                    // Reduced Max Dist slightly to accommodate higher node count (prevent hairball)
-                    const maxDist = 120; // Reduced from 140
+                    const maxDist = 120;
                     const maxDistSq = maxDist * maxDist;
-                    const maxConnections = 6; // Increased connections slightly
+                    const maxConnections = 6;
                     const connectionCounts = new Int8Array(nodeCount).fill(0);
 
-                    for (let i = 0; i < nodeCount; i++) {
-                        if (connectionCounts[i] >= maxConnections) continue;
-                        const nodeA = nodes[i];
+                    // SPATIAL GRID OPTIMIZATION: O(n) complexity
+                    const spatialGrid = spatialGridRef.current;
+                    if (spatialGrid) {
+                        // Clear and populate grid - O(n)
+                        spatialGrid.clear();
+                        for (let i = 0; i < nodeCount; i++) {
+                            spatialGrid.insert(nodes[i]);
+                        }
 
-                        for (let j = i + 1; j < nodeCount; j++) {
-                            if (connectionCounts[j] >= maxConnections) continue;
-                            const nodeB = nodes[j];
+                        // For each node, only check nearby nodes - O(n) total
+                        for (let i = 0; i < nodeCount; i++) {
+                            if (connectionCounts[i] >= maxConnections) continue;
 
-                            const dx = nodeA.x - nodeB.x;
-                            if (Math.abs(dx) > maxDist) continue;
-                            const dy = nodeA.y - nodeB.y;
-                            if (Math.abs(dy) > maxDist) continue;
+                            const nodeA = nodes[i];
+                            const nearbyNodes = spatialGrid.getNearby(nodeA);
 
-                            const distSq = dx * dx + dy * dy;
+                            // Only check nodes in nearby cells (typically 9 cells)
+                            for (let k = 0; k < nearbyNodes.length; k++) {
+                                const nodeB = nearbyNodes[k];
 
-                            if (distSq < maxDistSq) {
-                                // Add Link
-                                linksRef.current.push({ a: nodeA, b: nodeB });
+                                // Skip self
+                                if (nodeA === nodeB) continue;
 
-                                // Add Neighbors (for packets)
-                                nodeA.neighbors.push(nodeB);
-                                nodeB.neighbors.push(nodeA);
+                                // Find nodeB's index for connection tracking
+                                const j = nodes.indexOf(nodeB);
 
-                                connectionCounts[i]++;
-                                connectionCounts[j]++;
+                                // Skip if already processed (avoid duplicate connections)
+                                if (j <= i) continue;
 
-                                if (connectionCounts[i] >= maxConnections) break;
+                                if (connectionCounts[j] >= maxConnections) continue;
+
+                                const dx = nodeA.x - nodeB.x;
+                                if (Math.abs(dx) > maxDist) continue;
+                                const dy = nodeA.y - nodeB.y;
+                                if (Math.abs(dy) > maxDist) continue;
+
+                                const distSq = dx * dx + dy * dy;
+
+                                if (distSq < maxDistSq) {
+                                    // Add Link
+                                    linksRef.current.push({ a: nodeA, b: nodeB });
+
+                                    // Add Neighbors (for packets)
+                                    nodeA.neighbors.push(nodeB);
+                                    nodeB.neighbors.push(nodeA);
+
+                                    connectionCounts[i]++;
+                                    connectionCounts[j]++;
+
+                                    if (connectionCounts[i] >= maxConnections) break;
+                                }
                             }
                         }
                     }

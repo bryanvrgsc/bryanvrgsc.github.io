@@ -123,20 +123,20 @@ src/
 - [x] Extraer `TechCard` a `src/components/ui/TechCard.tsx`
 - [x] Extraer `PDFViewer` a `src/components/ui/PDFViewer.tsx`
 
-### Fase 4: Vistas ⏳
-- [ ] Extraer `HomeView` a `src/components/views/HomeView.tsx`
-- [ ] Extraer `ServicesView` a `src/components/views/ServicesView.tsx`
-- [ ] Extraer `PortfolioView` a `src/components/views/PortfolioView.tsx`
-- [ ] Extraer `BlogView` a `src/components/views/BlogView.tsx`
-- [ ] Extraer `ContactView` a `src/components/views/ContactView.tsx`
+### Fase 4: Vistas ✅
+- [x] Extraer `HomeView` a `src/components/views/HomeView.tsx`
+- [x] Extraer `ServicesView` a `src/components/views/ServicesView.tsx`
+- [x] Extraer `PortfolioView` a `src/components/views/PortfolioView.tsx`
+- [x] Extraer `BlogView` a `src/components/views/BlogView.tsx`
+- [x] Extraer `ContactView` a `src/components/views/ContactView.tsx`
 
-### Fase 5: Modales ⏳
-- [ ] Extraer `PortfolioModal` a `src/components/modals/PortfolioModal.tsx`
+### Fase 5: Modales ✅
+- [x] Extraer `PortfolioModal` a `src/components/modals/PortfolioModal.tsx`
 
-### Fase 6: Constantes Restantes ⏳
-- [ ] Crear `src/constants/portfolio.ts`
-- [ ] Crear `src/constants/blog.ts`
-- [ ] Crear `src/constants/engagement-models.ts`
+### Fase 6: Constantes Restantes ✅
+- [x] Crear `src/constants/portfolio.ts`
+- [x] Crear `src/constants/blog.ts`
+- [x] Crear `src/constants/engagement-models.ts`
 
 ### Fase 7: Limpieza Final ⏳
 - [ ] Actualizar imports en `App.tsx`
@@ -228,4 +228,4 @@ import type { Language, Service, PortfolioProject } from '@/types';
 ---
 
 **Última actualización**: 2025-11-29
-**Estado**: En progreso - Fase inicial completada
+**Estado**: En progreso - Fases 1-6 completadas

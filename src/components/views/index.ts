@@ -1,11 +1,11 @@
 /**
- * View Components Index
+ * Views Index
  * 
- * Re-exports view components from PageViews.tsx for backward compatibility.
- * These components represent full page views in the application.
- * 
- * Note: The actual component implementations are still in PageViews.tsx.
- * Future work: Extract each view into its own file for better modularity.
+ * Central export point for all view components.
  */
 
-export { HomeView, ServicesView, PortfolioView, BlogView, ContactView } from '../PageViews';
+export { HomeView } from './HomeView';
+export { ServicesView } from './ServicesView';
+export { PortfolioView } from './PortfolioView';
+export { BlogView } from './BlogView';
+export { ContactView } from './ContactView';

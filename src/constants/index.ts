@@ -1,9 +1,15 @@
+/**
+ * Constants Index
+ * 
+ * Central export point for all constants.
+ */
+
 // Re-export all constants from their respective files
 export { UI_TEXT } from './ui-text';
 export { SERVICES } from './services';
+export { PORTFOLIO } from './portfolio';
+export { BLOG_POSTS } from './blog';
+export { ENGAGEMENT_MODELS } from './engagement-models';
 
 // Re-export types
 export type { Language } from '../types';
-
-// Temporarily re-export from old constants file until migration is complete
-export { PORTFOLIO, BLOG_POSTS, ENGAGEMENT_MODELS } from '../constants';
