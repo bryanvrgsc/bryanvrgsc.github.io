@@ -4,7 +4,7 @@ import { settings } from '../../store';
 import { Icons } from '../Icons';
 import { LiquidButton, PhoneInput, BudgetInput } from '../common';
 import { UI_TEXT } from '../../constants/ui-text';
-import { SOCIAL_COLORS } from '../../constants/colors';
+import { SOCIAL_COLORS, DYNAMIC_COLORS, getDynamicButtonStyles } from '../../constants/colors';
 
 /**
  * ContactView Component
@@ -165,13 +165,23 @@ export const ContactView = () => {
         return (
             <div className="max-w-3xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
                 <div onMouseMove={handleMouseMove} className="bento-card p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px]">
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-emerald-500/5 to-transparent pointer-events-none"></div>
-                    <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(52,211,153,0.5)] animate-pulse">
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b pointer-events-none" style={{ backgroundImage: `linear-gradient(to bottom, ${DYNAMIC_COLORS.raw.light.primary}0D, transparent)` }}></div>
+                    <div
+                        className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-6 animate-pulse"
+                        style={{
+                            background: `linear-gradient(to bottom right, ${DYNAMIC_COLORS.raw.light.accent}, ${DYNAMIC_COLORS.raw.light.primary})`,
+                            boxShadow: `0 0 40px rgba(${DYNAMIC_COLORS.raw.light.rgb.r}, ${DYNAMIC_COLORS.raw.light.rgb.g}, ${DYNAMIC_COLORS.raw.light.rgb.b}, 0.5)`
+                        }}
+                    >
                         <Icons.CheckCircle className="w-10 h-10 md:w-12 md:h-12 text-white" />
                     </div>
                     <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4 tracking-tight">{t.successTitle}</h2>
                     <p className="text-lg md:text-xl text-[var(--text-secondary)] mb-10 max-w-md">{t.successMessage.replace('{name}', formData.name)}</p>
-                    <LiquidButton onClick={handleReset} className="px-8 py-4 md:px-8 md:py-4 text-base md:text-lg rounded-full" style={{ '--card-bg': 'rgba(16, 185, 129, 0.15)', '--card-border': 'rgba(16, 185, 129, 0.5)', '--glass-glow': 'rgba(16, 185, 129, 0.6)' } as React.CSSProperties}>
+                    <LiquidButton
+                        onClick={handleReset}
+                        className="px-8 py-4 md:px-8 md:py-4 text-base md:text-lg rounded-full"
+                        style={getDynamicButtonStyles().light as React.CSSProperties}
+                    >
                         {t.sendAnother}
                     </LiquidButton>
                 </div>
@@ -200,7 +210,13 @@ export const ContactView = () => {
 
                 {/* Contact Form */}
                 <div onMouseMove={handleMouseMove} className="bento-card p-6 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] text-center relative overflow-hidden flex-grow">
-                    <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-[2rem] mx-auto mb-6 md:mb-10 shadow-[0_20px_50px_-10px_rgba(16,185,129,0.5)] flex items-center justify-center relative z-10 transform -rotate-6 group-hover:rotate-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
+                    <div
+                        className="w-20 h-20 md:w-24 md:h-24 rounded-[2rem] mx-auto mb-6 md:mb-10 flex items-center justify-center relative z-10 transform -rotate-6 group-hover:rotate-0 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                        style={{
+                            background: `linear-gradient(to bottom right, #3b82f6, ${DYNAMIC_COLORS.raw.light.primary})`,
+                            boxShadow: `0 20px 50px -10px rgba(${DYNAMIC_COLORS.raw.light.rgb.r}, ${DYNAMIC_COLORS.raw.light.rgb.g}, ${DYNAMIC_COLORS.raw.light.rgb.b}, 0.5)`
+                        }}
+                    >
                         <Icons.Talk className="w-8 h-8 md:w-10 md:h-10 text-white" />
                     </div>
                     <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-4 md:mb-6 relative z-10 tracking-tight">{t.title}</h2>
@@ -222,7 +238,7 @@ export const ContactView = () => {
                                     aria-invalid={touched.name && !!fieldErrors.name}
                                     className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm focus:ring-1 disabled:opacity-50 ${touched.name && fieldErrors.name
                                         ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50'
-                                        : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-emerald-500/50'
+                                        : `border-[var(--input-border)] ${DYNAMIC_COLORS.focusBorder} focus:bg-[var(--glass-glow)] ${DYNAMIC_COLORS.focusRing}`
                                         }`}
                                 />
                                 {touched.name && fieldErrors.name && (
@@ -242,7 +258,7 @@ export const ContactView = () => {
                                     aria-invalid={touched.email && !!fieldErrors.email}
                                     className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all text-sm focus:ring-1 disabled:opacity-50 ${touched.email && fieldErrors.email
                                         ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50'
-                                        : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-emerald-500/50'
+                                        : `border-[var(--input-border)] ${DYNAMIC_COLORS.focusBorder} focus:bg-[var(--glass-glow)] ${DYNAMIC_COLORS.focusRing}`
                                         }`}
                                 />
                                 {touched.email && fieldErrors.email && (
@@ -274,7 +290,7 @@ export const ContactView = () => {
                                 aria-invalid={touched.message && !!fieldErrors.message}
                                 className={`w-full bg-[var(--input-bg)] border rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none transition-all resize-none text-sm focus:ring-1 disabled:opacity-50 ${touched.message && fieldErrors.message
                                     ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50'
-                                    : 'border-[var(--input-border)] focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] focus:ring-emerald-500/50'
+                                    : `border-[var(--input-border)] ${DYNAMIC_COLORS.focusBorder} focus:bg-[var(--glass-glow)] ${DYNAMIC_COLORS.focusRing}`
                                     }`}
                             ></textarea>
                             {touched.message && fieldErrors.message && (
@@ -297,13 +313,7 @@ export const ContactView = () => {
                         <LiquidButton
                             type="submit"
                             className="w-full py-5 md:py-6 text-lg md:text-xl font-bold tracking-wide rounded-full"
-                            style={{
-                                '--card-bg': 'rgba(16, 185, 129, 0.15)',
-                                '--card-hover-bg': 'rgba(16, 185, 129, 0.25)',
-                                '--card-border': 'rgba(16, 185, 129, 0.5)',
-                                '--glass-glow': 'rgba(16, 185, 129, 0.6)',
-                                '--highlight-color': 'rgba(16, 185, 129, 0.2)'
-                            } as React.CSSProperties}
+                            style={getDynamicButtonStyles().light as React.CSSProperties}
                         >
                             {status === 'submitting' ? t.button.sending : t.button.default}
                         </LiquidButton>

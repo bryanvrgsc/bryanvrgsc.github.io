@@ -3,7 +3,7 @@ import { useStore } from '@nanostores/react';
 import { settings } from '../../store';
 import { Icons } from '../Icons';
 import { UI_TEXT } from '../../constants';
-import { DOCK_COLORS, GLOW_EFFECTS } from '../../constants/colors';
+import { DOCK_COLORS, SEMANTIC_COLORS, DYNAMIC_COLORS } from '../../constants/colors';
 import { GlassDock } from '../common/GlassElement';
 import { LiquidButton } from '../common/LiquidButton';
 import { navigateTo } from '../../utils/navigation';
@@ -49,7 +49,13 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
                                 : 'text-[var(--dock-text)] hover:text-[var(--text-primary)] hover:scale-125'}`}
                     >
                         {activeId === item.id && (
-                            <div className={`absolute -bottom-1.5 w-1 h-1 rounded-full ${DOCK_COLORS.indicator.bg} ${GLOW_EFFECTS.emerald.small}`}></div>
+                            <div
+                                className="absolute -bottom-1.5 w-1 h-1 rounded-full"
+                                style={{
+                                    backgroundColor: DYNAMIC_COLORS.raw.light.primary,
+                                    boxShadow: `0 0 12px ${DYNAMIC_COLORS.raw.light.primary}`
+                                }}
+                            ></div>
                         )}
                         {activeId === item.id && (
                             <div className="absolute inset-0 bg-[var(--text-primary)] opacity-[0.03] rounded-full scale-110"></div>
@@ -67,15 +73,16 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
                     type="button"
                     className={`rounded-full px-5 py-3 md:px-7 md:py-3.5 text-xs md:text-sm font-semibold transition-all duration-500
                 ${activeId === 'contact'
-                            ? `${DOCK_COLORS.hoverScale} ${GLOW_EFFECTS.emerald.medium}`
+                            ? `${DOCK_COLORS.hoverScale}`
                             : 'hover:scale-105 opacity-90 hover:opacity-100'}`}
                     style={{
                         '--card-bg': activeId === 'contact' ? DOCK_COLORS.activeBg : DOCK_COLORS.inactiveBg,
-                        '--card-hover-bg': activeId === 'contact' ? '#f0fdf4' : 'var(--dock-item-bg)',
+                        '--card-hover-bg': activeId === 'contact' ? SEMANTIC_COLORS.light.successBg : 'var(--dock-item-bg)',
                         '--card-border': activeId === 'contact' ? DOCK_COLORS.activeBorder : DOCK_COLORS.inactiveBorder,
                         '--text-primary': activeId === 'contact' ? 'var(--button-text)' : 'var(--text-primary)',
                         '--glass-glow': DOCK_COLORS.activeGlow,
-                        color: activeId === 'contact' ? '#064e3b' : undefined,
+                        color: activeId === 'contact' ? SEMANTIC_COLORS.light.successText : undefined,
+                        boxShadow: activeId === 'contact' ? `0 0 20px ${DYNAMIC_COLORS.raw.light.primary}66` : undefined
                     } as React.CSSProperties}
                     onClick={() => navigateTo('/contact')}
                 >

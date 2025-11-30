@@ -14,7 +14,7 @@ export interface TypewriterProps {
     text: string;
     delay?: number;
     startDelay?: number;
-    cursorColor?: string;
+    cursorColor?: string; // Can be Tailwind class (bg-emerald-500) or will use default
     onComplete?: () => void;
     active?: boolean;
 }
@@ -23,7 +23,7 @@ export const Typewriter: React.FC<TypewriterProps> = ({
     text,
     delay = 25,
     startDelay = 0,
-    cursorColor = "bg-emerald-500",
+    cursorColor = "bg-[var(--text-primary)]", // Default to primary text color
     onComplete,
     active = true
 }) => {

@@ -2,7 +2,8 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings, applyTheme, checkPerformance } from './src/store';
-import { CanvasBackground, Header, Dock, ThemeToggle, LanguageToggle, ScrollToTop } from './src/components/SharedUI';
+import { CanvasBackground, Header, Dock, ScrollToTop } from './src/components/layout';
+import { ThemeToggle, LanguageToggle } from './src/components/ui';
 
 // Lazy load views for Code Splitting
 const HomeView = React.lazy(() => import('./src/components/views/HomeView').then(module => ({ default: module.HomeView })));

@@ -1,22 +1,42 @@
 import React from 'react';
+import { DYNAMIC_COLORS } from '../../constants/colors';
 
 /**
  * TechCard Component
  * 
- * Reusable card component with accent color theming.
+ * Reusable card component with dynamic accent color theming.
  * Features corner decorations, gradient effects, and hover animations.
+ * Colors automatically adapt to the active palette.
  * 
  * @param title - Card title displayed at the top
  * @param children - Card content
- * @param accentColor - Theme color: 'emerald' (default) or 'blue'
+ * @param accentColor - Theme color: 'primary' (uses active palette) or 'blue'
  * @param className - Additional CSS classes
  */
-export const TechCard = ({ title, children, accentColor = "emerald", className = "" }: { title: string, children?: React.ReactNode, accentColor?: "emerald" | "blue", className?: string }) => {
-    const styles = accentColor === 'emerald' ? { border: "border-emerald-500/20", bg: "bg-emerald-500/5", text: "text-emerald-600 dark:text-emerald-400", indicator: "bg-emerald-500", glow: "group-hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]" } : { border: "border-cyan-500/20", bg: "bg-cyan-500/5", text: "text-cyan-600 dark:text-cyan-400", indicator: "bg-cyan-500", glow: "group-hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]" };
+export const TechCard = ({ title, children, accentColor = "primary", className = "" }: { title: string, children?: React.ReactNode, accentColor?: "primary" | "blue", className?: string }) => {
+    // Dynamic styles based on active palette
+    const styles = accentColor === 'primary' ? {
+        border: DYNAMIC_COLORS.borderOpacity,
+        bg: `bg-[${DYNAMIC_COLORS.raw.light.primary}]/5 dark:bg-[${DYNAMIC_COLORS.raw.dark.primary}]/5`,
+        text: DYNAMIC_COLORS.text,
+        indicator: DYNAMIC_COLORS.bg,
+        glow: DYNAMIC_COLORS.shadow,
+    } : {
+        border: "border-cyan-500/20",
+        bg: "bg-cyan-500/5",
+        text: "text-cyan-600 dark:text-cyan-400",
+        indicator: "bg-cyan-500",
+        glow: "group-hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]"
+    };
 
-    // Explicitly defined gradient classes to avoid Tailwind purging issues with dynamic strings
-    const gradientDivider = accentColor === 'emerald' ? "from-emerald-500/30" : "from-cyan-500/30";
-    const gradientBlob = accentColor === 'emerald' ? "from-emerald-500/10" : "from-cyan-500/10";
+    // Gradient classes using active palette
+    const gradientDivider = accentColor === 'primary'
+        ? DYNAMIC_COLORS.gradientFrom
+        : "from-cyan-500/30";
+
+    const gradientBlob = accentColor === 'primary'
+        ? DYNAMIC_COLORS.gradientFrom
+        : "from-cyan-500/10";
 
     return (
         <div className={`relative overflow-hidden rounded-[20px] border ${styles.border} ${styles.bg} backdrop-blur-md p-6 md:p-8 flex flex-col h-full group transition-all duration-700 hover:border-opacity-60 ${styles.glow} ${className}`}>
@@ -28,11 +48,11 @@ export const TechCard = ({ title, children, accentColor = "emerald", className =
             <div className="flex items-center gap-3 mb-5 opacity-90 relative z-10">
                 <div className="relative"><div className={`w-2 h-2 rounded-sm ${styles.indicator} shadow-[0_0_10px_rgba(255,255,255,0.5)]`}></div><div className={`absolute inset-0 w-2 h-2 rounded-sm ${styles.indicator} animate-ping opacity-30`}></div></div>
                 <span className={`text-[10px] md:text-xs font-bold tracking-[0.25em] uppercase font-mono ${styles.text}`}>{title}</span>
-                <div className={`h-[1px] flex-grow bg-gradient-to-r ${gradientDivider} to-transparent`}></div>
+                <div className={`h-[1px] flex-grow bg-gradient-to-r ${gradientDivider} to-transparent opacity-30`}></div>
             </div>
             <div className={`font-mono text-sm md:text-[15px] leading-relaxed ${styles.text} opacity-90 relative z-10 h-full flex flex-col justify-start`}>{children}</div>
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay pointer-events-none"></div>
-            <div className={`absolute -right-20 -bottom-20 w-64 h-64 bg-gradient-to-tl ${gradientBlob} to-transparent rounded-full blur-3xl pointer-events-none group-hover:opacity-100 opacity-50 transition-opacity duration-700`}></div>
+            <div className={`absolute -right-20 -bottom-20 w-64 h-64 bg-gradient-to-tl ${gradientBlob} to-transparent opacity-10 rounded-full blur-3xl pointer-events-none group-hover:opacity-100 transition-opacity duration-700`}></div>
         </div>
     );
 };

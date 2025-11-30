@@ -5,6 +5,7 @@ import { Icons } from '../Icons';
 import { UI_TEXT } from '../../constants/ui-text';
 import { BLOG_POSTS } from '../../constants';
 import { getCategoryTheme } from '../../utils/helpers';
+import { DYNAMIC_COLORS } from '../../constants/colors';
 
 /**
  * BlogView Component
@@ -39,7 +40,22 @@ export const BlogView = () => {
                     const theme = getCategoryTheme(post.category);
                     return (
                         <article onMouseMove={handleMouseMove} key={i} className="bento-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8 cursor-pointer group" style={theme.colors as React.CSSProperties}>
-                            <div className="h-20 w-20 md:h-28 md:w-28 rounded-3xl bg-[var(--input-bg)] flex-shrink-0 flex flex-col items-center justify-center border border-[var(--card-border)] group-hover:scale-105 transition-all duration-500 group-hover:border-emerald-500/30 group-hover:shadow-[0_0_30px_rgba(52,211,153,0.1)]">
+                            <div
+                                className="h-20 w-20 md:h-28 md:w-28 rounded-3xl bg-[var(--input-bg)] flex-shrink-0 flex flex-col items-center justify-center border border-[var(--card-border)] transition-all duration-500"
+                                style={{
+                                    transform: 'scale(1)',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'scale(1.05)';
+                                    e.currentTarget.style.borderColor = `${DYNAMIC_COLORS.raw.light.primary}4D`; // 30% opacity
+                                    e.currentTarget.style.boxShadow = `0 0 30px rgba(${DYNAMIC_COLORS.raw.light.rgb.r}, ${DYNAMIC_COLORS.raw.light.rgb.g}, ${DYNAMIC_COLORS.raw.light.rgb.b}, 0.1)`;
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'scale(1)';
+                                    e.currentTarget.style.borderColor = 'var(--card-border)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                }}
+                            >
                                 <span className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] tracking-tighter">{post.date.split(' ')[1].replace(',', '')}</span>
                                 <span className="text-[10px] md:text-[11px] uppercase text-[var(--text-secondary)] font-bold tracking-widest mt-1">{post.date.split(' ')[0]}</span>
                             </div>

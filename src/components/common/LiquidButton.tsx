@@ -1,4 +1,5 @@
 import React from 'react';
+import { DYNAMIC_COLORS } from '../../constants/colors';
 
 /**
  * LiquidButton - A premium button component with liquid glass morphism effect
@@ -46,8 +47,13 @@ export const LiquidButton: React.FC<LiquidButtonProps> = ({
                     style={{ background: 'linear-gradient(to top right, var(--highlight-color) 0%, transparent 40%)' }}
                 ></div>
 
-                {/* Internal Gradient Glow */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-emerald-500/20 blur-md"></div>
+                {/* Internal Gradient Glow - Dynamic */}
+                <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur-md"
+                    style={{
+                        background: `linear-gradient(to right, ${DYNAMIC_COLORS.raw.light.primary}33, ${DYNAMIC_COLORS.raw.light.accent}33, ${DYNAMIC_COLORS.raw.light.primary}33)`
+                    }}
+                ></div>
 
                 {/* Border Layer */}
                 <div className="absolute inset-0 border border-[var(--card-border)] rounded-full group-hover:border-[var(--glass-glow)] transition-colors duration-500 pointer-events-none"></div>

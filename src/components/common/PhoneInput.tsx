@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { allCountries } from 'country-telephone-data';
+import { allCountries as allCountriesRaw } from 'country-telephone-data';
+import { CountryTelephoneData, PhoneInputProps } from '../../types/modules';
+import { DYNAMIC_COLORS } from '../../constants/colors';
 
-interface PhoneInputProps {
-    value: string;
-    countryCode: string;
-    onChange: (value: string, countryCode: string) => void;
-    placeholder?: string;
-    disabled?: boolean;
-}
+
+const allCountries = allCountriesRaw as CountryTelephoneData[];
 
 /**
  * PhoneInput Component
@@ -104,7 +101,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                         type="button"
                         onClick={() => !disabled && setIsOpen(!isOpen)}
                         disabled={disabled}
-                        className="h-full px-4 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 flex items-center gap-2 min-w-[100px]"
+                        className={`h-full px-4 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl text-[var(--text-primary)] focus:outline-none ${DYNAMIC_COLORS.focusBorder} focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 ${DYNAMIC_COLORS.focusRing} disabled:opacity-50 flex items-center gap-2 min-w-[100px]`}
                     >
                         <span className="text-xl">{getFlagEmoji(selectedCountry.iso2)}</span>
                         <span className="font-mono text-sm">+{selectedCountry.dialCode}</span>
@@ -135,7 +132,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             placeholder="Search country..."
-                                            className="w-full pl-9 pr-3 py-2 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-emerald-500/50"
+                                            className={`w-full pl-9 pr-3 py-2 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none ${DYNAMIC_COLORS.focusBorder}`}
                                             autoFocus
                                         />
                                     </div>
@@ -176,7 +173,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                     placeholder={placeholder}
                     disabled={disabled}
                     autoComplete="tel-national"
-                    className="flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50"
+                    className={`flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none ${DYNAMIC_COLORS.focusBorder} focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 ${DYNAMIC_COLORS.focusRing} disabled:opacity-50`}
                 />
             </div>
         </div>

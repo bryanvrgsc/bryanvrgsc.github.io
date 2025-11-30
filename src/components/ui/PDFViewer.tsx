@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { Icons } from '../Icons';
+import { DYNAMIC_COLORS } from '../../constants/colors';
 
 // @ts-ignore - Vite will handle this import
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -98,7 +99,10 @@ export const PDFViewer = ({ url }: { url: string }) => {
         return (
             <div className="relative w-full h-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+                    <div
+                        className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+                        style={{ borderBottomColor: DYNAMIC_COLORS.raw.light.primary }}
+                    ></div>
                     <p className="text-[var(--text-secondary)]">Cargando presentación...</p>
                 </div>
             </div>
@@ -110,7 +114,7 @@ export const PDFViewer = ({ url }: { url: string }) => {
             <div className="relative w-full h-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
                 <div className="text-center p-4">
                     <p className="text-[var(--text-secondary)] mb-4">No se pudo cargar el PDF</p>
-                    <a href={url} target="_blank" rel="noreferrer" className="text-emerald-500 font-bold hover:underline">
+                    <a href={url} target="_blank" rel="noreferrer" className="font-bold hover:underline" style={{ color: DYNAMIC_COLORS.raw.light.primary }}>
                         Descargar PDF
                     </a>
                 </div>
@@ -130,7 +134,18 @@ export const PDFViewer = ({ url }: { url: string }) => {
                 <button
                     onClick={goToPrevPage}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                    className="px-4 py-2 rounded-lg text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                    style={{
+                        backgroundColor: DYNAMIC_COLORS.raw.light.primary,
+                    }}
+                    onMouseEnter={(e) => {
+                        if (currentPage !== 1) {
+                            e.currentTarget.style.backgroundColor = DYNAMIC_COLORS.raw.light.secondary;
+                        }
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = DYNAMIC_COLORS.raw.light.primary;
+                    }}
                 >
                     <Icons.ArrowUp className="w-4 h-4 rotate-[-90deg]" />
                     Anterior
@@ -147,7 +162,18 @@ export const PDFViewer = ({ url }: { url: string }) => {
                 <button
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
-                    className="px-4 py-2 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                    className="px-4 py-2 rounded-lg text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                    style={{
+                        backgroundColor: DYNAMIC_COLORS.raw.light.primary,
+                    }}
+                    onMouseEnter={(e) => {
+                        if (currentPage !== totalPages) {
+                            e.currentTarget.style.backgroundColor = DYNAMIC_COLORS.raw.light.secondary;
+                        }
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = DYNAMIC_COLORS.raw.light.primary;
+                    }}
                 >
                     Siguiente
                     <Icons.ArrowUp className="w-4 h-4 rotate-90" />

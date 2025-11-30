@@ -9,542 +9,454 @@ import { NETWORK_COLORS } from '../../constants/colors';
  * Optimizes neighbor detection from O(n²) to O(n) by partitioning space into cells.
  * Each node only checks neighbors in its cell and adjacent cells.
  */
-class SpatialGrid {
-    private cellSize: number;
-    private cols: number;
-    private rows: number;
-    private grid: Map<string, NetworkNode[]>;
-    private _width: number;
-    private _height: number;
+// --- CUSTOM CANVAS BACKGROUND (Network Data Traffic) ---
 
-    constructor(width: number, height: number, cellSize: number) {
-        this._width = width;
-        this._height = height;
-        this.cellSize = cellSize;
-        this.cols = Math.ceil(width / cellSize);
-        this.rows = Math.ceil(height / cellSize);
-        this.grid = new Map();
-    }
-
-    /**
-     * Clear all cells in the grid
-     */
-    clear() {
-        this.grid.clear();
-    }
-
-    /**
-     * Get cell key for coordinates
-     */
-    private getCellKey(x: number, y: number): string {
-        const col = Math.floor(x / this.cellSize);
-        const row = Math.floor(y / this.cellSize);
-        return `${col},${row}`;
-    }
-
-    /**
-     * Insert a node into the grid
-     */
-    insert(node: NetworkNode) {
-        const key = this.getCellKey(node.x, node.y);
-        if (!this.grid.has(key)) {
-            this.grid.set(key, []);
-        }
-        this.grid.get(key)!.push(node);
-    }
-
-    /**
-     * Get all nodes in the same cell and adjacent cells (9 cells total)
-     * This is the key optimization: instead of checking all n nodes,
-     * we only check nodes in nearby cells.
-     */
-    getNearby(node: NetworkNode): NetworkNode[] {
-        const col = Math.floor(node.x / this.cellSize);
-        const row = Math.floor(node.y / this.cellSize);
-        const nearby: NetworkNode[] = [];
-
-        // Check 3x3 grid of cells (current cell + 8 adjacent cells)
-        for (let dc = -1; dc <= 1; dc++) {
-            for (let dr = -1; dr <= 1; dr++) {
-                const checkCol = col + dc;
-                const checkRow = row + dr;
-
-                // Skip out of bounds cells
-                if (checkCol < 0 || checkCol >= this.cols || checkRow < 0 || checkRow >= this.rows) {
-                    continue;
-                }
-
-                const key = `${checkCol},${checkRow}`;
-                const cellNodes = this.grid.get(key);
-
-                if (cellNodes) {
-                    nearby.push(...cellNodes);
-                }
-            }
-        }
-
-        return nearby;
-    }
-
-    /**
-     * Update grid dimensions (call on resize)
-     */
-    resize(width: number, height: number) {
-        this._width = width;
-        this._height = height;
-        this.cols = Math.ceil(width / this.cellSize);
-        this.rows = Math.ceil(height / this.cellSize);
-        this.clear();
-    }
-}
-
-/**
- * NetworkNode Class
- * 
- * Represents a node in the network visualization.
- * Nodes move around the canvas and can connect to nearby nodes.
- */
 class NetworkNode {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    radius: number;
-    opacity: number;
-    targetOpacity: number;
-    neighbors: NetworkNode[] = [];
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  opacity: number;
+  pulseSpeed: number;
+  neighbors: NetworkNode[] = [];
+  index: number;
 
-    constructor(w: number, h: number) {
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
-        // REDUCED SPEED: Slower movement is smoother and less chaotic
-        this.vx = (Math.random() - 0.5) * 0.15;
-        this.vy = (Math.random() - 0.5) * 0.15;
-        this.radius = Math.random() * 1.5 + 1;
-        this.opacity = Math.random() * 0.5 + 0.1;
-        this.targetOpacity = this.opacity;
-    }
+  constructor(w: number, h: number, index: number) {
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
 
-    update(w: number, h: number) {
-        this.x += this.vx;
-        this.y += this.vy;
+    const speed = 0.08;
+    const angle = Math.random() * Math.PI * 2;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
 
-        // Bounce off walls
-        if (this.x < 0 || this.x > w) this.vx *= -1;
-        if (this.y < 0 || this.y > h) this.vy *= -1;
+    this.radius = 1 + Math.random() * 1.5;
 
-        // Pulse opacity
-        if (Math.random() < 0.01) {
-            this.targetOpacity = Math.random() * 0.6 + 0.1;
-        }
-        this.opacity += (this.targetOpacity - this.opacity) * 0.05;
+    // sin-wave opacity
+    this.opacity = 0.3;
+    this.pulseSpeed = 0.002 + Math.random() * 0.003;
 
-        // Note: Neighbors are updated centrally now to allow throttling
-    }
+    this.index = index;
+  }
+
+  update(w: number, h: number, time: number) {
+    this.x += this.vx;
+    this.y += this.vy;
+
+    if (this.x < 0 || this.x > w) this.vx = -this.vx;
+    if (this.y < 0 || this.y > h) this.vy = -this.vy;
+
+    // MUCH smoother than random target opacity
+    this.opacity = 0.35 + Math.sin(time * this.pulseSpeed) * 0.25;
+  }
 }
 
-/**
- * DataPacket Class
- * 
- * Represents a data packet traveling between network nodes.
- * Packets move along connections and can hop to neighboring nodes.
- */
+//
+// ─────────────────────────────────────────────────────
+//   DataPacket
+// ─────────────────────────────────────────────────────
+//
+
 class DataPacket {
-    from: NetworkNode;
-    to: NetworkNode;
-    progress: number = 0;
-    speed: number;
-    active: boolean = true;
+  from: NetworkNode;
+  to: NetworkNode;
+  progress = 0;
+  speed: number;
 
-    constructor(startNode: NetworkNode, endNode: NetworkNode) {
-        this.from = startNode;
-        this.to = endNode;
-        // Slightly faster to make them visible but short lived
-        this.speed = Math.random() * 0.01 + 0.012; // Increased base speed slightly
-    }
+  constructor(start: NetworkNode, end: NetworkNode) {
+    this.from = start;
+    this.to = end;
+    this.speed = 0.01 + Math.random() * 0.006;
+  }
 
-    update() {
-        this.progress += this.speed;
-        if (this.progress >= 1) {
-            this.progress = 1;
-            this.active = false; // Reached destination
-        }
-    }
+  update() {
+    this.progress += this.speed;
+    return this.progress < 1;
+  }
 
-    draw(ctx: CanvasRenderingContext2D, color: string) {
-        const x = this.from.x + (this.to.x - this.from.x) * this.progress;
-        const y = this.from.y + (this.to.y - this.from.y) * this.progress;
+  // Glow batch (globalAlpha = 0.25)
+  drawGlow(ctx: CanvasRenderingContext2D) {
+    const x = this.from.x + (this.to.x - this.from.x) * this.progress;
+    const y = this.from.y + (this.to.y - this.from.y) * this.progress;
 
-        // Fake Glow (Large, Low Opacity)
-        // Optimization: Use globalAlpha instead of parsing color string
-        ctx.globalAlpha = 0.3;
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, Math.PI * 2);
-        ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
-        // Core (Small, High Opacity)
-        ctx.globalAlpha = 1.0;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-        ctx.fill();
-    }
+  // Core batch (globalAlpha = 1)
+  drawCore(ctx: CanvasRenderingContext2D) {
+    const x = this.from.x + (this.to.x - this.from.x) * this.progress;
+    const y = this.from.y + (this.to.y - this.from.y) * this.progress;
+
+    ctx.beginPath();
+    ctx.arc(x, y, 1.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
-/**
- * CanvasBackground Component
- * 
- * Animated network visualization background using HTML5 Canvas.
- * Features moving nodes connected by lines with data packets traveling between them.
- * Optimized for performance with throttled updates and configurable quality settings.
- * 
- * Performance modes:
- * - Normal: Full animation with all effects
- * - Lite: Simple gradient background (no animation)
- */
-export const CanvasBackground = () => {
-    const { theme } = useStore(settings);
-    const { lite } = useStore(performanceMode);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const nodesRef = useRef<NetworkNode[]>([]);
-    const packetsRef = useRef<DataPacket[]>([]);
-    const linksRef = useRef<{ a: NetworkNode, b: NetworkNode }[]>([]);
-    const spatialGridRef = useRef<SpatialGrid | null>(null);
-    const lastTopologyUpdate = useRef<number>(0);
-    const animationRef = useRef<number | undefined>(undefined);
-    const [noiseDataUrl, setNoiseDataUrl] = useState('');
+//
+// ─────────────────────────────────────────────────────
+//   Spatial Grid (Ultra-Fast)
+// ─────────────────────────────────────────────────────
+//
 
-    // Cache para colores y configuración
-    const colorsRef = useRef({ nodeColor: '', lineColor: '', packetColor: '' });
-    const configRef = useRef({ isDark: false, canvasWidth: 0, canvasHeight: 0 });
+class SpatialGrid {
+  cellSize: number;
+  cols: number;
+  rows: number;
+  grid: NetworkNode[][];
 
-    // Generate Static Noise (Optimizado)
-    useEffect(() => {
-        if (lite) return;
+  constructor(w: number, h: number, cellSize: number) {
+    this.cellSize = cellSize;
+    this.cols = Math.ceil(w / cellSize);
+    this.rows = Math.ceil(h / cellSize);
+    this.grid = new Array(this.cols * this.rows);
+    this.clear();
+  }
 
-        const createNoise = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 128;
-            canvas.height = 128;
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            if (ctx) {
-                const idata = ctx.createImageData(128, 128);
-                const buffer32 = new Uint32Array(idata.data.buffer);
-                const len = buffer32.length;
-                for (let i = 0; i < len; i++) {
-                    if (Math.random() < 0.5) buffer32[i] = 0x08000000;
-                }
-                ctx.putImageData(idata, 0, 0);
-                setNoiseDataUrl(canvas.toDataURL());
-            }
-        };
+  clear() {
+    for (let i = 0; i < this.grid.length; i++) this.grid[i] = [];
+  }
 
-        createNoise();
-    }, [lite]);
+  insert(node: NetworkNode) {
+    const col = (node.x / this.cellSize) | 0;
+    const row = (node.y / this.cellSize) | 0;
+    const idx = row * this.cols + col;
+    this.grid[idx].push(node);
+  }
 
-    useEffect(() => {
-        if (lite) return;
+  getNearby(n: NetworkNode): NetworkNode[] {
+    const col = (n.x / this.cellSize) | 0;
+    const row = (n.y / this.cellSize) | 0;
 
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+    const res: NetworkNode[] = [];
 
-        const ctx = canvas.getContext('2d', {
-            alpha: false,
-            desynchronized: true
-        });
-        if (!ctx) return;
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const nc = col + dx;
+        const nr = row + dy;
+        if (nc < 0 || nr < 0 || nc >= this.cols || nr >= this.rows) continue;
 
-        // Detectar tema y cachear colores
-        const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-        // Use centralized color constants
-        const networkColors = isDark ? NETWORK_COLORS.dark : NETWORK_COLORS.light;
-
-        colorsRef.current = {
-            nodeColor: networkColors.nodeColor,
-            lineColor: networkColors.lineColor,
-            packetColor: networkColors.packetColor
-        };
-
-        configRef.current.isDark = isDark;
-
-        // Initialization con límites optimizados
-        const init = () => {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-
-            // Reducir resolución en pantallas Retina
-            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-
-            // Setting width/height clears context and resets state
-            canvas.width = width * dpr;
-            canvas.height = height * dpr;
-            canvas.style.width = width + 'px';
-            canvas.style.height = height + 'px';
-            ctx.scale(dpr, dpr);
-
-            configRef.current.canvasWidth = width;
-            configRef.current.canvasHeight = height;
-
-            // INCREASED DENSITY DRASTICALLY: More nodes
-            const area = width * height;
-            let nodeCount;
-
-            // Divisor reduced from 30000 to 15000 approx to double density
-            if (width > 1920 || height > 1080) {
-                nodeCount = Math.min(Math.floor(area / 15000), 80);
-            } else if (dpr > 1.5) {
-                nodeCount = Math.min(Math.floor(area / 12000), 90);
-            } else {
-                nodeCount = Math.min(Math.floor(area / 10000), 100);
-            }
-
-            nodeCount = Math.max(nodeCount, 40); // Minimum 40 nodes
-
-            nodesRef.current = [];
-            packetsRef.current = [];
-            linksRef.current = [];
-            lastTopologyUpdate.current = 0; // Force update immediately
-
-            for (let i = 0; i < nodeCount; i++) {
-                nodesRef.current.push(new NetworkNode(width, height));
-            }
-
-            // Initialize Spatial Grid with cell size = maxDist for optimal performance
-            // This ensures each cell covers exactly the connection range
-            const maxDist = 120;
-            spatialGridRef.current = new SpatialGrid(width, height, maxDist);
-        };
-
-        // Variables para 60 FPS
-        let lastFrameTime = 0;
-        const targetFPS = 60;
-        const frameInterval = 1000 / targetFPS;
-
-        const draw = (time: number) => {
-            animationRef.current = requestAnimationFrame(draw);
-
-            const elapsed = time - lastFrameTime;
-
-            if (elapsed > frameInterval) {
-                lastFrameTime = time - (elapsed % frameInterval);
-
-                if (!canvas || !ctx) return;
-
-                const { canvasWidth, canvasHeight, isDark } = configRef.current;
-
-                // Clear con color de fondo
-                ctx.fillStyle = isDark ? '#0a0a0a' : '#ffffff';
-                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-                // Optimization: Avoid 'lighter' composite as it is expensive
-                ctx.globalCompositeOperation = 'source-over';
-
-                const nodes = nodesRef.current;
-                const nodeCount = nodes.length;
-
-                // Update Node Positions
-                for (let i = 0; i < nodeCount; i++) {
-                    nodes[i].update(canvasWidth, canvasHeight);
-                }
-
-                // Update Topology (Links) Throttled to every 300ms
-                // NOW USING SPATIAL GRID: O(n) instead of O(n²)
-                if (time - lastTopologyUpdate.current > 300) {
-                    lastTopologyUpdate.current = time;
-                    linksRef.current = [];
-
-                    // Clear neighbors for routing
-                    for (let i = 0; i < nodeCount; i++) {
-                        nodes[i].neighbors = [];
-                    }
-
-                    const maxDist = 120;
-                    const maxDistSq = maxDist * maxDist;
-                    const maxConnections = 6;
-                    const connectionCounts = new Int8Array(nodeCount).fill(0);
-
-                    // SPATIAL GRID OPTIMIZATION: O(n) complexity
-                    const spatialGrid = spatialGridRef.current;
-                    if (spatialGrid) {
-                        // Clear and populate grid - O(n)
-                        spatialGrid.clear();
-                        for (let i = 0; i < nodeCount; i++) {
-                            spatialGrid.insert(nodes[i]);
-                        }
-
-                        // For each node, only check nearby nodes - O(n) total
-                        for (let i = 0; i < nodeCount; i++) {
-                            if (connectionCounts[i] >= maxConnections) continue;
-
-                            const nodeA = nodes[i];
-                            const nearbyNodes = spatialGrid.getNearby(nodeA);
-
-                            // Only check nodes in nearby cells (typically 9 cells)
-                            for (let k = 0; k < nearbyNodes.length; k++) {
-                                const nodeB = nearbyNodes[k];
-
-                                // Skip self
-                                if (nodeA === nodeB) continue;
-
-                                // Find nodeB's index for connection tracking
-                                const j = nodes.indexOf(nodeB);
-
-                                // Skip if already processed (avoid duplicate connections)
-                                if (j <= i) continue;
-
-                                if (connectionCounts[j] >= maxConnections) continue;
-
-                                const dx = nodeA.x - nodeB.x;
-                                if (Math.abs(dx) > maxDist) continue;
-                                const dy = nodeA.y - nodeB.y;
-                                if (Math.abs(dy) > maxDist) continue;
-
-                                const distSq = dx * dx + dy * dy;
-
-                                if (distSq < maxDistSq) {
-                                    // Add Link
-                                    linksRef.current.push({ a: nodeA, b: nodeB });
-
-                                    // Add Neighbors (for packets)
-                                    nodeA.neighbors.push(nodeB);
-                                    nodeB.neighbors.push(nodeA);
-
-                                    connectionCounts[i]++;
-                                    connectionCounts[j]++;
-
-                                    if (connectionCounts[i] >= maxConnections) break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Batch drawing de líneas
-                const links = linksRef.current;
-                if (links.length > 0) {
-                    ctx.lineWidth = 1;
-                    ctx.strokeStyle = colorsRef.current.lineColor;
-                    ctx.beginPath();
-
-                    for (let i = 0; i < links.length; i++) {
-                        const link = links[i];
-                        ctx.moveTo(link.a.x, link.a.y);
-                        ctx.lineTo(link.b.x, link.b.y);
-                    }
-                    ctx.stroke();
-                }
-
-                // Draw Nodes
-                for (let i = 0; i < nodeCount; i++) {
-                    const node = nodes[i];
-                    ctx.fillStyle = colorsRef.current.nodeColor + node.opacity + ")";
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                // Gestión de Packets
-                const packets = packetsRef.current;
-
-                for (let i = packets.length - 1; i >= 0; i--) {
-                    const packet = packets[i];
-                    if (!packet.active) {
-                        const current = packet.to;
-
-                        // DECREASED HOP CHANCE drastically (0.2 -> 0.15): "Lleguen menos lejos"
-                        // Packets die much sooner, creating "short bursts" of traffic.
-                        if (current.neighbors.length > 0 && Math.random() < 0.15) {
-                            const next = current.neighbors[Math.floor(Math.random() * current.neighbors.length)];
-                            packets.push(new DataPacket(current, next));
-                        }
-                        packets.splice(i, 1);
-                    }
-                }
-
-                // INCREASED PACKET COUNT & SPAWN RATE: "Salgan más paquetes"
-                const maxPackets = 50; // Increased significantly
-                const spawnRate = 0.25; // Very high spawn rate
-
-                if (packets.length < maxPackets && Math.random() < spawnRate) {
-                    const randomNode = nodes[Math.floor(Math.random() * nodeCount)];
-                    if (randomNode.neighbors.length > 0) {
-                        const target = randomNode.neighbors[Math.floor(Math.random() * randomNode.neighbors.length)];
-                        packets.push(new DataPacket(randomNode, target));
-                    }
-                }
-
-                // Update y Draw Packets
-                const packetCount = packets.length;
-                for (let i = 0; i < packetCount; i++) {
-                    packets[i].update();
-                    packets[i].draw(ctx, colorsRef.current.packetColor);
-                }
-            }
-        };
-
-        // Debounce resize
-        let resizeTimeout: ReturnType<typeof setTimeout>;
-        const handleResize = () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(init, 300);
-        };
-
-        // Pause/resume con cleanup
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                if (animationRef.current) {
-                    cancelAnimationFrame(animationRef.current);
-                    animationRef.current = undefined;
-                }
-            } else {
-                lastFrameTime = performance.now();
-                lastTopologyUpdate.current = 0; // Force update on resume
-                animationRef.current = requestAnimationFrame(draw);
-            }
-        };
-
-        window.addEventListener('resize', handleResize, { passive: true });
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
-        init();
-        animationRef.current = requestAnimationFrame(draw);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
-            }
-        };
-    }, [theme, lite]);
-
-    // Lite Mode
-    if (lite) {
-        return (
-            <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)]" />
-        );
+        const idx = nr * this.cols + nc;
+        const cell = this.grid[idx];
+        if (cell.length) res.push(...cell);
+      }
     }
 
+    return res;
+  }
+}
+
+//
+// ─────────────────────────────────────────────────────
+//   Canvas Component
+// ─────────────────────────────────────────────────────
+//
+
+export const CanvasBackground = () => {
+  const { theme } = useStore(settings);
+  const { lite } = useStore(performanceMode);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const nodesRef = useRef<NetworkNode[]>([]);
+  const packetsRef = useRef<DataPacket[]>([]);
+  const linksRef = useRef<{ a: NetworkNode; b: NetworkNode }[]>([]);
+  const gridRef = useRef<SpatialGrid | null>(null);
+
+  const [noiseDataUrl, setNoiseDataUrl] = useState("");
+
+  const colorsRef = useRef({
+    nodeColor: theme === "dark" ? NETWORK_COLORS.dark.nodeColor : NETWORK_COLORS.light.nodeColor,
+    lineColor: theme === "dark" ? NETWORK_COLORS.dark.lineColor : NETWORK_COLORS.light.lineColor,
+    packetColor: theme === "dark" ? NETWORK_COLORS.dark.packetColor : NETWORK_COLORS.light.packetColor
+  });
+
+  const configRef = useRef({ w: 0, h: 0, isDark: false });
+
+  //
+  // NOISE BACKGROUND
+  //
+  useEffect(() => {
+    if (lite) return;
+
+    const c = document.createElement("canvas");
+    c.width = 128;
+    c.height = 128;
+
+    const ctx = c.getContext("2d");
+    if (ctx) {
+      const id = ctx.createImageData(128, 128);
+      const buf = new Uint32Array(id.data.buffer);
+
+      for (let i = 0; i < buf.length; i++) {
+        buf[i] = Math.random() < 0.5 ? 0x08000000 : 0;
+      }
+      ctx.putImageData(id, 0, 0);
+      setNoiseDataUrl(c.toDataURL());
+    }
+  }, []);
+
+  //
+  // THEME CHANGES → COLOR UPDATE
+  //
+  useEffect(() => {
+    const isDark =
+      theme === "dark" ||
+      (theme === "system" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+    colorsRef.current = {
+      nodeColor: isDark ? NETWORK_COLORS.dark.nodeColor : NETWORK_COLORS.light.nodeColor,
+      lineColor: isDark ? NETWORK_COLORS.dark.lineColor : NETWORK_COLORS.light.lineColor,
+      packetColor: isDark ? NETWORK_COLORS.dark.packetColor : NETWORK_COLORS.light.packetColor
+    };
+
+    configRef.current.isDark = isDark;
+  }, [theme]);
+
+  //
+  // MAIN EFFECT (Rendering Loop)
+  //
+  useEffect(() => {
+    if (lite) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d", {
+      alpha: false,
+      desynchronized: true
+    });
+    if (!ctx) return;
+
+    //
+    // INIT CANVAS + GRID + NODES
+    //
+    const init = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.scale(dpr, dpr);
+
+      configRef.current.w = w;
+      configRef.current.h = h;
+
+      const area = w * h;
+
+      let count = Math.min(Math.floor(area / 4000), 300);
+      count = Math.max(count, 80);
+
+      nodesRef.current = [];
+      packetsRef.current = [];
+      linksRef.current = [];
+
+      const maxDist = 120;
+      gridRef.current = new SpatialGrid(w, h, maxDist);
+
+      for (let i = 0; i < count; i++) {
+        nodesRef.current.push(new NetworkNode(w, h, i));
+      }
+    };
+
+    init();
+
+    let lastFrame = 0;
+    let lastTopoUpdate = 0;
+
+    const fpsInterval = 1000 / 60;
+    const topoInterval = 300;
+
+    //
+    // DRAW LOOP
+    //
+    const draw = (time: number) => {
+      requestAnimationFrame(draw);
+
+      const elapsed = time - lastFrame;
+      if (elapsed < fpsInterval) return;
+
+      lastFrame = time - (elapsed % fpsInterval);
+
+      const { w, h, isDark } = configRef.current;
+
+      //
+      // CLEAR
+      //
+      ctx.fillStyle = isDark ? NETWORK_COLORS.dark.canvasBg : NETWORK_COLORS.light.canvasBg; 
+      ctx.fillRect(0, 0, w, h); 
+      ctx.globalCompositeOperation = "source-over";
+
+      const nodes = nodesRef.current;
+      const nodeCount = nodes.length;
+
+      //
+      // UPDATE NODES
+      //
+      for (let i = 0; i < nodeCount; i++) {
+        nodes[i].update(w, h, time);
+      }
+
+      //
+      // UPDATE TOPOLOGY (every 300 ms)
+      //
+      const grid = gridRef.current;
+      if (grid && time - lastTopoUpdate > topoInterval) {
+        lastTopoUpdate = time;
+        linksRef.current = [];
+
+        grid.clear();
+
+        for (let i = 0; i < nodeCount; i++) {
+          nodes[i].neighbors = [];
+          grid.insert(nodes[i]);
+        }
+
+        const maxDist = 120;
+        const maxDistSq = maxDist * maxDist;
+        const maxConn = 6;
+
+        const connCount = new Int8Array(nodeCount);
+
+        for (let i = 0; i < nodeCount; i++) {
+          if (connCount[i] >= maxConn) continue;
+
+          const a = nodes[i];
+          const nearby = grid.getNearby(a);
+
+          for (let b of nearby) {
+            if (a === b) continue;
+
+            const j = b.index;
+            if (j <= i) continue;
+            if (connCount[j] >= maxConn) continue;
+
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const d2 = dx * dx + dy * dy;
+
+            if (d2 < maxDistSq) {
+              linksRef.current.push({ a, b });
+              a.neighbors.push(b);
+              b.neighbors.push(a);
+              connCount[i]++;
+              connCount[j]++;
+              if (connCount[i] >= maxConn) break;
+            }
+          }
+        }
+      }
+
+      //
+      // DRAW LINKS
+      //
+      const links = linksRef.current;
+      ctx.strokeStyle = colorsRef.current.lineColor;
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      for (const l of links) {
+        ctx.moveTo(l.a.x, l.a.y);
+        ctx.lineTo(l.b.x, l.b.y);
+      }
+      ctx.stroke();
+
+      //
+      // DRAW NODES
+      //
+      for (const n of nodes) {
+        ctx.fillStyle = colorsRef.current.nodeColor + n.opacity + ")";
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      //
+      // PACKETS UPDATE
+      //
+      const packets = packetsRef.current;
+
+      for (let i = packets.length - 1; i >= 0; i--) {
+        const p = packets[i];
+        if (!p.update()) {
+          const cur = p.to;
+
+          if (cur.neighbors.length && Math.random() < 0.25) {
+            const next =
+              cur.neighbors[(Math.random() * cur.neighbors.length) | 0];
+            packets.push(new DataPacket(cur, next));
+          }
+          packets.splice(i, 1);
+        }
+      }
+
+      //
+      // SPAWN PACKETS
+      //
+      const maxPackets = Math.min(nodeCount * 0.5, 200);
+      if (packets.length < maxPackets && Math.random() < 0.35) {
+        const n = nodes[(Math.random() * nodeCount) | 0];
+        if (n.neighbors.length) {
+          const t =
+            n.neighbors[(Math.random() * n.neighbors.length) | 0];
+          packets.push(new DataPacket(n, t));
+        }
+      }
+
+      //
+      // DRAW PACKETS (BATCHED)
+      //
+
+      // Glow (globalAlpha = 0.25)
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = colorsRef.current.packetColor;
+      for (const p of packets) p.drawGlow(ctx);
+
+      // Core
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = colorsRef.current.packetColor;
+      for (const p of packets) p.drawCore(ctx);
+    };
+
+    requestAnimationFrame(draw);
+
+    const resize = () => {
+      setTimeout(init, 200);
+    };
+
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [lite]);
+
+  //
+  // LITE MODE
+  //
+  if (lite) {
     return (
-        <>
-            <div
-                className="fixed top-0 left-0 w-full h-full -z-10 bg-[var(--bg-gradient)]"
-                style={{ backgroundAttachment: 'fixed' }}
-            />
-
-            <canvas
-                ref={canvasRef}
-                className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-60 dark:opacity-100"
-            />
-
-            {noiseDataUrl && (
-                <div
-                    className="bg-noise fixed top-0 left-0 w-full h-full z-0 pointer-events-none"
-                    style={{ backgroundImage: `url(${noiseDataUrl})` }}
-                />
-            )}
-        </>
+      <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)] pointer-events-none" />
     );
+  }
+
+  return (
+    <>
+      <canvas
+        ref={canvasRef}
+        className="fixed top-0 left-0 w-full h-full pointer-events-none opacity-60 dark:opacity-100"
+      />
+
+      {noiseDataUrl && (
+        <div
+          className="fixed top-0 left-0 w-full h-full pointer-events-none bg-noise"
+          style={{ backgroundImage: `url(${noiseDataUrl})` }}
+        />
+      )}
+    </>
+  );
 };

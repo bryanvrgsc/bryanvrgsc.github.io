@@ -5,6 +5,7 @@ import { Icons } from '../Icons';
 import { UI_TEXT } from '../../constants/ui-text';
 import { SERVICES, ENGAGEMENT_MODELS } from '../../constants';
 import { getCategoryTheme } from '../../utils/helpers';
+import { DYNAMIC_COLORS } from '../../constants/colors';
 
 /**
  * ServicesView Component
@@ -50,7 +51,7 @@ export const ServicesView = () => {
             </div>
             <div onMouseMove={handleMouseMove} className="mt-8 md:mt-12 p-5 md:p-10 bento-card rounded-[2rem] md:rounded-[2.5rem]">
                 <h3 className="text-2xl font-bold mb-6 md:mb-8 tracking-tight text-[var(--text-primary)] text-center">{t.engagementModels}</h3>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">{ENGAGEMENT_MODELS[lang].map((m, i) => { const Icon = Icons[m.iconName as keyof typeof Icons]; return (<div key={i} className="flex flex-col items-center justify-center p-6 md:p-8 bg-[var(--input-bg)] rounded-3xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-all duration-300 group cursor-default hover:-translate-y-1 text-center"><div className="mb-4 text-[var(--text-tertiary)] group-hover:text-emerald-500 group-hover:scale-110 transition-all"><Icon className="w-6 h-6 md:w-8 md:h-8" /></div><span className="text-sm font-semibold text-[var(--text-primary)] tracking-wide">{m.label}</span></div>); })}</div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">{ENGAGEMENT_MODELS[lang].map((m, i) => { const Icon = Icons[m.iconName as keyof typeof Icons]; return (<div key={i} className="flex flex-col items-center justify-center p-6 md:p-8 bg-[var(--input-bg)] rounded-3xl border border-[var(--card-border)] hover:bg-[var(--glass-glow)] transition-all duration-300 group cursor-default hover:-translate-y-1 text-center"><div className="mb-4 text-[var(--text-tertiary)] transition-all" style={{ color: 'var(--text-tertiary)' }} onMouseEnter={(e) => e.currentTarget.style.color = DYNAMIC_COLORS.raw.light.primary} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-tertiary)'}><Icon className="w-6 h-6 md:w-8 md:h-8 transition-transform group-hover:scale-110" /></div><span className="text-sm font-semibold text-[var(--text-primary)] tracking-wide">{m.label}</span></div>); })}</div>
             </div>
         </div>
     );

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings } from '../../store';
 import { Icons } from '../Icons';
-import { LOGO_COLORS, GLOW_EFFECTS } from '../../constants/colors';
+import { LOGO_COLORS, injectPaletteCSS, DYNAMIC_COLORS } from '../../constants/colors';
 import { navigateTo } from '../../utils/navigation';
 
 /**
@@ -17,6 +17,9 @@ export const Header = () => {
     const { theme } = useStore(settings);
 
     useEffect(() => {
+        // Inject palette CSS variables on mount
+        injectPaletteCSS();
+
         // Detect scroll to toggle 'pill' mode
         const handleScroll = () => setScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
@@ -27,12 +30,16 @@ export const Header = () => {
 
     const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
+    // Get dynamic colors for inline styles
+    const logoColor = isDark ? DYNAMIC_COLORS.raw.dark.primary : DYNAMIC_COLORS.raw.light.primary;
+    const logoRgb = isDark ? DYNAMIC_COLORS.raw.dark.rgb : DYNAMIC_COLORS.raw.light.rgb;
+
     return (
         <header className="fixed top-0 left-0 right-0 z-40 flex justify-center pt-4 md:pt-6 pointer-events-none">
             <a
                 href="#/"
                 onClick={(e) => { e.preventDefault(); navigateTo('/'); }}
-                className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-full
+                className={`pointer-events-auto cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 ${DYNAMIC_COLORS.ring} rounded-full
           w-auto px-6 h-[44px]
           ${scrolled
                         ? 'bg-[var(--bg-primary)]/80 backdrop-blur-xl border border-[var(--card-border)] shadow-2xl opacity-100 translate-y-0'
@@ -47,7 +54,12 @@ export const Header = () => {
                     </div>
                     <span className="font-mono text-base md:text-lg font-bold tracking-tight text-[var(--text-primary)] flex items-center">
                         <span className="text-[var(--text-tertiary)] mr-[1px]">@</span>
-                        bryan<span className="text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]">vrgsc</span>
+                        bryan<span
+                            style={{
+                                color: logoColor,
+                                filter: `drop-shadow(0 0 8px rgba(${logoRgb.r}, ${logoRgb.g}, ${logoRgb.b}, 0.4))`
+                            }}
+                        >vrgsc</span>
                         <span className="text-[var(--text-secondary)]">~%</span>
                         <span className="ml-2 w-2.5 h-4 md:w-3 md:h-5 bg-[var(--text-primary)] animate-cursor-blink block"></span>
                     </span>

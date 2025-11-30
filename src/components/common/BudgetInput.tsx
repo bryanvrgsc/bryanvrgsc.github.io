@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CurrencyInput from 'react-currency-input-field';
+import { DYNAMIC_COLORS } from '../../constants/colors';
 
 interface BudgetInputProps {
     value: string;
@@ -132,7 +133,7 @@ export const BudgetInput: React.FC<BudgetInputProps> = ({
                         type="button"
                         onClick={() => !disabled && setIsOpen(!isOpen)}
                         disabled={disabled}
-                        className="h-full px-4 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl text-[var(--text-primary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 flex items-center gap-2 min-w-[100px]"
+                        className={`h-full px-4 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl text-[var(--text-primary)] focus:outline-none ${DYNAMIC_COLORS.focusBorder} focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 ${DYNAMIC_COLORS.focusRing} disabled:opacity-50 flex items-center gap-2 min-w-[100px]`}
                     >
                         <span className="text-xl">{selectedCurrency.flag}</span>
                         <span className="font-mono text-sm font-bold">{selectedCurrency.symbol}</span>
@@ -164,7 +165,7 @@ export const BudgetInput: React.FC<BudgetInputProps> = ({
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             placeholder="Search currency..."
-                                            className="w-full pl-9 pr-3 py-2 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-emerald-500/50"
+                                            className={`w-full pl-9 pr-3 py-2 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none ${DYNAMIC_COLORS.focusBorder}`}
                                             autoFocus
                                         />
                                     </div>
@@ -208,7 +209,7 @@ export const BudgetInput: React.FC<BudgetInputProps> = ({
                     disabled={disabled}
                     decimalsLimit={2}
                     prefix={selectedCurrency.symbol + ' '}
-                    className="flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-emerald-500/50 focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50"
+                    className={`flex-1 bg-[var(--input-bg)] border border-[var(--input-border)] rounded-2xl px-5 py-5 text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none ${DYNAMIC_COLORS.focusBorder} focus:bg-[var(--glass-glow)] transition-all text-sm focus:ring-1 ${DYNAMIC_COLORS.focusRing} disabled:opacity-50`}
                 />
             </div>
         </div>

@@ -5,6 +5,7 @@ import { Icons } from '../Icons';
 import { UI_TEXT } from '../../constants/ui-text';
 import { PORTFOLIO } from '../../constants';
 import { PortfolioModal } from '../modals';
+import { DYNAMIC_COLORS } from '../../constants/colors';
 
 /**
  * PortfolioView Component
@@ -50,7 +51,7 @@ export const PortfolioView = () => {
                             </div>
                             <div className="p-6 md:p-10 relative z-20 -mt-16 md:-mt-24 pointer-events-none">
                                 <h3 className="text-2xl md:text-4xl font-bold text-[var(--text-primary)] mb-3 drop-shadow-lg tracking-tight">{item.title}</h3>
-                                <p className="text-emerald-500 font-semibold mb-6 md:mb-8 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider"><Icons.CheckCircle className="w-4 h-4 md:w-5 md:h-5" /> {item.result}</p>
+                                <p className="font-semibold mb-6 md:mb-8 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider" style={{ color: DYNAMIC_COLORS.raw.light.primary }}><Icons.CheckCircle className="w-4 h-4 md:w-5 md:h-5" /> {item.result}</p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm text-[var(--text-secondary)]">
                                     <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.challenge}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.problem}</span></div>
                                     <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.solution}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.solution}</span></div>
