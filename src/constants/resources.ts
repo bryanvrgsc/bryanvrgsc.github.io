@@ -4,7 +4,7 @@
  * Contains all blog post information in both English and Spanish.
  */
 
-export const BLOG_POSTS = {
+export const RESOURCES = {
     en: [
         {
             title: "How a mobile app can automate your business",

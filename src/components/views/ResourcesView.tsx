@@ -3,12 +3,12 @@ import { useStore } from '@nanostores/react';
 import { settings } from '../../store';
 import { Icons } from '../Icons';
 import { UI_TEXT } from '../../constants/ui-text';
-import { BLOG_POSTS } from '../../constants';
+import { RESOURCES } from '../../constants';
 import { getCategoryTheme } from '../../utils/helpers';
 import { DYNAMIC_COLORS } from '../../constants/colors';
 
 /**
- * BlogView Component
+ * ResourcesView Component
  * 
  * Displays blog posts with category-based theming.
  */
@@ -24,10 +24,10 @@ const useMousePosition = () => {
     return handleMouseMove;
 };
 
-export const BlogView = () => {
+export const ResourcesView = () => {
     const { lang } = useStore(settings);
     const handleMouseMove = useMousePosition();
-    const t = UI_TEXT[lang].blog;
+    const t = UI_TEXT[lang].resources;
 
     return (
         <div className="max-w-5xl mx-auto pt-24 md:pt-32 px-4 md:px-6 pb-32 md:pb-40 animate-slide-up">
@@ -36,7 +36,7 @@ export const BlogView = () => {
                 <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
             </div>
             <div className="space-y-6 md:space-y-8">
-                {BLOG_POSTS[lang].map((post, i) => {
+                {RESOURCES[lang].map((post, i) => {
                     const theme = getCategoryTheme(post.category);
                     return (
                         <article onMouseMove={handleMouseMove} key={i} className="bento-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8 cursor-pointer group" style={theme.colors as React.CSSProperties}>

@@ -32,7 +32,7 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
         { id: 'home', label: t.home, Icon: Icons.Home, href: '/' },
         { id: 'services', label: t.services, Icon: Icons.Layers, href: '/services' },
         { id: 'portfolio', label: t.work, Icon: Icons.Briefcase, href: '/portfolio' },
-        { id: 'blog', label: t.blog, Icon: Icons.Book, href: '/blog' },
+        { id: 'resources', label: t.resources, Icon: Icons.Book, href: '/resources' },
     ];
 
     return (

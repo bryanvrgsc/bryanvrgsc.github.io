@@ -93,7 +93,7 @@ export interface UIText {
             pdfError: string;
         };
     };
-    blog: {
+    resources: {
         title: string;
         subtitle: string;
     };
@@ -127,7 +127,7 @@ export interface UIText {
         home: string;
         services: string;
         work: string;
-        blog: string;
+        resources: string;
         contact: string;
     };
 }

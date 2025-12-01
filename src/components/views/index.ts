@@ -7,5 +7,5 @@
 export { HomeView } from './HomeView';
 export { ServicesView } from './ServicesView';
 export { PortfolioView } from './PortfolioView';
-export { BlogView } from './BlogView';
+export { ResourcesView } from './ResourcesView';
 export { ContactView } from './ContactView';

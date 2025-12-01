@@ -56,8 +56,8 @@ export const UI_TEXT: Record<'en' | 'es', UIText> = {
                 pdfError: "PDF viewing not supported."
             }
         },
-        blog: {
-            title: "Papers",
+        resources: {
+            title: "Resources",
             subtitle: "Strategic thinking and tech deep dives."
         },
         contact: {
@@ -90,7 +90,7 @@ export const UI_TEXT: Record<'en' | 'es', UIText> = {
             home: "Home",
             services: "Services",
             work: "Work",
-            blog: "Papers",
+            resources: "Resources",
             contact: "Contact"
         }
     },
@@ -149,8 +149,8 @@ export const UI_TEXT: Record<'en' | 'es', UIText> = {
                 pdfError: "Visualización de PDF no soportada."
             }
         },
-        blog: {
-            title: "Artículos",
+        resources: {
+            title: "Recursos",
             subtitle: "Pensamiento estratégico y tecnología profunda."
         },
         contact: {
@@ -183,7 +183,7 @@ export const UI_TEXT: Record<'en' | 'es', UIText> = {
             home: "Inicio",
             services: "Servicios",
             work: "Portafolio",
-            blog: "Artículos",
+            resources: "Recursos",
             contact: "Contacto"
         }
     }

@@ -8,7 +8,7 @@
 export { UI_TEXT } from './ui-text';
 export { SERVICES } from './services';
 export { PORTFOLIO } from './portfolio';
-export { BLOG_POSTS } from './blog';
+export { RESOURCES } from './resources';
 export { ENGAGEMENT_MODELS } from './engagement-models';
 
 // Re-export types
