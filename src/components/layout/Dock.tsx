@@ -24,7 +24,7 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
     const activeId = currentPath === '/' ? 'home'
         : currentPath.includes('services') ? 'services'
             : currentPath.includes('portfolio') ? 'portfolio'
-                : currentPath.includes('blog') ? 'blog'
+                : currentPath.includes('resources') ? 'resources'
                     : currentPath.includes('contact') ? 'contact'
                         : 'home';
 
