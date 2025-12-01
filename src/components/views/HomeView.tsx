@@ -82,7 +82,7 @@ export const HomeView = () => {
                                 className={`w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full transition-all duration-500 ease-in-out border border-[var(--card-border)] ${isActive ? 'scale-125' : 'bg-[var(--dock-item-bg)] hover:bg-[var(--text-tertiary)] group-hover:scale-110'}`}
                                 style={activeStyle}
                             ></div>
-                            <span className={`hidden md:block text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-500 ${isActive ? 'text-[var(--text-primary)] opacity-100 translate-x-0' : 'text-[var(--text-tertiary)] opacity-0 -translate-x-2 group-hover:opacity-70 group-hover:translate-x-0'}`}>{step.label}</span>
+                            <span className={`hidden md:inline-block text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-500 ${isActive ? 'text-[var(--text-primary)] opacity-100 translate-x-0' : 'text-[var(--text-tertiary)] opacity-0 -translate-x-2 group-hover:opacity-70 group-hover:translate-x-0'}`}>{step.label}</span>
                         </div>
                     );
                 })}
@@ -147,7 +147,7 @@ export const HomeView = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
                         <div className="order-2 md:order-1 h-full w-full">
                             <TechCard title={`/// ${t.mission.title.toUpperCase()}`} accentColor="primary" className="h-full flex flex-col justify-center w-full">
-                                <div className="flex flex-col h-full justify-center"><div className="text-base md:text-lg lg:text-xl leading-relaxed"><Typewriter text={t.mission.content} startDelay={200} cursorColor={DYNAMIC_COLORS.bg} delay={15} active={activeStep >= 2} /></div></div>
+                                <div className="flex flex-col h-full justify-center"><div className="text-base md:text-lg lg:text-xl leading-relaxed"><Typewriter text={t.mission.content} startDelay={80} cursorColor={DYNAMIC_COLORS.bg} delay={8} active={activeStep >= 2} /></div></div>
                             </TechCard>
                         </div>
                         <div className="order-1 md:order-2 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
@@ -173,15 +173,25 @@ export const HomeView = () => {
                 <section ref={(el) => { sectionRefs.current[2] = el }} className="min-h-screen min-h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
                         <div className="order-1 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
-                            <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/60 via-transparent to-transparent z-10 mix-blend-multiply"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t via-transparent to-transparent z-10 mix-blend-multiply" style={{ backgroundImage: `linear-gradient(to top, ${DYNAMIC_COLORS.raw.dark.secondary}99, transparent, transparent)` }}></div>
                             <img src="https://images.unsplash.com/photo-1480694313141-fce5e697ee25?q=80&w=2070&auto=format&fit=crop" alt="Future Vision" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
                             <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-20">
-                                <div className="bg-cyan-500/20 backdrop-blur-xl border border-cyan-500/30 text-cyan-100 text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2"><div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-cyan-400 animate-pulse"></div>{t.homeLabels.future}</div>
+                                <div
+                                    className="backdrop-blur-xl text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2"
+                                    style={{
+                                        backgroundColor: `${DYNAMIC_COLORS.raw.light.secondary}33`,
+                                        borderColor: `${DYNAMIC_COLORS.raw.light.secondary}4D`,
+                                        border: '1px solid'
+                                    }}
+                                >
+                                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full animate-pulse" style={{ backgroundColor: DYNAMIC_COLORS.raw.light.accent }}></div>
+                                    {t.homeLabels.future}
+                                </div>
                             </div>
                         </div>
                         <div className="order-2 h-full w-full flex flex-col">
-                            <TechCard title={`/// ${t.vision.title.toUpperCase()}`} accentColor="blue" className="h-full flex flex-col justify-center w-full">
-                                <div className="flex flex-col h-full justify-center"><div className="text-base md:text-lg lg:text-xl leading-relaxed"><Typewriter text={t.vision.content} startDelay={200} cursorColor="bg-cyan-500" delay={15} active={activeStep >= 3} /></div></div>
+                            <TechCard title={`/// ${t.vision.title.toUpperCase()}`} accentColor="primary" className="h-full flex flex-col justify-center w-full">
+                                <div className="flex flex-col h-full justify-center"><div className="text-base md:text-lg lg:text-xl leading-relaxed"><Typewriter text={t.vision.content} startDelay={80} cursorColor={DYNAMIC_COLORS.bg} delay={8} active={activeStep >= 3} /></div></div>
                             </TechCard>
                         </div>
                     </div>

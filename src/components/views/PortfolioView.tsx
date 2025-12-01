@@ -40,13 +40,30 @@ export const PortfolioView = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
                     {PORTFOLIO[lang].map((item, i) => (
-                        <div onMouseMove={handleMouseMove} onClick={() => setSelectedProject(item)} key={i} className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer">
+                        <div onMouseMove={handleMouseMove} onClick={() => setSelectedProject(item)} key={i} className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
                             <div className="h-[250px] md:h-[400px] overflow-hidden relative">
                                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
-                                <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105" />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center backdrop-blur-[2px]">
-                                    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-3 text-white font-bold text-sm tracking-widest uppercase transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">{t.viewDetails} <Icons.ArrowRight className="w-4 h-4" /></div>
+                                <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" />
+
+                                {/* Animated cursor pointer overlay - shows briefly on mobile, on hover for desktop */}
+                                <div className="absolute inset-0 bg-black/30 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center animate-[fadeOut_3s_ease-in-out_2s_forwards] md:animate-none">
+                                    <div className="relative">
+                                        {/* Pulsing ring */}
+                                        <div className="absolute inset-0 rounded-full bg-white/20 animate-ping"></div>
+                                        {/* Lucide Pointer icon */}
+                                        <div className="relative bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl">
+                                            <svg className="w-12 h-12 text-[var(--primary-color)] animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                                <path d="M22 14a8 8 0 0 1-8 8" />
+                                                <path d="M18 11v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
+                                                <path d="M14 10V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1" />
+                                                <path d="M10 9.5V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v10" />
+                                                <path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                {/* Tech badge */}
                                 <div className="absolute top-6 right-6 md:top-8 md:right-8 z-20 pointer-events-none"><span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[var(--text-primary)] backdrop-blur-xl shadow-xl">{item.tech.split(',')[0]}</span></div>
                             </div>
                             <div className="p-6 md:p-10 relative z-20 -mt-16 md:-mt-24 pointer-events-none">
@@ -55,6 +72,14 @@ export const PortfolioView = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm text-[var(--text-secondary)]">
                                     <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.challenge}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.problem}</span></div>
                                     <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.solution}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.solution}</span></div>
+                                </div>
+
+                                {/* "View Details" button - visible on mobile, on hover for desktop */}
+                                <div className="mt-6 pointer-events-auto md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                                    <div className="bg-gradient-to-r from-[var(--primary-color)] to-[var(--accent-color)] text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg cursor-pointer">
+                                        <Icons.ExternalLink className="w-5 h-5" />
+                                        {t.viewDetails}
+                                    </div>
                                 </div>
                             </div>
                         </div>

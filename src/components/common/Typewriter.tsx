@@ -30,6 +30,12 @@ export const Typewriter: React.FC<TypewriterProps> = ({
     const [displayedText, setDisplayedText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    // Reset when text changes (e.g., language change)
+    useEffect(() => {
+        setDisplayedText('');
+        setCurrentIndex(0);
+    }, [text]);
+
     useEffect(() => {
         if (!active) return;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { DYNAMIC_COLORS } from '../../constants/colors';
+import { DYNAMIC_COLORS, hexToRgba } from '../../constants/colors';
 
 /**
  * TechCard Component
@@ -17,13 +17,13 @@ export const TechCard = ({ title, children, accentColor = "primary", className =
     // Dynamic styles based on active palette
     const styles = accentColor === 'primary' ? {
         border: DYNAMIC_COLORS.borderOpacity,
-        bg: `bg-[${DYNAMIC_COLORS.raw.light.primary}]/5 dark:bg-[${DYNAMIC_COLORS.raw.dark.primary}]/5`,
+        bgColor: hexToRgba(DYNAMIC_COLORS.raw.light.primary, 0.05),
         text: DYNAMIC_COLORS.text,
         indicator: DYNAMIC_COLORS.bg,
         glow: DYNAMIC_COLORS.shadow,
     } : {
         border: "border-cyan-500/20",
-        bg: "bg-cyan-500/5",
+        bgColor: "rgba(6, 182, 212, 0.05)",
         text: "text-cyan-600 dark:text-cyan-400",
         indicator: "bg-cyan-500",
         glow: "group-hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]"
@@ -39,7 +39,10 @@ export const TechCard = ({ title, children, accentColor = "primary", className =
         : "from-cyan-500/10";
 
     return (
-        <div className={`relative overflow-hidden rounded-[20px] border ${styles.border} ${styles.bg} backdrop-blur-md p-6 md:p-8 flex flex-col h-full group transition-all duration-700 hover:border-opacity-60 ${styles.glow} ${className}`}>
+        <div
+            className={`relative overflow-hidden rounded-[20px] border ${styles.border} backdrop-blur-md p-6 md:p-8 flex flex-col h-full group transition-all duration-700 hover:border-opacity-60 ${styles.glow} ${className}`}
+            style={{ backgroundColor: styles.bgColor }}
+        >
             <div className={`absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 ${styles.border} rounded-tl-[18px] opacity-40 group-hover:opacity-100 transition-opacity duration-500`}></div>
             <div className={`absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 ${styles.border} rounded-br-[18px] opacity-40 group-hover:opacity-100 transition-opacity duration-500`}></div>
             <div className="absolute top-4 right-4 flex gap-1 opacity-20 group-hover:opacity-50 transition-opacity">
@@ -47,7 +50,7 @@ export const TechCard = ({ title, children, accentColor = "primary", className =
             </div>
             <div className="flex items-center gap-3 mb-5 opacity-90 relative z-10">
                 <div className="relative"><div className={`w-2 h-2 rounded-sm ${styles.indicator} shadow-[0_0_10px_rgba(255,255,255,0.5)]`}></div><div className={`absolute inset-0 w-2 h-2 rounded-sm ${styles.indicator} animate-ping opacity-30`}></div></div>
-                <span className={`text-[10px] md:text-xs font-bold tracking-[0.25em] uppercase font-mono ${styles.text}`}>{title}</span>
+                <span className={`text-sm md:text-base font-bold tracking-[0.25em] uppercase font-mono ${styles.text}`}>{title}</span>
                 <div className={`h-[1px] flex-grow bg-gradient-to-r ${gradientDivider} to-transparent opacity-30`}></div>
             </div>
             <div className={`font-mono text-sm md:text-[15px] leading-relaxed ${styles.text} opacity-90 relative z-10 h-full flex flex-col justify-start`}>{children}</div>

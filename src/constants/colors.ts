@@ -149,10 +149,37 @@ export type Theme = 'light' | 'dark' | 'system';
 export type PaletteName = 'emerald' | 'ocean' | 'sunset' | 'rose' | 'amber';
 
 /**
+ * All color palettes grouped by name
+ * Used by PaletteSelector component for dynamic palette switching
+ */
+export const COLOR_PALETTES = {
+    emerald: {
+        light: LIGHT_PALETTE_EMERALD,
+        dark: DARK_PALETTE_EMERALD
+    },
+    ocean: {
+        light: LIGHT_PALETTE_OCEAN,
+        dark: DARK_PALETTE_ELECTRIC
+    },
+    sunset: {
+        light: LIGHT_PALETTE_SUNSET,
+        dark: DARK_PALETTE_CYBER
+    },
+    rose: {
+        light: LIGHT_PALETTE_ROSE,
+        dark: DARK_PALETTE_HOT
+    },
+    amber: {
+        light: LIGHT_PALETTE_AMBER,
+        dark: DARK_PALETTE_GOLDEN
+    }
+} as const;
+
+/**
  * Current active palette (can be changed to switch entire app theme)
  * Change this value to switch the entire application's color scheme
  */
-export const ACTIVE_PALETTE: PaletteName = 'amber';
+export const ACTIVE_PALETTE: PaletteName = 'ocean';
 
 /* ============================================
    PALETTE-BASED COLOR GENERATION
@@ -289,7 +316,7 @@ export const NETWORK_COLORS = (() => {
             nodeColor: 'rgba(0, 0, 0, 1)',
 
             // Lines connecting nodes
-            lineColor: 'rgba(71, 85, 105, 0.64)',
+            lineColor: 'rgba(71, 85, 105, 0.25)',
 
             // Data packets traveling between nodes
             packetColor: lightPalette.secondary,
@@ -695,6 +722,18 @@ export function injectPaletteCSS() {
         '--secondary-color': lightPalette.secondary,
         '--accent-color': lightPalette.accent,
         '--primary-rgb': `${parseInt(lightPalette.primary.slice(1, 3), 16)}, ${parseInt(lightPalette.primary.slice(3, 5), 16)}, ${parseInt(lightPalette.primary.slice(5, 7), 16)}`,
+
+        // Glow and shadow effects
+        '--primary-glow': hexToRgba(lightPalette.primary, 0.35),
+        '--primary-shadow': hexToRgba(lightPalette.primary, 0.2),
+
+        // Gradient colors
+        '--primary-gradient': hexToRgba(lightPalette.primary, 0.1),
+        '--accent-gradient-1': hexToRgba(lightPalette.accent, 0.1),
+
+        // Animation/circuit colors (darker versions for light mode)
+        '--primary-dark': hexToRgba(lightPalette.primary, 0.9),
+        '--primary-darker': hexToRgba(lightPalette.secondary, 0.9),
     };
 
     // Update CSS variables for dark theme
@@ -703,6 +742,11 @@ export function injectPaletteCSS() {
         '--secondary-color-dark': darkPalette.secondary,
         '--accent-color-dark': darkPalette.accent,
         '--primary-rgb-dark': `${parseInt(darkPalette.primary.slice(1, 3), 16)}, ${parseInt(darkPalette.primary.slice(3, 5), 16)}, ${parseInt(darkPalette.primary.slice(5, 7), 16)}`,
+
+        // Dark mode specific (lighter versions for dark mode)
+        '--primary-light': hexToRgba(darkPalette.primary, 0.4),
+        '--accent-light': hexToRgba(darkPalette.accent, 0.4),
+        '--accent-gradient-2': hexToRgba(darkPalette.accent, 0.08),
     };
 
     // Apply to :root

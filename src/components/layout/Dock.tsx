@@ -36,21 +36,21 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
     ];
 
     return (
-        <nav className="fixed left-1/2 -translate-x-1/2 z-50 flex flex-col items-center select-none bottom-[calc(0.5rem+env(safe-area-inset-bottom))] md:bottom-[calc(2.5rem+env(safe-area-inset-bottom))]" aria-label="Main Navigation">
+        <nav className="fixed left-1/2 -translate-x-1/2 z-50 flex flex-col items-center select-none bottom-[calc(0.25rem+env(safe-area-inset-bottom))] md:bottom-[calc(0.5rem+env(safe-area-inset-bottom))]" aria-label="Main Navigation">
             <GlassDock>
                 {navItems.map((item) => (
                     <a
                         key={item.id}
                         href={`#${item.href}`}
                         onClick={(e) => { e.preventDefault(); navigateTo(item.href); }}
-                        className={`dock-item group relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full transition-all duration-300 ease-[cubic-bezier(0.25,1,0.3,1)]
+                        className={`dock-item group relative flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.25,1,0.3,1)]
                   ${activeId === item.id
                                 ? 'text-[var(--text-primary)]'
-                                : 'text-[var(--dock-text)] hover:text-[var(--text-primary)] hover:scale-125'}`}
+                                : 'text-[var(--dock-text)] hover:text-[var(--text-primary)] hover:scale-105'}`}
                     >
                         {activeId === item.id && (
                             <div
-                                className="absolute -bottom-1.5 w-1 h-1 rounded-full"
+                                className="absolute -bottom-1 w-1 h-1 rounded-full"
                                 style={{
                                     backgroundColor: DYNAMIC_COLORS.raw.light.primary,
                                     boxShadow: `0 0 12px ${DYNAMIC_COLORS.raw.light.primary}`
@@ -58,10 +58,10 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
                             ></div>
                         )}
                         {activeId === item.id && (
-                            <div className="absolute inset-0 bg-[var(--text-primary)] opacity-[0.03] rounded-full scale-110"></div>
+                            <div className="absolute inset-0 bg-[var(--text-primary)] opacity-[0.03] rounded-2xl"></div>
                         )}
-                        <item.Icon className={`w-6 h-6 md:w-7 md:h-7 transition-all duration-300 ${activeId === item.id ? 'stroke-[2px]' : 'stroke-[1.5px]'}`} />
-                        <span className="absolute -top-14 opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100 px-3 py-1.5 rounded-xl bg-[var(--dock-bg)] backdrop-blur-xl border border-[var(--card-border)] text-[11px] font-semibold tracking-wide text-[var(--text-primary)] shadow-xl pointer-events-none whitespace-nowrap z-50">
+                        <item.Icon className={`w-5 h-5 md:w-6 md:h-6 transition-all duration-300 ${activeId === item.id ? 'stroke-[2px]' : 'stroke-[1.5px]'}`} />
+                        <span className={`text-[9px] md:text-[10px] font-semibold tracking-wide transition-all duration-300 ${activeId === item.id ? 'opacity-100' : 'opacity-70'}`}>
                             {item.label}
                         </span>
                     </a>
@@ -77,10 +77,10 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
                             : 'hover:scale-105 opacity-90 hover:opacity-100'}`}
                     style={{
                         '--card-bg': activeId === 'contact' ? DOCK_COLORS.activeBg : DOCK_COLORS.inactiveBg,
-                        '--card-hover-bg': activeId === 'contact' ? SEMANTIC_COLORS.light.successBg : 'var(--dock-item-bg)',
-                        '--card-border': activeId === 'contact' ? DOCK_COLORS.activeBorder : DOCK_COLORS.inactiveBorder,
+                        '--card-hover-bg': activeId === 'contact' ? `${DYNAMIC_COLORS.raw.light.primary}1A` : 'var(--dock-item-bg)',
+                        '--card-border': activeId === 'contact' ? `${DYNAMIC_COLORS.raw.light.primary}4D` : DOCK_COLORS.inactiveBorder,
                         '--text-primary': activeId === 'contact' ? 'var(--button-text)' : 'var(--text-primary)',
-                        '--glass-glow': DOCK_COLORS.activeGlow,
+                        '--glass-glow': `${DYNAMIC_COLORS.raw.light.primary}66`,
                         color: activeId === 'contact' ? SEMANTIC_COLORS.light.successText : undefined,
                         boxShadow: activeId === 'contact' ? `0 0 20px ${DYNAMIC_COLORS.raw.light.primary}66` : undefined
                     } as React.CSSProperties}

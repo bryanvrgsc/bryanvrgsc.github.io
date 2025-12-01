@@ -34,10 +34,10 @@ export const ContactView = () => {
         name: '',
         email: '',
         phone: '',
-        phoneCountry: 'US',
+        phoneCountry: lang === 'es' ? 'MX' : 'US',
         message: '',
         budget: '',
-        budgetCurrency: 'USD'
+        budgetCurrency: lang === 'es' ? 'MXN' : 'USD'
     });
 
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -55,6 +55,16 @@ export const ContactView = () => {
     useEffect(() => {
         setFieldErrors({});
         setTouched({});
+
+        // Update phone country and currency based on language
+        const newPhoneCountry = lang === 'es' ? 'MX' : 'US';
+        const newCurrency = lang === 'es' ? 'MXN' : 'USD';
+
+        setFormData(prev => ({
+            ...prev,
+            phoneCountry: newPhoneCountry,
+            budgetCurrency: newCurrency
+        }));
     }, [lang]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -144,10 +154,10 @@ export const ContactView = () => {
             name: '',
             email: '',
             phone: '',
-            phoneCountry: 'US',
+            phoneCountry: '',
             message: '',
             budget: '',
-            budgetCurrency: 'USD'
+            budgetCurrency: lang === 'es' ? 'MXN' : 'USD'
         });
         setFieldErrors({});
         setTouched({});

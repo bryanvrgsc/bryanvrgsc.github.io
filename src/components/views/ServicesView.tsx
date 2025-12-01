@@ -35,12 +35,12 @@ export const ServicesView = () => {
             <div className="flex flex-col items-center text-center mb-8 md:mb-16 px-2 md:px-0">
                 <div><h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-3 tracking-tight">{t.title}</h2><p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p></div>
             </div>
-            <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
                 {SERVICES[lang].map((s, i) => {
                     const Icon = Icons[s.iconName as keyof typeof Icons];
                     const theme = getCategoryTheme(s.title);
                     return (
-                        <div onMouseMove={handleMouseMove} key={i} className="bento-card rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-10 flex flex-col items-start text-left h-full group w-full md:w-[calc(33.33%-1.5rem)] flex-grow-0" style={theme.colors as React.CSSProperties}>
+                        <div onMouseMove={handleMouseMove} key={i} className="bento-card rounded-[2rem] md:rounded-[2.5rem] p-5 md:p-10 flex flex-col items-start text-left h-full group" style={theme.colors as React.CSSProperties}>
                             <div className={`h-16 w-16 md:h-20 md:h-20 rounded-3xl bg-gradient-to-br ${theme.gradientFrom} to-transparent flex items-center justify-center mb-6 md:mb-10 border border-[var(--card-border)] ${theme.text} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg relative z-10`}><Icon className="w-7 h-7 md:w-9 md:h-9 drop-shadow-sm" /></div>
                             <h3 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-4 md:mb-6 relative z-10 tracking-tight">{s.title}</h3>
                             <div className="flex-grow space-y-3 md:space-y-5 relative z-10 w-full flex flex-col items-start">{s.items.map((item, idx) => (<div key={idx} className="flex items-start justify-start gap-3 md:gap-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors w-full"><div className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${theme.bullet} shadow-sm flex-shrink-0 mt-2`}></div><span className="text-sm md:text-[15px] font-medium leading-relaxed">{item}</span></div>))}</div>

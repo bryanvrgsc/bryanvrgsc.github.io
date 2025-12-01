@@ -21,31 +21,48 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCountryCode, setSelectedCountryCode] = useState((countryCode || 'US').toUpperCase());
 
     // Priority countries to show first
     const priorityCountries = ['US', 'MX', 'ES', 'GB', 'CA'];
 
-    // Autofill country based on geolocation
+    // Sync local state with prop changes
     useEffect(() => {
-        if (!countryCode || countryCode === 'US') {
-            // Try to detect user's country
-            fetch('https://ipapi.co/json/')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.country_code) {
-                        const detectedCountry = allCountries.find(
-                            c => c.iso2 === data.country_code
-                        );
-                        if (detectedCountry) {
-                            onChange(value, detectedCountry.iso2);
-                        }
-                    }
-                })
-                .catch(() => {
-                    // Silently fail, keep default
-                });
+        if (countryCode) {
+            const normalizedCode = countryCode.toUpperCase();
+            setSelectedCountryCode(normalizedCode);
         }
-    }, []);
+    }, [countryCode]);
+
+    // Geolocation disabled - using language-based country selection instead
+    // useEffect(() => {
+    //     if (!countryCode) {
+    //         fetch('https://ipapi.co/json/')
+    //             .then(res => res.json())
+    //             .then(data => {
+    //                 if (data.country_code) {
+    //                     const detectedCountry = allCountries.find(
+    //                         c => c.iso2 === data.country_code
+    //                     );
+    //                     if (detectedCountry) {
+    //                         setSelectedCountryCode(detectedCountry.iso2);
+    //                         onChange(value, detectedCountry.iso2);
+    //                     }
+    //                 }
+    //             })
+    //             .catch(() => {
+    //                 // Silently fail, keep default
+    //             });
+    //     }
+    // }, []);
+
+    // React to countryCode prop changes (e.g., when language changes)
+    useEffect(() => {
+        if (countryCode) {
+            setIsOpen(false);
+            setSearchQuery('');
+        }
+    }, [countryCode]);
 
     // Filter countries based on search query
     const filteredCountries = allCountries.filter(country => {
@@ -69,9 +86,14 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
         return a.name.localeCompare(b.name);
     });
 
-    const selectedCountry = allCountries.find(c => c.iso2 === countryCode) || allCountries[0];
+    const selectedCountry = React.useMemo(() => {
+        // Case-insensitive search to handle different formats in country-telephone-data
+        const country = allCountries.find(c => c.iso2.toUpperCase() === selectedCountryCode.toUpperCase()) || allCountries[0];
+        return country;
+    }, [selectedCountryCode]);
 
     const handleCountryChange = (newCountryCode: string) => {
+        setSelectedCountryCode(newCountryCode);
         onChange(value, newCountryCode);
         setIsOpen(false);
         setSearchQuery('');
@@ -80,7 +102,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // Only allow numbers
         const newValue = e.target.value.replace(/[^\d]/g, '');
-        onChange(newValue, countryCode);
+        onChange(newValue, selectedCountryCode);
     };
 
     // Get flag emoji from country code

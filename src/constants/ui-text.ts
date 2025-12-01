@@ -57,7 +57,7 @@ export const UI_TEXT: Record<'en' | 'es', UIText> = {
             }
         },
         blog: {
-            title: "Insights",
+            title: "Papers",
             subtitle: "Strategic thinking and tech deep dives."
         },
         contact: {
@@ -90,7 +90,7 @@ export const UI_TEXT: Record<'en' | 'es', UIText> = {
             home: "Home",
             services: "Services",
             work: "Work",
-            blog: "Blog",
+            blog: "Papers",
             contact: "Contact"
         }
     },
@@ -150,7 +150,7 @@ export const UI_TEXT: Record<'en' | 'es', UIText> = {
             }
         },
         blog: {
-            title: "Insights",
+            title: "Artículos",
             subtitle: "Pensamiento estratégico y tecnología profunda."
         },
         contact: {
@@ -183,7 +183,7 @@ export const UI_TEXT: Record<'en' | 'es', UIText> = {
             home: "Inicio",
             services: "Servicios",
             work: "Portafolio",
-            blog: "Blog",
+            blog: "Artículos",
             contact: "Contacto"
         }
     }

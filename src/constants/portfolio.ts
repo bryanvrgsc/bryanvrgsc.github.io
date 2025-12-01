@@ -41,7 +41,7 @@ export const PORTFOLIO = {
             tech: "SQL, ETL, PowerBI, Data Warehousing",
             result: "Integral vision & 360° impact analysis.",
             image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
-            presentationUrl: "docs/data_warehouse_final.pdf",
+            presentationUrl: "docs/work/data_warehouse_final.pdf",
             screenshots: [
                 "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
                 "https://datablog.zeus.vision/wp-content/uploads/2017/05/datawarehouse.jpg",
@@ -55,10 +55,10 @@ export const PORTFOLIO = {
                     "Satisfaction surveys & key indicators"
                 ],
                 documents: [
-                    { label: "Protocol Presentation", url: "docs/data_warehouse_protocolo.pdf" },
-                    { label: "First Partial Presentation", url: "docs/data_warehouse_parcial1.pdf" },
-                    { label: "Second Partial Presentation", url: "docs/data_warehouse_parcial2.pdf" },
-                    { label: "Final Presentation", url: "docs/data_warehouse_final.pdf" }
+                    { label: "Protocol Presentation", url: "docs/work/data_warehouse_protocolo.pdf" },
+                    { label: "First Partial Presentation", url: "docs/work/data_warehouse_parcial1.pdf" },
+                    { label: "Second Partial Presentation", url: "docs/work/data_warehouse_parcial2.pdf" },
+                    { label: "Final Presentation", url: "docs/work/data_warehouse_final.pdf" }
                 ]
             }
         },
@@ -92,7 +92,7 @@ export const PORTFOLIO = {
             tech: "Swift, Node.js, PostgreSQL, Glitch",
             result: "Full-stack mobile commerce.",
             image: "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg", repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
-            presentationUrl: "docs/ios_store_presentation.pdf",
+            presentationUrl: "docs/work/ios_store_presentation.pdf",
             screenshots: [
                 "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
                 "https://splitmetrics.com/wp-content/uploads/2017/06/apple-app-store-1-1-1024x498.png",
@@ -122,7 +122,7 @@ export const PORTFOLIO = {
             result: "Efficient appointment & access management.",
             image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop", repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
             videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
-            presentationUrl: "docs/appointment_app_presentation.pdf",
+            presentationUrl: "docs/work/appointment_app_presentation.pdf",
             screenshots: [
                 "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
                 "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1468&auto=format&fit=crop",
@@ -194,7 +194,7 @@ export const PORTFOLIO = {
             tech: "SQL, ETL, PowerBI, Data Warehousing",
             result: "Visión integral y análisis de impacto 360°.",
             image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
-            presentationUrl: "docs/data_warehouse_final.pdf",
+            presentationUrl: "docs/work/data_warehouse_final.pdf",
             screenshots: [
                 "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
                 "https://datablog.zeus.vision/wp-content/uploads/2017/05/datawarehouse.jpg",
@@ -208,10 +208,10 @@ export const PORTFOLIO = {
                     "Encuestas de satisfacción e indicadores clave"
                 ],
                 documents: [
-                    { label: "Presentación Protocolo", url: "docs/data_warehouse_protocolo.pdf" },
-                    { label: "Presentación Primer Parcial", url: "docs/data_warehouse_parcial1.pdf" },
-                    { label: "Presentación Segundo Parcial", url: "docs/data_warehouse_parcial2.pdf" },
-                    { label: "Presentación Final", url: "docs/data_warehouse_final.pdf" }
+                    { label: "Presentación Protocolo", url: "docs/work/data_warehouse_protocolo.pdf" },
+                    { label: "Presentación Primer Parcial", url: "docs/work/data_warehouse_parcial1.pdf" },
+                    { label: "Presentación Segundo Parcial", url: "docs/work/data_warehouse_parcial2.pdf" },
+                    { label: "Presentación Final", url: "docs/work/data_warehouse_final.pdf" }
                 ]
             }
         },
@@ -245,7 +245,7 @@ export const PORTFOLIO = {
             tech: "Swift, Node.js, PostgreSQL, Glitch",
             result: "Experiencia de compra completa.",
             image: "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg", repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
-            presentationUrl: "docs/ios_store_presentation.pdf",
+            presentationUrl: "docs/work/ios_store_presentation.pdf",
             screenshots: [
                 "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
                 "https://splitmetrics.com/wp-content/uploads/2017/06/apple-app-store-1-1-1024x498.png",
@@ -275,7 +275,7 @@ export const PORTFOLIO = {
             result: "Gestión eficiente de citas y accesos.",
             image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop", repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
             videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
-            presentationUrl: "docs/appointment_app_presentation.pdf",
+            presentationUrl: "docs/work/appointment_app_presentation.pdf",
             screenshots: [
                 "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
                 "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1468&auto=format&fit=crop",
