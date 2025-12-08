@@ -42,6 +42,12 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
     // Update indicator position when active item changes - useLayoutEffect for synchronous DOM reads
     useLayoutEffect(() => {
         const updateIndicator = () => {
+            // Hide indicator if activeId is contact (it's a separate button)
+            if (activeId === 'contact') {
+                setIndicatorStyle(prev => ({ ...prev, opacity: 0 }));
+                return;
+            }
+
             const activeElement = itemRefs.current[activeId];
             const container = containerRef.current;
 

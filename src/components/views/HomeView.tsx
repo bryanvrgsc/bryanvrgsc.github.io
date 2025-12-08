@@ -146,7 +146,7 @@ export const HomeView = () => {
                 <section ref={(el) => { sectionRefs.current[1] = el }} className="min-h-screen min-h-[100svh] w-full flex flex-col justify-center items-center py-12 md:py-20 snap-start">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
                         <div className="order-2 md:order-1 h-full w-full">
-                            <TechCard title={`/// ${t.mission.title.toUpperCase()}`} accentColor="primary" className="h-full flex flex-col justify-center w-full">
+                            <TechCard title={`/// ${t.mission.title.toUpperCase()}`} accentColor="primary" className="h-full flex flex-col justify-center w-full" disableHover={true}>
                                 <div className="flex flex-col h-full justify-center"><div className="text-base md:text-lg lg:text-xl leading-relaxed"><Typewriter text={t.mission.content} startDelay={80} cursorColor={DYNAMIC_COLORS.bg} delay={8} active={activeStep >= 2} /></div></div>
                             </TechCard>
                         </div>
@@ -190,7 +190,7 @@ export const HomeView = () => {
                             </div>
                         </div>
                         <div className="order-2 h-full w-full flex flex-col">
-                            <TechCard title={`/// ${t.vision.title.toUpperCase()}`} accentColor="primary" className="h-full flex flex-col justify-center w-full">
+                            <TechCard title={`/// ${t.vision.title.toUpperCase()}`} accentColor="primary" className="h-full flex flex-col justify-center w-full" disableHover={true}>
                                 <div className="flex flex-col h-full justify-center"><div className="text-base md:text-lg lg:text-xl leading-relaxed"><Typewriter text={t.vision.content} startDelay={80} cursorColor={DYNAMIC_COLORS.bg} delay={8} active={activeStep >= 3} /></div></div>
                             </TechCard>
                         </div>
