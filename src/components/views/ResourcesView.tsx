@@ -7,23 +7,13 @@ import { DOCUMENTS, Document } from '../../constants/resources';
 import { DYNAMIC_COLORS } from '../../constants/colors';
 import { PDFPreviewModal } from '../common/PDFPreviewModal';
 import { PDFThumbnail } from '../common/PDFThumbnail';
+import { useMousePosition } from '../../utils/helpers';
 
 /**
  * ResourcesView Component
  * 
  * Digital library displaying PDF documents with preview and download functionality.
  */
-
-// Hook for mouse position tracking
-const useMousePosition = () => {
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const { currentTarget: target } = e;
-        const rect = target.getBoundingClientRect();
-        target.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
-        target.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
-    };
-    return handleMouseMove;
-};
 
 type FilterType = 'all' | 'paper' | 'slides';
 
@@ -94,13 +84,23 @@ export const ResourcesView = () => {
                     {filteredDocs.map((doc) => {
                         const DocIcon = getDocIcon(doc.type);
                         const badge = getTypeBadge(doc.type);
+                        const handleKeyDown = (e: React.KeyboardEvent) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setPreviewDoc(doc);
+                            }
+                        };
 
                         return (
                             <div
                                 key={doc.id}
                                 onMouseMove={handleMouseMove}
                                 onClick={() => setPreviewDoc(doc)}
-                                className="bento-card rounded-[2rem] md:rounded-[2.5rem] overflow-hidden group p-0 border-0 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+                                onKeyDown={handleKeyDown}
+                                tabIndex={0}
+                                role="button"
+                                aria-label={`${doc.title[lang]} - ${lang === 'en' ? 'View Document' : 'Ver Documento'}`}
+                                className="bento-card rounded-[2rem] md:rounded-[2.5rem] overflow-hidden group p-0 border-0 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]"
                             >
                                 {/* Background Preview - usando el path del PDF como preview */}
                                 <div className="h-[300px] md:h-[350px] overflow-hidden relative bg-[var(--input-bg)]">

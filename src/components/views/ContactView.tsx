@@ -5,6 +5,7 @@ import { Icons } from '../Icons';
 import { LiquidButton, PhoneInput, BudgetInput } from '../common';
 import { UI_TEXT } from '../../constants/ui-text';
 import { SOCIAL_COLORS, DYNAMIC_COLORS, getDynamicButtonStyles } from '../../constants/colors';
+import { useMousePosition } from '../../utils/helpers';
 
 /**
  * ContactView Component
@@ -13,17 +14,6 @@ import { SOCIAL_COLORS, DYNAMIC_COLORS, getDynamicButtonStyles } from '../../con
  * Includes international phone input and budget input with currency selector.
  * Integrates with Formspree for form submission.
  */
-
-// Hook for mouse position tracking
-const useMousePosition = () => {
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const { currentTarget: target } = e;
-        const rect = target.getBoundingClientRect();
-        target.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
-        target.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
-    };
-    return handleMouseMove;
-};
 
 export const ContactView = () => {
     const { lang } = useStore(settings);

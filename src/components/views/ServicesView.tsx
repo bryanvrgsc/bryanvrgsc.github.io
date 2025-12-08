@@ -4,7 +4,7 @@ import { settings } from '../../store';
 import { Icons } from '../Icons';
 import { UI_TEXT } from '../../constants/ui-text';
 import { SERVICES, ENGAGEMENT_MODELS } from '../../constants';
-import { getCategoryTheme } from '../../utils/helpers';
+import { getCategoryTheme, useMousePosition } from '../../utils/helpers';
 import { DYNAMIC_COLORS } from '../../constants/colors';
 
 /**
@@ -13,17 +13,6 @@ import { DYNAMIC_COLORS } from '../../constants/colors';
  * Displays all services offered with detailed descriptions,
  * value propositions, and engagement models.
  */
-
-// Hook for mouse position tracking
-const useMousePosition = () => {
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const { currentTarget: target } = e;
-        const rect = target.getBoundingClientRect();
-        target.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
-        target.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
-    };
-    return handleMouseMove;
-};
 
 export const ServicesView = () => {
     const { lang } = useStore(settings);

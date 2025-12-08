@@ -8,6 +8,7 @@ import { Typewriter } from '../common/Typewriter';
 import { UI_TEXT } from '../../constants/ui-text';
 import { navigateTo } from '../../utils/navigation';
 import { DYNAMIC_COLORS, getDynamicButtonStyles } from '../../constants/colors';
+import { useMousePosition } from '../../utils/helpers';
 
 /**
  * HomeView Component
@@ -15,17 +16,6 @@ import { DYNAMIC_COLORS, getDynamicButtonStyles } from '../../constants/colors';
  * Main landing page with hero section, mission, and vision.
  * Features scroll-snapping sections and animated typewriter effects.
  */
-
-// Hook for mouse position tracking with performance optimization
-const useMousePosition = () => {
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const { currentTarget: target } = e;
-        const rect = target.getBoundingClientRect();
-        target.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
-        target.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
-    };
-    return handleMouseMove;
-};
 
 export const HomeView = () => {
     const { lang } = useStore(settings);

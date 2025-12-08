@@ -6,6 +6,7 @@ import { UI_TEXT } from '../../constants/ui-text';
 import { PORTFOLIO } from '../../constants';
 import { PortfolioModal } from '../modals';
 import { DYNAMIC_COLORS } from '../../constants/colors';
+import { useMousePosition } from '../../utils/helpers';
 
 /**
  * PortfolioView Component
@@ -13,17 +14,6 @@ import { DYNAMIC_COLORS } from '../../constants/colors';
  * Displays portfolio projects in a grid layout.
  * Clicking on a project opens a detailed modal.
  */
-
-// Hook for mouse position tracking
-const useMousePosition = () => {
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const { currentTarget: target } = e;
-        const rect = target.getBoundingClientRect();
-        target.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
-        target.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
-    };
-    return handleMouseMove;
-};
 
 export const PortfolioView = () => {
     const { lang } = useStore(settings);
@@ -39,51 +29,68 @@ export const PortfolioView = () => {
                     <p className="text-[var(--text-secondary)] text-base md:text-lg">{t.subtitle}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-                    {PORTFOLIO[lang].map((item, i) => (
-                        <div onMouseMove={handleMouseMove} onClick={() => setSelectedProject(item)} key={i} className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
-                            <div className="h-[250px] md:h-[400px] overflow-hidden relative">
-                                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
-                                <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" />
+                    {PORTFOLIO[lang].map((item, i) => {
+                        const handleKeyDown = (e: React.KeyboardEvent) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedProject(item);
+                            }
+                        };
+                        return (
+                            <div
+                                onMouseMove={handleMouseMove}
+                                onClick={() => setSelectedProject(item)}
+                                onKeyDown={handleKeyDown}
+                                key={i}
+                                tabIndex={0}
+                                role="button"
+                                aria-label={`${item.title} - ${t.viewDetails}`}
+                                className="bento-card rounded-[2rem] md:rounded-[3rem] overflow-hidden group p-0 border-0 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]"
+                            >
+                                <div className="h-[250px] md:h-[400px] overflow-hidden relative">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent z-10 opacity-90"></div>
+                                    <img src={item.image} alt={item.title} className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110" />
 
-                                {/* Animated cursor pointer overlay - shows briefly on mobile, on hover for desktop */}
-                                <div className="absolute inset-0 bg-black/30 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center animate-[fadeOut_3s_ease-in-out_2s_forwards] md:animate-none">
-                                    <div className="relative">
-                                        {/* Pulsing ring */}
-                                        <div className="absolute inset-0 rounded-full bg-white/20 animate-ping"></div>
-                                        {/* Lucide Pointer icon */}
-                                        <div className="relative bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl">
-                                            <svg className="w-12 h-12 text-[var(--primary-color)] animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                                                <path d="M22 14a8 8 0 0 1-8 8" />
-                                                <path d="M18 11v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
-                                                <path d="M14 10V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1" />
-                                                <path d="M10 9.5V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v10" />
-                                                <path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
-                                            </svg>
+                                    {/* Animated cursor pointer overlay - shows briefly on mobile, on hover for desktop */}
+                                    <div className="absolute inset-0 bg-black/30 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 z-20 flex items-center justify-center animate-[fadeOut_3s_ease-in-out_2s_forwards] md:animate-none">
+                                        <div className="relative">
+                                            {/* Pulsing ring */}
+                                            <div className="absolute inset-0 rounded-full bg-white/20 animate-ping"></div>
+                                            {/* Lucide Pointer icon */}
+                                            <div className="relative bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl">
+                                                <svg className="w-12 h-12 text-[var(--primary-color)] animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                                    <path d="M22 14a8 8 0 0 1-8 8" />
+                                                    <path d="M18 11v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" />
+                                                    <path d="M14 10V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1" />
+                                                    <path d="M10 9.5V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v10" />
+                                                    <path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Tech badge */}
+                                    <div className="absolute top-6 right-6 md:top-8 md:right-8 z-20 pointer-events-none"><span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[var(--text-primary)] backdrop-blur-xl shadow-xl">{item.tech.split(',')[0]}</span></div>
+                                </div>
+                                <div className="p-6 md:p-10 relative z-20 -mt-16 md:-mt-24 pointer-events-none">
+                                    <h3 className="text-2xl md:text-4xl font-bold text-[var(--text-primary)] mb-3 drop-shadow-lg tracking-tight">{item.title}</h3>
+                                    <p className="font-semibold mb-6 md:mb-8 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider" style={{ color: DYNAMIC_COLORS.raw.light.primary }}><Icons.CheckCircle className="w-4 h-4 md:w-5 md:h-5" /> {item.result}</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm text-[var(--text-secondary)]">
+                                        <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.challenge}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.problem}</span></div>
+                                        <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.solution}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.solution}</span></div>
+                                    </div>
+
+                                    {/* "View Details" button - visible on mobile, on hover for desktop */}
+                                    <div className="mt-6 pointer-events-auto md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                                        <div className="bg-gradient-to-r from-[var(--primary-color)] to-[var(--accent-color)] text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg cursor-pointer">
+                                            <Icons.ExternalLink className="w-5 h-5" />
+                                            {t.viewDetails}
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Tech badge */}
-                                <div className="absolute top-6 right-6 md:top-8 md:right-8 z-20 pointer-events-none"><span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[var(--text-primary)] backdrop-blur-xl shadow-xl">{item.tech.split(',')[0]}</span></div>
                             </div>
-                            <div className="p-6 md:p-10 relative z-20 -mt-16 md:-mt-24 pointer-events-none">
-                                <h3 className="text-2xl md:text-4xl font-bold text-[var(--text-primary)] mb-3 drop-shadow-lg tracking-tight">{item.title}</h3>
-                                <p className="font-semibold mb-6 md:mb-8 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider" style={{ color: DYNAMIC_COLORS.raw.light.primary }}><Icons.CheckCircle className="w-4 h-4 md:w-5 md:h-5" /> {item.result}</p>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-sm text-[var(--text-secondary)]">
-                                    <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.challenge}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.problem}</span></div>
-                                    <div className="bg-[var(--input-bg)] p-4 md:p-6 rounded-2xl border border-[var(--card-border)]"><span className="block text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] mb-2 md:mb-3 font-bold">{t.solution}</span><span className="text-sm leading-relaxed block line-clamp-3">{item.solution}</span></div>
-                                </div>
-
-                                {/* "View Details" button - visible on mobile, on hover for desktop */}
-                                <div className="mt-6 pointer-events-auto md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                                    <div className="bg-gradient-to-r from-[var(--primary-color)] to-[var(--accent-color)] text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg cursor-pointer">
-                                        <Icons.ExternalLink className="w-5 h-5" />
-                                        {t.viewDetails}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
             {selectedProject && (<PortfolioModal project={selectedProject} onClose={() => setSelectedProject(null)} lang={lang} />)}

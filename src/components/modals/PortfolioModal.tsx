@@ -5,6 +5,7 @@ import { PDFViewer } from '../ui/PDFViewer';
 import { UI_TEXT } from '../../constants/ui-text';
 import type { Language } from '../../types';
 import { DYNAMIC_COLORS } from '../../constants/colors';
+import { getEmbedUrl } from '../../utils/helpers';
 
 /**
  * PortfolioModal Component
@@ -41,15 +42,6 @@ export const PortfolioModal = ({ project, onClose, lang }: PortfolioModalProps) 
 
     // Basic check for PDF files (local or remote)
     const isPdf = currentPdf?.toLowerCase().endsWith('.pdf');
-
-    // Legacy embedding for Drive links if any remain (though updated to local now)
-    const getEmbedUrl = (url: string) => {
-        if (url.includes('drive.google.com')) {
-            if (url.includes('/preview')) return url;
-            return url.replace(/\/view.*/, '/preview');
-        }
-        return `${url}#view=FitH`;
-    };
 
     const pdfEmbedSrc = !isPdf && currentPdf ? getEmbedUrl(currentPdf) : null;
 
