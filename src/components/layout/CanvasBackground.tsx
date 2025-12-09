@@ -290,8 +290,8 @@ export const CanvasBackground = () => {
       //
       // CLEAR
       //
-      ctx.fillStyle = isDark ? NETWORK_COLORS.dark.canvasBg : NETWORK_COLORS.light.canvasBg; 
-      ctx.fillRect(0, 0, w, h); 
+      ctx.fillStyle = isDark ? NETWORK_COLORS.dark.canvasBg : NETWORK_COLORS.light.canvasBg;
+      ctx.fillRect(0, 0, w, h);
       ctx.globalCompositeOperation = "source-over";
 
       const nodes = nodesRef.current;

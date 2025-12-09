@@ -25,6 +25,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react": "^5.1.1",
+    "@webgpu/types": "^0.1.67",
     "gh-pages": "^6.3.0",
     "tailwindcss": "^4.1.17",
     "terser": "^5.44.1",
