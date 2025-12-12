@@ -45,8 +45,12 @@ export const TechCard = ({ title, children, accentColor = "primary", className =
 
     return (
         <div
-            className={`relative overflow-hidden rounded-[20px] border ${styles.border} backdrop-blur-md p-6 md:p-8 flex flex-col h-full group transition-all duration-700 ${hoverClasses} ${className}`}
-            style={{ backgroundColor: styles.bgColor }}
+            className={`relative overflow-hidden rounded-[20px] border ${styles.border} p-6 md:p-8 flex flex-col h-full group transition-all duration-700 ${hoverClasses} ${className}`}
+            style={{
+                backgroundColor: 'var(--card-bg, rgba(22, 22, 22, 0.8))',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)', // Safari/Chrome prefix
+            }}
         >
             <div className={`absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 ${styles.border} rounded-tl-[18px] ${groupHoverOpacity} transition-opacity duration-500`}></div>
             <div className={`absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 ${styles.border} rounded-br-[18px] ${groupHoverOpacity} transition-opacity duration-500`}></div>
