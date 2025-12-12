@@ -3,6 +3,8 @@
   --apple-ease: cubic-bezier(0.25, 1, 0.3, 1);
   /* Smoother spring feel */
 
+  /* Color scheme for DarkReader and browser detection */
+  color-scheme: light dark;
   /* Luminous Light Mode (Premium) */
   --bg-primary: #f8fafc;
   /* Very light slate/white */

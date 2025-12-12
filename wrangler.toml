@@ -1,13 +1,14 @@
+# Cloudflare Pages configuration
 name = "bryanvrgsc-portfolio"
 compatibility_date = "2024-12-11"
-pages_build_output_dir = "./dist"
 
-[env.production]
-name = "bryanvrgsc-portfolio"
-routes = [
-  { pattern = "bryanvrgsc.github.io", custom_domain = true }
-]
+# Pages specific settings
+pages_build_output_dir = "dist"
 
-# Environment variables (set these in Cloudflare dashboard)
-# PUBLIC_FORMSPREE_ID
-# PUBLIC_RECAPTCHA_SITE_KEY
+# Note: For Pages, most settings are configured in the Cloudflare dashboard
+# Environment variables should be set in:
+# Cloudflare Dashboard > Workers & Pages > Your Project > Settings > Environment variables
+#
+# Required variables:
+# - PUBLIC_FORMSPREE_ID (if using contact form)
+# - PUBLIC_RECAPTCHA_SITE_KEY (if using reCAPTCHA)
