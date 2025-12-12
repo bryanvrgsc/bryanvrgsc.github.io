@@ -1,114 +1,216 @@
-# bryanvrgsc.github.io
+# Bryan Vargas - Portfolio
 
-This project showcases my skills, projects, and experience in web development. It features a modern design with glassmorphism, dark/light themes, bilingual support (English/Spanish), and a responsive layout.
+Ultra-fast, secure landing page built with **Astro** and **Cloudflare Pages**.
 
-### Núcleo y Lenguaje
+## 🚀 Tech Stack
 
-**React 19**: La biblioteca principal para construir la interfaz de usuario.
-
-**TypeScript**: El lenguaje de programación utilizado, que añade tipos estáticos a JavaScript para un código más robusto y seguro.
-
-**Vite**: La herramienta de compilación y servidor de desarrollo, elegida por su extrema rapidez.
-
-### Estilos y Diseño
-
-**Tailwind CSS (v4)**: Framework de utilidad para el diseño rápido y responsivo.
-
-**CSS Puro y Animaciones**: Utilizado extensivamente para el nuevo fondo animado (burbujas flotantes, efectos de brillo) y los efectos de "cristal" (Glassmorphism) sin depender de librerías pesadas de JavaScript.
-
-**Diseño Responsivo**: Adaptado para móviles, tablets y escritorio.
-
-### Gestión de Estado
-
-**Nano Stores**: Una biblioteca de gestión de estado muy ligera y rápida, usada para manejar el tema (claro/oscuro), el idioma y el modo de rendimiento globalmente.
-
-### Funcionalidades Específicas
-
-**PDF.js** (pdfjs-dist): Motor para renderizar documentos PDF y generar sus miniaturas directamente en el navegador.
-
-**Detect GPU**: Utilidad para detectar la capacidad de la tarjeta gráfica del usuario y activar automáticamente el "modo lite" en dispositivos lentos.
-
-**Formspree**: (Integrado) Servicio para manejar el envío del formulario de contacto sin necesidad de un backend propio.
-
-### Infraestructura
-
-**GitHub Pages**: Plataforma de alojamiento estático donde vive tu sitio.
-
-**npm**: Gestor de paquetes.
-
-## 🚀 Run Locally
-
-**Prerequisites:** Node.js
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-
-3. Run the app:
-   ```bash
-   npm run dev
-   ```
-
-## 📁 Project Structure
-
-This project has been reorganized for better maintainability and clarity. See the documentation below for details.
-
-```
-src/
-├── components/     # React components (organized by function)
-├── constants/      # Application constants and data
-├── utils/          # Utility functions and helpers
-├── types/          # TypeScript type definitions
-├── store.ts        # Global state management
-└── styles.css      # Global styles
-```
-
-## 📚 Documentation
-
-- **[REORGANIZATION_COMPLETE.md](./REORGANIZATION_COMPLETE.md)** - ✅ Start here! Complete overview of the reorganization
-- **[REORGANIZATION_SUMMARY.md](./REORGANIZATION_SUMMARY.md)** - Visual summary with metrics and examples
-- **[REORGANIZATION_PLAN.md](./REORGANIZATION_PLAN.md)** - Detailed plan and roadmap
-- **[MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md)** - Quick migration guide
-- **[src/components/README.md](./src/components/README.md)** - Components documentation
+- **Framework**: [Astro](https://astro.build) v5
+- **Styling**: [Tailwind CSS](https://tailwindcss.com) v4
+- **Hosting**: [Cloudflare Pages](https://pages.cloudflare.com)
+- **Package Manager**: [pnpm](https://pnpm.io)
+- **TypeScript**: Full type safety
+- **Image Optimization**: vite-imagetools
+- **Contact Form**: Formspree + reCAPTCHA
 
 ## ✨ Features
 
-- 🎨 Modern glassmorphism design
-- 🌓 Dark/Light theme support
-- 🌐 Bilingual (English/Spanish)
-- 📱 Fully responsive
-- ⚡ Optimized performance
-- 🎭 Smooth animations
-- 📊 Interactive canvas background
+- ⚡ **Ultra-fast**: Astro's island architecture for optimal performance
+- 🔒 **Secure**: Comprehensive security headers (CSP, HSTS, X-Frame-Options, etc.)
+- 🌍 **Global CDN**: Deployed on Cloudflare's edge network
+- 📱 **Responsive**: Mobile-first design
+- 🎨 **Modern UI**: Tailwind CSS v4 with custom design system
+- 🌙 **Dark Mode**: CSS custom properties for theming
+- ♿ **Accessible**: WCAG compliant
+- 📧 **Contact Form**: Serverless form with spam protection
 
-## 🛠️ Tech Stack
+## 🛠️ Getting Started
 
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Tailwind CSS** - Styling
-- **Nanostores** - State management
+### Prerequisites
 
-## 📦 Build
+- Node.js 18+ 
+- pnpm (install with `npm install -g pnpm`)
+
+### Installation
 
 ```bash
-npm run build
+# Clone the repository
+git clone https://github.com/bryanvrgsc/bryanvrgsc.github.io.git
+cd bryanvrgsc.github.io
+
+# Checkout the Astro branch
+git checkout astro-cloudflare-migration
+
+# Install dependencies
+pnpm install
+
+# Create environment file
+cp .env.example .env
+# Edit .env and add your Formspree and reCAPTCHA keys
 ```
 
-## 🎯 Code Organization
+### Development
 
-The codebase has been reorganized into a modular structure:
+```bash
+# Start dev server (http://localhost:4321)
+pnpm dev
 
-- **Components**: Separated into `common`, `layout`, `ui`, `modals`, and `views`
-- **Constants**: Organized by domain (ui-text, services, portfolio, etc.)
-- **Utils**: Helper functions and utilities
-- **Types**: Centralized TypeScript definitions
+# Build for production
+pnpm build
 
-See [REORGANIZATION_COMPLETE.md](./REORGANIZATION_COMPLETE.md) for full details.
+# Preview production build
+pnpm preview
+
+# Type check
+pnpm astro check
+```
+
+## 🔐 Environment Variables
+
+Create a `.env` file with the following variables:
+
+```env
+PUBLIC_FORMSPREE_ID=your_formspree_id_here
+PUBLIC_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
+```
+
+### Getting API Keys
+
+**Formspree**:
+1. Sign up at [formspree.io](https://formspree.io)
+2. Create a new form
+3. Copy the form ID
+
+**reCAPTCHA**:
+1. Go to [Google reCAPTCHA](https://www.google.com/recaptcha/admin)
+2. Register a new site (use reCAPTCHA v3)
+3. Add your domain
+4. Copy the site key
+
+## 🚢 Deployment
+
+### Deploy to Cloudflare Pages
+
+#### Option 1: Using Wrangler CLI
+
+```bash
+pnpm pages:deploy
+```
+
+#### Option 2: Using Cloudflare Dashboard
+
+1. Go to [Cloudflare Pages](https://pages.cloudflare.com/)
+2. Connect your GitHub repository
+3. Configure build settings:
+   - **Build command**: `pnpm build`
+   - **Build output directory**: `dist`
+   - **Framework preset**: Astro
+4. Add environment variables
+5. Deploy
+
+### Configure Security Headers
+
+In Cloudflare Pages dashboard, add these headers:
+
+```
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://formspree.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://formspree.io; frame-src https://www.google.com/recaptcha/; base-uri 'self'; form-action 'self' https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests
+
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+X-Frame-Options: DENY
+
+X-Content-Type-Options: nosniff
+
+Referrer-Policy: strict-origin-when-cross-origin
+
+Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+```
+
+## 📁 Project Structure
+
+```
+/
+├── public/
+│   └── favicon.svg
+├── src/
+│   ├── components/
+│   │   └── ContactForm.astro
+│   ├── layouts/
+│   │   └── BaseLayout.astro
+│   ├── middleware/
+│   │   └── index.ts
+│   ├── pages/
+│   │   └── index.astro
+│   ├── styles/
+│   │   └── global.css
+│   └── env.d.ts
+├── astro.config.mjs
+├── package.json
+├── postcss.config.cjs
+├── tailwind.config.cjs
+├── tsconfig.json
+└── wrangler.toml
+```
+
+## 🎨 Customization
+
+### Colors
+
+Edit `tailwind.config.cjs` to customize the color palette:
+
+```javascript
+colors: {
+  primary: { /* your colors */ },
+  accent: { /* your colors */ }
+}
+```
+
+### Fonts
+
+Update Google Fonts import in `src/styles/global.css`:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=YourFont&display=swap');
+```
+
+### Content
+
+- **Landing Page**: Edit `src/pages/index.astro`
+- **Meta Tags**: Edit `src/layouts/BaseLayout.astro`
+- **Styles**: Edit `src/styles/global.css`
+
+## 📊 Performance
+
+Target Lighthouse scores:
+
+- ⚡ Performance: 95+
+- ♿ Accessibility: 95+
+- ✅ Best Practices: 95+
+- 🔍 SEO: 95+
+
+## 🔒 Security
+
+This project implements multiple security layers:
+
+- **Content Security Policy (CSP)**: Prevents XSS attacks
+- **HSTS**: Enforces HTTPS
+- **X-Frame-Options**: Prevents clickjacking
+- **X-Content-Type-Options**: Prevents MIME sniffing
+- **Referrer-Policy**: Controls referrer information
+- **Permissions-Policy**: Restricts browser features
+- **DDoS Protection**: Via Cloudflare
+
+## 📝 License
+
+MIT License - feel free to use this project for your own portfolio!
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+## 📧 Contact
+
+Bryan Vargas - [GitHub](https://github.com/bryanvrgsc)
 
 ---
 
-**Last Updated**: 2025-11-29
+Built with ❤️ using Astro and Cloudflare Pages

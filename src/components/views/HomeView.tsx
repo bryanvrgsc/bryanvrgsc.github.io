@@ -82,13 +82,18 @@ export const HomeView = () => {
             <div className="w-full max-w-7xl mx-auto px-4 md:px-8">
                 <section ref={(el) => { sectionRefs.current[0] = el }} className="min-h-screen min-h-[100svh] w-full flex flex-col justify-center items-center py-20 md:py-24 snap-start relative">
                     <div className="flex flex-col items-center text-center animate-slide-up max-w-5xl mx-auto w-full">
-                        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[8rem] font-bold tracking-tighter mb-4 md:mb-6 text-transparent bg-clip-text bg-gradient-to-b from-[var(--text-primary)] via-[var(--text-primary)] to-transparent drop-shadow-sm leading-[0.9]">
-                            {t.heroTitle.split(' ')[0]} <br />
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[7rem] font-bold tracking-normal mb-4 md:mb-6 leading-[1.2]">
+                            <span className="text-[var(--text-primary)] block py-[0.1em]">
+                                {t.heroTitle.split(' ')[0]}
+                            </span>
                             <span
-                                className="text-transparent bg-clip-text bg-gradient-to-r filter"
+                                className="block py-[0.1em]"
                                 style={{
-                                    backgroundImage: `linear-gradient(to right, ${DYNAMIC_COLORS.raw.light.primary}, ${DYNAMIC_COLORS.raw.light.accent})`,
-                                    filter: `drop-shadow(0 0 30px rgba(${DYNAMIC_COLORS.raw.light.rgb.r}, ${DYNAMIC_COLORS.raw.light.rgb.g}, ${DYNAMIC_COLORS.raw.light.rgb.b}, 0.3))`
+                                    background: `linear-gradient(to right, ${DYNAMIC_COLORS.raw.light.primary}, ${DYNAMIC_COLORS.raw.light.accent})`,
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    backgroundClip: 'text',
+                                    filter: `drop-shadow(0 0 30px rgba(${DYNAMIC_COLORS.raw.light.rgb.r}, ${DYNAMIC_COLORS.raw.light.rgb.g}, ${DYNAMIC_COLORS.raw.light.rgb.b}, 0.3))`,
                                 }}
                             >{t.heroTitle.split(' ').slice(1).join(' ')}</span>
                         </h1>

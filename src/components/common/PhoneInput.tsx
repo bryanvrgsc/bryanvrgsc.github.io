@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { allCountries as allCountriesRaw } from 'country-telephone-data';
-import { CountryTelephoneData, PhoneInputProps } from '../../types/modules';
+import type { CountryTelephoneData, PhoneInputProps } from '../../types/modules';
 import { DYNAMIC_COLORS } from '../../constants/colors';
 
 

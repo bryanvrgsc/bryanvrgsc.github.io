@@ -59,15 +59,6 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
                 if (activeRect.width > 0 && activeRect.height > 0) {
                     const left = activeRect.left - containerRect.left;
 
-                    console.log('Indicator positioning:', {
-                        activeId,
-                        containerLeft: containerRect.left,
-                        activeLeft: activeRect.left,
-                        calculatedLeft: left,
-                        width: activeRect.width,
-                        height: activeRect.height
-                    });
-
                     setIndicatorStyle({
                         left,
                         width: activeRect.width,

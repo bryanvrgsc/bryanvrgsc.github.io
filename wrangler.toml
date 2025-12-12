@@ -1,0 +1,13 @@
+name = "bryanvrgsc-portfolio"
+compatibility_date = "2024-12-11"
+pages_build_output_dir = "./dist"
+
+[env.production]
+name = "bryanvrgsc-portfolio"
+routes = [
+  { pattern = "bryanvrgsc.github.io", custom_domain = true }
+]
+
+# Environment variables (set these in Cloudflare dashboard)
+# PUBLIC_FORMSPREE_ID
+# PUBLIC_RECAPTCHA_SITE_KEY

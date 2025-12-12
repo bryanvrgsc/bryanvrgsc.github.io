@@ -472,3 +472,251 @@ body {
 .lite-mode .bento-card::before {
   display: none;
 }
+
+/* ================================================
+   MESH GRADIENT BACKGROUND ANIMATIONS
+   ================================================ */
+
+@keyframes mesh-orb-1 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(10%, 5%) scale(1.05);
+  }
+
+  50% {
+    transform: translate(5%, 10%) scale(0.95);
+  }
+
+  75% {
+    transform: translate(-5%, 5%) scale(1.02);
+  }
+}
+
+@keyframes mesh-orb-2 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(-8%, 8%) scale(0.98);
+  }
+
+  50% {
+    transform: translate(-5%, -5%) scale(1.04);
+  }
+
+  75% {
+    transform: translate(5%, 3%) scale(0.96);
+  }
+}
+
+@keyframes mesh-orb-3 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  25% {
+    transform: translate(5%, -8%) scale(1.03);
+  }
+
+  50% {
+    transform: translate(-7%, 5%) scale(0.97);
+  }
+
+  75% {
+    transform: translate(3%, 7%) scale(1.01);
+  }
+}
+
+@keyframes mesh-orb-4 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+
+  25% {
+    transform: translate(-10%, -5%) scale(1.05) rotate(5deg);
+  }
+
+  50% {
+    transform: translate(5%, -10%) scale(0.95) rotate(-3deg);
+  }
+
+  75% {
+    transform: translate(8%, 5%) scale(1.02) rotate(2deg);
+  }
+}
+
+/* Mesh Gradient Orb Animation Classes */
+.mesh-orb-1 {
+  animation: mesh-orb-1 25s ease-in-out infinite;
+}
+
+.mesh-orb-2 {
+  animation: mesh-orb-2 30s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+.mesh-orb-3 {
+  animation: mesh-orb-3 35s ease-in-out infinite;
+  animation-delay: -10s;
+}
+
+.mesh-orb-4 {
+  animation: mesh-orb-4 40s ease-in-out infinite;
+  animation-delay: -15s;
+}
+
+/* Disable mesh animations in lite mode */
+.lite-mode .mesh-orb-1,
+.lite-mode .mesh-orb-2,
+.lite-mode .mesh-orb-3,
+.lite-mode .mesh-orb-4 {
+  animation: none !important;
+}
+
+/* ============================================
+   SKELETON LOADING ANIMATIONS
+   ============================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ============================================
+   VIEW TRANSITIONS
+   ============================================ */
+
+/* Fade in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+/* Slide up with fade */
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up-fade {
+  animation: slide-up-fade 0.5s var(--apple-ease) forwards;
+}
+
+/* View enter animation */
+@keyframes view-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.view-transition-enter {
+  animation: view-enter 0.4s var(--apple-ease) forwards;
+}
+
+/* View exit animation */
+@keyframes view-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.98);
+  }
+}
+
+.view-transition-exit {
+  animation: view-exit 0.3s var(--apple-ease) forwards;
+}
+
+/* Stagger animation for children */
+.stagger-children>* {
+  opacity: 0;
+  animation: slide-up-fade 0.5s var(--apple-ease) forwards;
+}
+
+.stagger-children>*:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.stagger-children>*:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.stagger-children>*:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.stagger-children>*:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.stagger-children>*:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.stagger-children>*:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+.stagger-children>*:nth-child(7) {
+  animation-delay: 0.35s;
+}
+
+.stagger-children>*:nth-child(8) {
+  animation-delay: 0.4s;
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+
+  .animate-fade-in,
+  .animate-slide-up-fade,
+  .view-transition-enter,
+  .view-transition-exit,
+  .stagger-children>* {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

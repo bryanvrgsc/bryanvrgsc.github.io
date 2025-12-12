@@ -14,9 +14,11 @@ import { navigateTo } from '../../utils/navigation';
  */
 export const Header = () => {
     const [scrolled, setScrolled] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const { theme } = useStore(settings);
 
     useEffect(() => {
+        setMounted(true);
         // Inject palette CSS variables on mount
         injectPaletteCSS();
 
@@ -28,7 +30,11 @@ export const Header = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // Default to dark theme during SSR to match the expected client render
+    // Only check system preference after mount to avoid hydration mismatch
+    const isDark = mounted
+        ? (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches))
+        : true; // Assume dark during SSR
 
     // Get dynamic colors for inline styles
     const logoColor = isDark ? DYNAMIC_COLORS.raw.dark.primary : DYNAMIC_COLORS.raw.light.primary;

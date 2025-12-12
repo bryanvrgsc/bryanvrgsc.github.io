@@ -35,12 +35,36 @@ export const GlassElement: React.FC<GlassElementProps> = ({
         ...(width ? { width: `${width}px` } : {}),
         ...(height ? { height: `${height}px` } : {}),
         ...(radius ? { borderRadius: `${radius}px` } : {}),
-        '--glass-blur': `${blur}px`,
-    } as React.CSSProperties;
+        position: 'relative',
+        background: 'var(--dock-bg, rgba(240, 240, 245, 0.65))',
+        backdropFilter: `blur(${blur}px) saturate(180%)`,
+        WebkitBackdropFilter: `blur(${blur}px) saturate(180%)`,
+        boxShadow: `
+            inset 0 0 0 1px var(--card-border, rgba(255, 255, 255, 0.2)),
+            0 20px 50px -12px rgba(0, 0, 0, 0.3)
+        `,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'all 0.5s cubic-bezier(0.25, 1, 0.3, 1)',
+        overflow: 'visible',
+        isolation: 'isolate',
+    };
 
     return (
-        <div className={`glass-element-box ${className}`} style={dynamicStyle}>
-            <div className="glass-element-shine" />
+        <div className={className} style={dynamicStyle}>
+            {/* Glass shine effect */}
+            <div
+                style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: 'inherit',
+                    pointerEvents: 'none',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 20%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.1) 80%, rgba(255, 255, 255, 0.3) 100%)',
+                    opacity: 0.6,
+                    zIndex: 0,
+                }}
+            />
             {children}
         </div>
     );
@@ -99,7 +123,10 @@ export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
             </div>
 
             {/* Actual Visible Glass Element */}
-            <div className={`transition-opacity duration-500 ${size.width > 0 ? 'opacity-100' : 'opacity-0'}`}>
+            <div
+                className="transition-opacity duration-500"
+                style={{ opacity: size.width > 0 ? 1 : 0 }}
+            >
                 <GlassElement
                     width={size.width}
                     height={size.height}

@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
 import { Icons } from '../Icons';
 import { DYNAMIC_COLORS } from '../../constants/colors';
-
-// @ts-ignore - Vite will handle this import
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-// Configure PDF.js worker
-if (typeof window !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-}
 
 /**
  * PDFViewer Component
@@ -30,10 +21,19 @@ export const PDFViewer = ({ url }: { url: string }) => {
 
     // Load PDF document
     useEffect(() => {
+        if (typeof window === 'undefined') return;
+
         const loadPDF = async () => {
             try {
                 setLoading(true);
                 setError(false);
+
+                // Dynamic import to avoid SSR issues
+                const pdfjsLib = await import('pdfjs-dist');
+                const { default: pdfjsWorker } = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
+
+                pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
                 const loadingTask = pdfjsLib.getDocument(url);
                 const pdf = await loadingTask.promise;
                 setPdfDoc(pdf);

@@ -17,5 +17,12 @@ export { BudgetInput } from './BudgetInput';
 export { Typewriter } from './Typewriter';
 export type { TypewriterProps } from './Typewriter';
 
-// GlassDock will be added here when extracted
-// export { GlassDock } from './GlassDock';
+export {
+    Skeleton,
+    SkeletonText,
+    SkeletonCard,
+    ViewSkeleton,
+    HomeViewSkeleton,
+    ContactViewSkeleton,
+    PortfolioViewSkeleton
+} from './Skeleton';
