@@ -35,6 +35,17 @@ export const applyTheme = (theme: Theme) => {
   if (isDark) {
     root.setAttribute('data-theme', 'dark');
     root.classList.add('dark');
+    // Tell DarkReader this is already dark - don't modify
+    root.style.colorScheme = 'dark';
+  } else {
+    // Tell DarkReader this is light mode
+    root.style.colorScheme = 'light';
+  }
+
+  // Update meta tag for DarkReader detection
+  const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
+  if (metaColorScheme) {
+    metaColorScheme.setAttribute('content', isDark ? 'dark' : 'light');
   }
 };
 
