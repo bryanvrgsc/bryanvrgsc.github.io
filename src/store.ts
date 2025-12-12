@@ -56,16 +56,21 @@ export const checkPerformance = async () => {
     const gpuTier = await getGPUTier();
 
     // Tier 0: Blocklisted/Fail
-    // Tier 1: Low-end (Integrated graphics, older mobile)
+    // Tier 1: Low-end (Integrated graphics, older mobile) - BUT Safari/Apple GPU often reports Tier 1 incorrectly
     // Tier 2: Mid-range
     // Tier 3: High-end
-    // FPS: Estimated framerate for heavy tasks
-
-    const isLowEnd = gpuTier.tier < 2 || (gpuTier.fps !== undefined && gpuTier.fps < 50);
 
     console.log(`Hardware Detection (detect-gpu): Tier ${gpuTier.tier}, FPS: ${gpuTier.fps}, GPU: ${gpuTier.gpu}`);
 
-    if (isLowEnd) {
+    // Safari/Apple GPU fix: Apple GPUs are powerful but often report as Tier 1
+    // Only enable Lite Mode for truly low-end devices (Tier 0 or explicit low FPS)
+    const isAppleGPU = gpuTier.gpu && gpuTier.gpu.toLowerCase().includes('apple');
+    const isTrulyLowEnd = gpuTier.tier === 0 || (gpuTier.fps !== undefined && gpuTier.fps < 30);
+
+    // Don't enable lite mode for Apple GPUs unless FPS is explicitly low
+    const shouldEnableLiteMode = isTrulyLowEnd && !isAppleGPU;
+
+    if (shouldEnableLiteMode) {
       console.log('Performance: Switching to Lite Mode (Device capability limit)');
       enableLiteMode(true);
     } else {
@@ -74,8 +79,9 @@ export const checkPerformance = async () => {
     }
 
   } catch (error) {
-    console.warn('GPU Detection failed, defaulting to Lite Mode for safety.', error);
-    enableLiteMode(true);
+    console.warn('GPU Detection failed, keeping default mode.', error);
+    // Don't enable lite mode on error - assume capable device
+    enableLiteMode(false);
   }
 };
 
