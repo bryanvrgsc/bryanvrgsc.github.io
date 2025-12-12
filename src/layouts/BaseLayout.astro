@@ -57,18 +57,7 @@ const imageUrl = Astro.site ? new URL(image, Astro.site).href : image;
     <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
     
     <!-- Color Scheme for DarkReader detection -->
-    <meta name="color-scheme" content="dark" />
-    
-    <!-- Set color-scheme immediately before paint to prevent DarkReader flash -->
-    <script is:inline>
-      (function() {
-        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
-        const meta = document.querySelector('meta[name="color-scheme"]');
-        if (meta) meta.content = isDark ? 'dark' : 'light';
-        if (isDark) document.documentElement.classList.add('dark');
-      })();
-    </script>
+    <meta name="color-scheme" content="light dark" />
   </head>
   <body>
     <slot />
