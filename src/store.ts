@@ -38,6 +38,35 @@ export const applyTheme = (theme: Theme) => {
   }
 };
 
+// Listen for system theme changes and auto-update when theme is 'system'
+let systemThemeListener: MediaQueryList | null = null;
+
+export const initThemeListener = () => {
+  if (typeof window === 'undefined') return;
+
+  // Clean up existing listener
+  if (systemThemeListener) {
+    systemThemeListener.removeEventListener('change', handleSystemThemeChange);
+  }
+
+  // Create new listener
+  systemThemeListener = window.matchMedia('(prefers-color-scheme: dark)');
+  systemThemeListener.addEventListener('change', handleSystemThemeChange);
+
+  // Apply current theme
+  const currentTheme = settings.get().theme;
+  applyTheme(currentTheme);
+};
+
+const handleSystemThemeChange = () => {
+  const currentTheme = settings.get().theme;
+
+  // Only auto-update if theme is set to 'system'
+  if (currentTheme === 'system') {
+    applyTheme('system');
+  }
+};
+
 // Helper to detect device capabilities and enable Lite Mode
 export const checkPerformance = async () => {
   if (typeof window === 'undefined') return;

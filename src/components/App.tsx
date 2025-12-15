@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Suspense, useRef } from 'react';
 import { useStore } from '@nanostores/react';
-import { settings, applyTheme, checkPerformance } from '../store';
+import { settings, applyTheme, checkPerformance, initThemeListener } from '../store';
 import { CanvasBackground, Header, Dock, ScrollToTop } from './layout';
 import { ThemeToggle, LanguageToggle } from './ui';
 import { HomeViewSkeleton, PortfolioViewSkeleton, ContactViewSkeleton, ViewSkeleton } from './common';
@@ -66,10 +66,10 @@ export default function App() {
     const [viewKey, setViewKey] = useState(0);
     const previousPath = useRef('/');
 
-    // Effect for Theme
+    // Effect for Theme - Initialize listener for system theme changes
     useEffect(() => {
-        applyTheme(theme);
-    }, [theme]);
+        initThemeListener();
+    }, []);
 
     // Effect for Performance - Runs ONCE on mount
     useEffect(() => {
