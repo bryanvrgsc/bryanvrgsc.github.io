@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Suspense, useRef } from 'react';
 import { useStore } from '@nanostores/react';
-import { settings, applyTheme, checkPerformance, initThemeListener } from '../store';
+import { settings, checkPerformance, initThemeListener } from '../store';
 import { CanvasBackground, Header, Dock, ScrollToTop } from './layout';
 import { ThemeToggle, LanguageToggle } from './ui';
 import { HomeViewSkeleton, PortfolioViewSkeleton, ContactViewSkeleton, ViewSkeleton } from './common';
@@ -60,7 +60,7 @@ const getSkeletonForPath = (path: string) => {
 };
 
 export default function App() {
-    const { theme } = useStore(settings);
+    useStore(settings);
     const [currentHash, setCurrentHash] = useState('#/');
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [viewKey, setViewKey] = useState(0);
