@@ -32,10 +32,10 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@types/country-telephone-data": "^0.6.3",
-    "@types/node": "^22.19.3",
+    "@types/node": "^25.0.2",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "vite-imagetools": "^7.1.1",
-    "wrangler": "^3.114.15"
+    "vite-imagetools": "^9.0.2",
+    "wrangler": "^4.54.0"
   }
 }
