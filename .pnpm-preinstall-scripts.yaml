@@ -1,4 +1,0 @@
-# Auto-approve build scripts for trusted packages
-esbuild@*=builtin:default
-sharp@*=builtin:default
-workerd@*=builtin:default
