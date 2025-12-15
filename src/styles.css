@@ -430,8 +430,7 @@ body {
 .lite-mode {
   /* Disable all transitions globally */
   --lite-transition: none !important;
-  /* Optimize paint and layout */
-  contain: layout style;
+  /* Note: Do NOT use 'contain' property here as it breaks fixed positioning (dock) */
 }
 
 /* Lite mode background - GPU optimized */
