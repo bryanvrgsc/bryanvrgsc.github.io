@@ -1,0 +1,57 @@
+# Vercel ignore file
+# Files and directories to exclude from deployment
+
+# Development
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build artifacts (already in dist/)
+node_modules/
+.cache/
+.temp/
+.tmp/
+coverage/
+.nyc_output/
+
+# Wrangler (Cloudflare)
+.wrangler/
+wrangler.toml
+
+# Git
+.git/
+.gitignore
+
+# Documentation (optional - remove if you want docs in deployment)
+*.md
+!README.md
+
+# Test files
+**/*.test.js
+**/*.test.ts
+**/*.spec.js
+**/*.spec.ts
+__tests__/
+test/
+tests/
