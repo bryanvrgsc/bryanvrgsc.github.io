@@ -218,6 +218,33 @@ export const CanvasBackground = () => {
   }, [theme]);
 
   //
+  // LISTEN TO SYSTEM THEME CHANGES (when theme === 'system')
+  //
+  useEffect(() => {
+    if (theme !== 'system') return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const handleChange = () => {
+      const isDark = mediaQuery.matches;
+
+      colorsRef.current = {
+        nodeColor: isDark ? NETWORK_COLORS.dark.nodeColor : NETWORK_COLORS.light.nodeColor,
+        lineColor: isDark ? NETWORK_COLORS.dark.lineColor : NETWORK_COLORS.light.lineColor,
+        packetColor: isDark ? NETWORK_COLORS.dark.packetColor : NETWORK_COLORS.light.packetColor
+      };
+
+      configRef.current.isDark = isDark;
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, [theme]);
+
+  //
   // MAIN EFFECT (Rendering Loop)
   //
   useEffect(() => {
