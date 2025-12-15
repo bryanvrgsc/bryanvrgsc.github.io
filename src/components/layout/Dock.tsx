@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings } from '../../store';
 import { Icons } from '../Icons';
@@ -17,27 +17,71 @@ import { navigateTo } from '../../utils/navigation';
  * 
  * @param currentPath - The current route path for active state detection
  */
-export const Dock = ({ currentPath }: { currentPath: string }) => {
+
+interface DockItemType {
+    id: string;
+    label: string;
+    Icon: React.ComponentType<{ className?: string }>;
+    href: string;
+}
+
+const DockItem = React.memo(({
+    item,
+    isActive,
+    itemRef,
+    onNavigate
+}: {
+    item: DockItemType;
+    isActive: boolean;
+    itemRef: (el: HTMLAnchorElement | null) => void;
+    onNavigate: (href: string) => void;
+}) => (
+    <a
+        ref={itemRef}
+        href={`#${item.href}`}
+        onClick={(e) => { e.preventDefault(); onNavigate(item.href); }}
+        className={`dock-item group relative flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.25,1,0.3,1)]
+            ${isActive
+                ? 'text-[var(--text-primary)]'
+                : 'text-[var(--dock-text)] hover:text-[var(--text-primary)] hover:scale-105'}`}
+    >
+        <item.Icon className={`w-5 h-5 md:w-6 md:h-6 transition-all duration-300 relative z-10 ${isActive ? 'stroke-[2px]' : 'stroke-[1.5px]'}`} />
+        <span className={`text-[9px] md:text-[10px] font-semibold tracking-wide transition-all duration-300 relative z-10 ${isActive ? 'opacity-100' : 'opacity-70'}`}>
+            {item.label}
+        </span>
+    </a>
+));
+
+DockItem.displayName = 'DockItem';
+
+export const Dock = React.memo(({ currentPath }: { currentPath: string }) => {
     const { lang } = useStore(settings);
     const t = UI_TEXT[lang].nav;
     const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
     const containerRef = useRef<HTMLDivElement>(null);
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, height: 0, opacity: 0 });
     const isFirstRender = useRef(true);
+    const updateTimerRef = useRef<number | undefined>(undefined);
 
-    const activeId = currentPath === '/' ? 'home'
-        : currentPath.includes('services') ? 'services'
-            : currentPath.includes('portfolio') ? 'portfolio'
-                : currentPath.includes('resources') ? 'resources'
-                    : currentPath.includes('contact') ? 'contact'
-                        : 'home';
+    const activeId = useMemo(() => {
+        if (currentPath === '/') return 'home';
+        if (currentPath.includes('services')) return 'services';
+        if (currentPath.includes('portfolio')) return 'portfolio';
+        if (currentPath.includes('resources')) return 'resources';
+        if (currentPath.includes('contact')) return 'contact';
+        return 'home';
+    }, [currentPath]);
 
-    const navItems = [
+    const navItems = useMemo<DockItemType[]>(() => [
         { id: 'home', label: t.home, Icon: Icons.Home, href: '/' },
         { id: 'services', label: t.services, Icon: Icons.Layers, href: '/services' },
         { id: 'portfolio', label: t.work, Icon: Icons.Briefcase, href: '/portfolio' },
         { id: 'resources', label: t.resources, Icon: Icons.Book, href: '/resources' },
-    ];
+    ], [t]);
+
+    const handleNavigate = useCallback((href: string) => {
+        navigateTo(href);
+    }, []);
 
     // Update indicator position when active item changes - useLayoutEffect for synchronous DOM reads
     useLayoutEffect(() => {
@@ -76,22 +120,36 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
             }
         };
 
-        // Multiple attempts to ensure DOM is fully rendered (especially important on page load)
-        // GlassDock uses ResizeObserver which may take time to calculate final size
-        const timer1 = setTimeout(updateIndicator, 100);
-        const timer2 = setTimeout(updateIndicator, 200);
-        const timer3 = setTimeout(updateIndicator, 300);
-        const timer4 = setTimeout(updateIndicator, 500);
+        // Clear any pending timer
+        if (updateTimerRef.current) {
+            clearTimeout(updateTimerRef.current);
+        }
 
-        window.addEventListener('resize', updateIndicator);
+        // Single delayed update instead of multiple timeouts
+        updateTimerRef.current = window.setTimeout(updateIndicator, 100);
+
+        const handleResize = () => {
+            if (updateTimerRef.current) {
+                clearTimeout(updateTimerRef.current);
+            }
+            updateTimerRef.current = window.setTimeout(updateIndicator, 150);
+        };
+
+        window.addEventListener('resize', handleResize);
         return () => {
-            clearTimeout(timer1);
-            clearTimeout(timer2);
-            clearTimeout(timer3);
-            clearTimeout(timer4);
-            window.removeEventListener('resize', updateIndicator);
+            if (updateTimerRef.current) {
+                clearTimeout(updateTimerRef.current);
+            }
+            window.removeEventListener('resize', handleResize);
         };
     }, [activeId]);
+
+    const indicatorTransition = useMemo(() =>
+        isFirstRender.current
+            ? 'none'
+            : 'left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease',
+        [isFirstRender.current]
+    );
 
     return (
         <>
@@ -116,16 +174,14 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
                     <div ref={containerRef} className="relative flex items-center gap-2 md:gap-3">
                         {/* Animated Sliding Liquid Indicator */}
                         <div
-                            className="liquid-indicator absolute top-1/2 rounded-2xl pointer-events-none overflow-hidden"
+                            className="liquid-indicator absolute top-1/2 rounded-2xl pointer-events-none overflow-hidden will-change-transform"
                             style={{
                                 left: `${indicatorStyle.left}px`,
                                 width: `${indicatorStyle.width}px`,
                                 height: `${indicatorStyle.height}px`,
                                 opacity: indicatorStyle.opacity,
                                 transform: 'translateY(-50%)',
-                                transition: isFirstRender.current
-                                    ? 'none'
-                                    : 'left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease',
+                                transition: indicatorTransition,
                                 filter: 'url(#goo-filter)',
                             }}
                         >
@@ -151,21 +207,13 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
                         </div>
 
                         {navItems.map((item) => (
-                            <a
+                            <DockItem
                                 key={item.id}
-                                ref={(el) => { itemRefs.current[item.id] = el; }}
-                                href={`#${item.href}`}
-                                onClick={(e) => { e.preventDefault(); navigateTo(item.href); }}
-                                className={`dock-item group relative flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.25,1,0.3,1)]
-                                    ${activeId === item.id
-                                        ? 'text-[var(--text-primary)]'
-                                        : 'text-[var(--dock-text)] hover:text-[var(--text-primary)] hover:scale-105'}`}
-                            >
-                                <item.Icon className={`w-5 h-5 md:w-6 md:h-6 transition-all duration-300 relative z-10 ${activeId === item.id ? 'stroke-[2px]' : 'stroke-[1.5px]'}`} />
-                                <span className={`text-[9px] md:text-[10px] font-semibold tracking-wide transition-all duration-300 relative z-10 ${activeId === item.id ? 'opacity-100' : 'opacity-70'}`}>
-                                    {item.label}
-                                </span>
-                            </a>
+                                item={item}
+                                isActive={activeId === item.id}
+                                itemRef={(el) => { itemRefs.current[item.id] = el; }}
+                                onNavigate={handleNavigate}
+                            />
                         ))}
                     </div>
 
@@ -194,4 +242,6 @@ export const Dock = ({ currentPath }: { currentPath: string }) => {
             </nav>
         </>
     );
-};
+});
+
+Dock.displayName = 'Dock';
