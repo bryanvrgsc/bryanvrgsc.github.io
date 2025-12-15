@@ -4,6 +4,7 @@ import { settings, applyTheme, checkPerformance } from '../store';
 import { CanvasBackground, Header, Dock, ScrollToTop } from './layout';
 import { ThemeToggle, LanguageToggle } from './ui';
 import { HomeViewSkeleton, PortfolioViewSkeleton, ContactViewSkeleton, ViewSkeleton } from './common';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Lazy load views for Code Splitting
 const HomeView = React.lazy(() => import('./views/HomeView').then(module => ({ default: module.HomeView })));
@@ -139,6 +140,7 @@ export default function App() {
 
             <Dock currentPath={path} />
             <ScrollToTop />
+            <SpeedInsights />
         </div>
     );
 }
