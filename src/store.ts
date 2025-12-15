@@ -72,50 +72,115 @@ const handleSystemThemeChange = () => {
 };
 
 // Helper to detect device capabilities and enable Lite Mode
+// OPTIMIZED: Faster detection with caching and immediate signals
 export const checkPerformance = async () => {
   if (typeof window === 'undefined') return;
 
-  // 1. Accessibility Preference (User explicitly asked for less motion)
+  const CACHE_KEY = 'performance-mode-cache';
+  const CACHE_VERSION = 'v1';
+
+  // 1. Check sessionStorage cache first (instant)
+  try {
+    const cached = sessionStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { version, lite } = JSON.parse(cached);
+      if (version === CACHE_VERSION) {
+        console.log(`Performance: Using cached mode (lite: ${lite})`);
+        enableLiteMode(lite);
+        return;
+      }
+    }
+  } catch (e) {
+    // sessionStorage not available, continue with detection
+  }
+
+  // 2. Accessibility Preference (User explicitly asked for less motion)
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReducedMotion) {
     console.log('Performance: Lite Mode enabled (Prefers Reduced Motion)');
-    enableLiteMode(true);
+    cacheAndEnableLiteMode(true, CACHE_KEY, CACHE_VERSION);
     return;
   }
 
-  // 2. Advanced GPU Detection - Dynamic import to avoid SSR issues
+  // 3. Immediate signals for low-end devices (no async needed)
+  const immediateSignals = detectImmediateLowEndSignals();
+  if (immediateSignals.isDefinitelyLowEnd) {
+    console.log(`Performance: Lite Mode enabled (${immediateSignals.reason})`);
+    cacheAndEnableLiteMode(true, CACHE_KEY, CACHE_VERSION);
+    return;
+  }
+
+  // 4. Advanced GPU Detection with timeout
   try {
     const { getGPUTier } = await import('detect-gpu');
-    const gpuTier = await getGPUTier();
 
-    // Tier 0: Blocklisted/Fail
-    // Tier 1: Low-end (Integrated graphics, older mobile) - BUT Safari/Apple GPU often reports Tier 1 incorrectly
-    // Tier 2: Mid-range
-    // Tier 3: High-end
+    // Race between GPU detection and 2 second timeout
+    const gpuTier = await Promise.race([
+      getGPUTier(),
+      new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('GPU detection timeout')), 2000)
+      )
+    ]);
 
-    console.log(`Hardware Detection (detect-gpu): Tier ${gpuTier.tier}, FPS: ${gpuTier.fps}, GPU: ${gpuTier.gpu}`);
+    if (!gpuTier) {
+      // Timeout - assume capable device
+      console.log('Performance: GPU detection timed out, assuming capable device');
+      cacheAndEnableLiteMode(false, CACHE_KEY, CACHE_VERSION);
+      return;
+    }
 
-    // Safari/Apple GPU fix: Apple GPUs are powerful but often report as Tier 1
-    // Only enable Lite Mode for truly low-end devices (Tier 0 or explicit low FPS)
+    console.log(`Hardware Detection: Tier ${gpuTier.tier}, FPS: ${gpuTier.fps}, GPU: ${gpuTier.gpu}`);
+
+    // Safari/Apple GPU fix
     const isAppleGPU = gpuTier.gpu && gpuTier.gpu.toLowerCase().includes('apple');
     const isTrulyLowEnd = gpuTier.tier === 0 || (gpuTier.fps !== undefined && gpuTier.fps < 30);
-
-    // Don't enable lite mode for Apple GPUs unless FPS is explicitly low
     const shouldEnableLiteMode = isTrulyLowEnd && !isAppleGPU;
 
     if (shouldEnableLiteMode) {
-      console.log('Performance: Switching to Lite Mode (Device capability limit)');
-      enableLiteMode(true);
+      console.log('Performance: Lite Mode enabled (GPU tier limit)');
+      cacheAndEnableLiteMode(true, CACHE_KEY, CACHE_VERSION);
     } else {
       console.log('Performance: High Performance Mode enabled');
-      enableLiteMode(false);
+      cacheAndEnableLiteMode(false, CACHE_KEY, CACHE_VERSION);
     }
 
   } catch (error) {
     console.warn('GPU Detection failed, keeping default mode.', error);
-    // Don't enable lite mode on error - assume capable device
-    enableLiteMode(false);
+    cacheAndEnableLiteMode(false, CACHE_KEY, CACHE_VERSION);
   }
+};
+
+// Detect immediate low-end signals without async operations
+const detectImmediateLowEndSignals = (): { isDefinitelyLowEnd: boolean; reason: string } => {
+  // Check device memory (Chrome/Edge only)
+  const deviceMemory = (navigator as any).deviceMemory;
+  if (deviceMemory && deviceMemory <= 2) {
+    return { isDefinitelyLowEnd: true, reason: `Low memory: ${deviceMemory}GB` };
+  }
+
+  // Check hardware concurrency (CPU cores)
+  const cores = navigator.hardwareConcurrency;
+  if (cores && cores <= 2) {
+    return { isDefinitelyLowEnd: true, reason: `Low CPU cores: ${cores}` };
+  }
+
+  // Check connection type (slow network often = older device)
+  const connection = (navigator as any).connection;
+  if (connection && connection.effectiveType === '2g') {
+    return { isDefinitelyLowEnd: true, reason: '2G connection detected' };
+  }
+
+  return { isDefinitelyLowEnd: false, reason: '' };
+};
+
+// Cache result and enable/disable lite mode
+const cacheAndEnableLiteMode = (enable: boolean, key: string, version: string) => {
+  try {
+    sessionStorage.setItem(key, JSON.stringify({ version, lite: enable }));
+  } catch (e) {
+    // sessionStorage not available
+  }
+  enableLiteMode(enable);
 };
 
 const enableLiteMode = (enable: boolean) => {

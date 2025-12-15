@@ -463,11 +463,17 @@ export const CanvasBackground = () => {
   }, [lite]);
 
   //
-  // LITE MODE
+  // LITE MODE - Optimized: Pure CSS, no React logic
   //
   if (lite) {
     return (
-      <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-[var(--bg-primary)] to-[var(--bg-secondary)] pointer-events-none" />
+      <div
+        className="fixed inset-0 pointer-events-none lite-background"
+        style={{
+          background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)',
+          willChange: 'auto'
+        }}
+      />
     );
   }
 

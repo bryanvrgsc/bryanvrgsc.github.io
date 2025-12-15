@@ -426,6 +426,21 @@ body {
 
 /* --- Lite Mode Optimizations (Low-End Devices) --- */
 
+/* Global lite mode optimizations */
+.lite-mode {
+  /* Disable all transitions globally */
+  --lite-transition: none !important;
+  /* Optimize paint and layout */
+  contain: layout style;
+}
+
+/* Lite mode background - GPU optimized */
+.lite-mode .lite-background {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
 /* 1. Disable Background Blur (Most expensive) */
 .lite-mode .glass-element-box,
 .lite-mode .bento-card,
@@ -437,6 +452,8 @@ body {
   /* Solid opaque color */
   opacity: 1;
   /* Remove transparency */
+  /* Disable transitions */
+  transition: none !important;
 }
 
 /* 2. Dark mode solid background */
@@ -449,6 +466,7 @@ body {
 /* 3. Simplify Shadows (Expensive spread calculations) */
 .lite-mode .bento-card {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+  transition: none !important;
 }
 
 .lite-mode .bento-card:hover {
@@ -469,6 +487,7 @@ body {
 .lite-mode .animate-slide-up {
   filter: none !important;
   /* Remove blur from entry animation */
+  animation-duration: 0.3s !important;
 }
 
 /* 6. Stop Mouse Hover Glow (Expensive radial gradient calculation) */
