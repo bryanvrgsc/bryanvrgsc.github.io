@@ -12,30 +12,30 @@
     "pages:deploy": "pnpm build && wrangler pages deploy ./dist"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/cloudflare": "^12.1.0",
-    "@astrojs/react": "^4.2.1",
+    "@astrojs/check": "^0.9.6",
+    "@astrojs/cloudflare": "^12.6.12",
+    "@astrojs/react": "^4.4.2",
     "@nanostores/react": "^1.0.0",
     "@vercel/analytics": "^1.6.1",
     "@vercel/speed-insights": "^1.3.1",
-    "astro": "^5.1.4",
+    "astro": "^5.16.5",
     "country-telephone-data": "^0.6.3",
     "detect-gpu": "^5.0.70",
     "nanostores": "^1.1.0",
     "pdfjs-dist": "^5.4.449",
-    "react": "^19.2.0",
+    "react": "^19.2.3",
     "react-currency-input-field": "^4.0.3",
-    "react-dom": "^19.2.0",
-    "tailwindcss": "^4.1.17",
+    "react-dom": "^19.2.3",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@types/country-telephone-data": "^0.6.3",
-    "@types/node": "^22.10.5",
+    "@types/node": "^22.19.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "vite-imagetools": "^7.0.4",
-    "wrangler": "^3.102.0"
+    "vite-imagetools": "^7.1.1",
+    "wrangler": "^3.114.15"
   }
 }
