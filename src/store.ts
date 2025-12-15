@@ -64,6 +64,10 @@ const handleSystemThemeChange = () => {
   // Only auto-update if theme is set to 'system'
   if (currentTheme === 'system') {
     applyTheme('system');
+
+    // Force React components to re-render by toggling the store
+    // This ensures CanvasBackground and other components update
+    settings.setKey('theme', 'system');
   }
 };
 
