@@ -3,7 +3,7 @@ import { map } from 'nanostores';
 export type Language = 'en' | 'es';
 export type Theme = 'light' | 'dark' | 'system';
 
-export const settings = map<{ lang: Language; theme: Theme }>({
+export const settings = map<{ lang: Language; theme: Theme; _systemThemeUpdate?: number }>({
   lang: 'es', // Default to Spanish
   theme: 'system'
 });
@@ -49,13 +49,13 @@ export const initThemeListener = () => {
     systemThemeListener.removeEventListener('change', handleSystemThemeChange);
   }
 
-  // Create new listener
+  // Create new listener for system theme changes
   systemThemeListener = window.matchMedia('(prefers-color-scheme: dark)');
   systemThemeListener.addEventListener('change', handleSystemThemeChange);
 
-  // Apply current theme
-  const currentTheme = settings.get().theme;
-  applyTheme(currentTheme);
+  // Note: We do NOT call applyTheme here because the inline script in
+  // BaseLayout.astro already applied the theme before React hydration.
+  // This prevents the flash of wrong theme.
 };
 
 const handleSystemThemeChange = () => {
@@ -65,9 +65,10 @@ const handleSystemThemeChange = () => {
   if (currentTheme === 'system') {
     applyTheme('system');
 
-    // Force React components to re-render by toggling the store
-    // This ensures CanvasBackground and other components update
-    settings.setKey('theme', 'system');
+    // Force React components to re-render by updating a timestamp
+    // Nanostores won't trigger updates if the value is the same,
+    // so we use a unique timestamp to ensure re-render
+    settings.setKey('_systemThemeUpdate', Date.now());
   }
 };
 
