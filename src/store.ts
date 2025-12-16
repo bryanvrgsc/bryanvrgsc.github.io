@@ -13,12 +13,31 @@ export const performanceMode = map<{ lite: boolean }>({
   lite: false
 });
 
+// Dock Visibility Store
+export const dockState = map<{ hidden: boolean }>({
+  hidden: false
+});
+
+export const hideDock = () => {
+  dockState.setKey('hidden', true);
+};
+
+export const showDock = () => {
+  dockState.setKey('hidden', false);
+};
+
 export const setLang = (lang: Language) => {
   settings.setKey('lang', lang);
 };
 
 export const setTheme = (theme: Theme) => {
   settings.setKey('theme', theme);
+  // Persist theme to localStorage for the inline script to read on next page load
+  try {
+    localStorage.setItem('theme', theme);
+  } catch (e) {
+    // localStorage not available
+  }
   applyTheme(theme);
 };
 
@@ -27,7 +46,8 @@ export const applyTheme = (theme: Theme) => {
   if (typeof window === 'undefined') return;
 
   const root = document.documentElement;
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const isDark = theme === 'dark' || (theme === 'system' && mediaQuery.matches);
 
   root.removeAttribute('data-theme');
   root.classList.remove('dark');
@@ -43,6 +63,16 @@ let systemThemeListener: MediaQueryList | null = null;
 
 export const initThemeListener = () => {
   if (typeof window === 'undefined') return;
+
+  // Sync theme from localStorage into nanostores (for React components)
+  try {
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+      settings.setKey('theme', savedTheme);
+    }
+  } catch (e) {
+    // localStorage not available
+  }
 
   // Clean up existing listener
   if (systemThemeListener) {

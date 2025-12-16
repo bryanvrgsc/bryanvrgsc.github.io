@@ -62,14 +62,44 @@ const imageUrl = Astro.site ? new URL(image, Astro.site).href : image;
     <!-- Prevent theme flash: Apply theme before body renders -->
     <script is:inline>
       (function() {
-        const theme = 'system'; // Default theme
-        const isDark = theme === 'dark' || 
-          (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        
-        if (isDark) {
-          document.documentElement.setAttribute('data-theme', 'dark');
-          document.documentElement.classList.add('dark');
+        // Theme application function
+        function applyTheme() {
+          var savedTheme = null;
+          try {
+            savedTheme = localStorage.getItem('theme');
+          } catch(e) {}
+          
+          var theme = savedTheme || 'system';
+          var mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          var isDark = theme === 'dark' || (theme === 'system' && mediaQuery.matches);
+          
+          var root = document.documentElement;
+          if (isDark) {
+            root.setAttribute('data-theme', 'dark');
+            root.classList.add('dark');
+          } else {
+            root.removeAttribute('data-theme');
+            root.classList.remove('dark');
+          }
+          
+          return mediaQuery;
         }
+        
+        // Apply immediately
+        var mediaQuery = applyTheme();
+        
+        // Chrome fix: Re-apply after a microtask to ensure matchMedia is ready
+        Promise.resolve().then(applyTheme);
+        
+        // Also listen for system theme changes (for when theme is 'system')
+        // Listen for system theme changes
+        mediaQuery.addEventListener('change', function() {
+          var savedTheme = null;
+          try { savedTheme = localStorage.getItem('theme'); } catch(e) {}
+          if (!savedTheme || savedTheme === 'system') {
+            applyTheme();
+          }
+        });
       })();
     </script>
   </head>
