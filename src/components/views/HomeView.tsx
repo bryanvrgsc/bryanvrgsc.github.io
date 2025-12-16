@@ -147,7 +147,7 @@ export const HomeView = () => {
                         </div>
                         <div className="order-1 md:order-2 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
                             <div className="absolute inset-0 bg-gradient-to-t via-transparent to-transparent z-10 mix-blend-multiply" style={{ backgroundImage: `linear-gradient(to top, ${DYNAMIC_COLORS.raw.dark.primary}99, transparent, transparent)` }}></div>
-                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" alt="Mission Team" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
+                            <img src="/img/home/mission_team.webp" alt="Mission Team" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
                             <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20">
                                 <div
                                     className="backdrop-blur-xl text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2"
@@ -169,7 +169,7 @@ export const HomeView = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 lg:gap-16 items-center w-full max-w-6xl h-auto md:h-[500px]">
                         <div className="order-1 h-[300px] md:h-full w-full rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-[var(--card-border)] relative group shadow-2xl">
                             <div className="absolute inset-0 bg-gradient-to-t via-transparent to-transparent z-10 mix-blend-multiply" style={{ backgroundImage: `linear-gradient(to top, ${DYNAMIC_COLORS.raw.dark.secondary}99, transparent, transparent)` }}></div>
-                            <img src="https://images.unsplash.com/photo-1480694313141-fce5e697ee25?q=80&w=2070&auto=format&fit=crop" alt="Future Vision" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
+                            <img src="/img/home/future_vision.webp" alt="Future Vision" className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.3,1)] group-hover:scale-105" />
                             <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 z-20">
                                 <div
                                     className="backdrop-blur-xl text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full uppercase tracking-widest shadow-lg flex items-center gap-2"

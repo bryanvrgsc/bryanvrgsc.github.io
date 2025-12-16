@@ -2,7 +2,60 @@
  * Portfolio Projects Data
  * 
  * Contains all portfolio project information in both English and Spanish.
+ * Images are now served locally from /img/portfolio/[project]/
  */
+
+// Image paths for portfolio projects
+const IMG = {
+    gymapp: {
+        cover: '/img/portfolio/gymapp/cover.webp',
+        screenshots: [
+            '/img/portfolio/gymapp/screenshot_1.webp',
+            '/img/portfolio/gymapp/screenshot_2.webp',
+            '/img/portfolio/gymapp/screenshot_3.webp',
+        ]
+    },
+    datawarehouse: {
+        cover: '/img/portfolio/datawarehouse/cover.webp',
+        screenshots: [
+            '/img/portfolio/datawarehouse/screenshot_1.webp',
+            '/img/portfolio/datawarehouse/screenshot_2.webp',
+            '/img/portfolio/datawarehouse/screenshot_3.webp',
+        ]
+    },
+    c_animation: {
+        cover: '/img/portfolio/c_animation/cover.webp',
+        screenshots: [
+            '/img/portfolio/c_animation/screenshot_1.webp',
+            '/img/portfolio/c_animation/screenshot_2.webp',
+            '/img/portfolio/c_animation/screenshot_3.webp',
+        ]
+    },
+    ios_store: {
+        cover: '/img/portfolio/ios_store/cover.webp',
+        screenshots: [
+            '/img/portfolio/ios_store/screenshot_1.webp',
+            '/img/portfolio/ios_store/screenshot_2.webp',
+            '/img/portfolio/ios_store/screenshot_3.webp',
+        ]
+    },
+    appointment_app: {
+        cover: '/img/portfolio/appointment_app/cover.webp',
+        screenshots: [
+            '/img/portfolio/appointment_app/screenshot_1.webp',
+            '/img/portfolio/appointment_app/screenshot_2.webp',
+            '/img/portfolio/appointment_app/screenshot_3.webp',
+        ]
+    },
+    predictive_analysis: {
+        cover: '/img/portfolio/predictive_analysis/cover.webp',
+        screenshots: [
+            '/img/portfolio/predictive_analysis/screenshot_1.webp',
+            '/img/portfolio/predictive_analysis/screenshot_2.webp',
+            '/img/portfolio/predictive_analysis/screenshot_3.webp',
+        ]
+    }
+};
 
 export const PORTFOLIO = {
     en: [
@@ -12,13 +65,9 @@ export const PORTFOLIO = {
             solution: "Complete experience for users and admins with SwiftUI & Auth0.",
             tech: "Swift, SwiftUI, Combine, Auth0",
             result: "Smart access & 60% time reduction",
-            image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop",
+            image: IMG.gymapp.cover,
             repoUrl: "https://github.com/bryanvrgsc/GymApp",
-            screenshots: [
-                "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1381&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop"
-            ],
+            screenshots: IMG.gymapp.screenshots,
             details: {
                 currentFeatures: [
                     "Secure Login with Auth0",
@@ -40,13 +89,9 @@ export const PORTFOLIO = {
             solution: "Multidimensional Data Warehouse implementation to improve decision making and service quality.",
             tech: "SQL, ETL, PowerBI, Data Warehousing",
             result: "Integral vision & 360° impact analysis.",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
+            image: IMG.datawarehouse.cover,
             presentationUrl: "docs/work/data_warehouse_final.pdf",
-            screenshots: [
-                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
-                "https://datablog.zeus.vision/wp-content/uploads/2017/05/datawarehouse.jpg",
-                "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=1470&auto=format&fit=crop"
-            ],
+            screenshots: IMG.datawarehouse.screenshots,
             details: {
                 currentFeatures: [
                     "Multidimensional approach (Dimensions & Measures)",
@@ -68,14 +113,10 @@ export const PORTFOLIO = {
             solution: "Flutter app captures sensor data and sends it to a C server rendering in OpenGL via TCP/IP Sockets.",
             tech: "C, OpenGL, Flutter, Dart, Sockets TCP/IP",
             result: "Real-time sensor synchronization.",
-            image: "https://images.unsplash.com/photo-1617791160505-6f00504e3519?q=80&w=1470&auto=format&fit=crop",
+            image: IMG.c_animation.cover,
             videoUrl: "https://youtu.be/0tyqM-I_Pr8?si=UrBlcPtQ-MtfW9RI",
             repoUrl: "https://github.com/FrancoGL20/Animacion-con-C-desde-Celular",
-            screenshots: [
-                "https://images.unsplash.com/photo-1617791160505-6f00504e3519?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1470&auto=format&fit=crop"
-            ],
+            screenshots: IMG.c_animation.screenshots,
             details: {
                 currentFeatures: [
                     "Motion capture via Flutter sensors",
@@ -91,13 +132,10 @@ export const PORTFOLIO = {
             solution: "Developed in Swift with a Node.js (Glitch) backend and PostgreSQL database.",
             tech: "Swift, Node.js, PostgreSQL, Glitch",
             result: "Full-stack mobile commerce.",
-            image: "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg", repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
+            image: IMG.ios_store.cover,
+            repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
             presentationUrl: "docs/work/ios_store_presentation.pdf",
-            screenshots: [
-                "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
-                "https://splitmetrics.com/wp-content/uploads/2017/06/apple-app-store-1-1-1024x498.png",
-                "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1470&auto=format&fit=crop"
-            ],
+            screenshots: IMG.ios_store.screenshots,
             details: {
                 currentFeatures: [
                     "User Registration",
@@ -120,14 +158,11 @@ export const PORTFOLIO = {
             solution: "Comprehensive solution with Flutter, Firebase, and QR attendance control.",
             tech: "Flutter, Dart, Firebase, QR Scanner",
             result: "Efficient appointment & access management.",
-            image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop", repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
+            image: IMG.appointment_app.cover,
+            repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
             videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
             presentationUrl: "docs/work/appointment_app_presentation.pdf",
-            screenshots: [
-                "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1468&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1595078475328-1ab05d0a6a0e?q=80&w=1374&auto=format&fit=crop"
-            ],
+            screenshots: IMG.appointment_app.screenshots,
             details: {
                 currentFeatures: [
                     "Secure authentication with Firebase Auth",
@@ -150,12 +185,8 @@ export const PORTFOLIO = {
             solution: "Python algorithms for seasonal demand prediction.",
             tech: "Python, Pandas, Scikit-learn",
             result: "25% inventory optimization.",
-            image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop",
-            screenshots: [
-                "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1415&auto=format&fit=crop"
-            ]
+            image: IMG.predictive_analysis.cover,
+            screenshots: IMG.predictive_analysis.screenshots
         }
     ],
     es: [
@@ -165,13 +196,9 @@ export const PORTFOLIO = {
             solution: "Experiencia completa para usuarios y administradores con SwiftUI y Auth0.",
             tech: "Swift, SwiftUI, Combine, Auth0",
             result: "Acceso inteligente y reducción de tiempos en 60%",
-            image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop",
+            image: IMG.gymapp.cover,
             repoUrl: "https://github.com/bryanvrgsc/GymApp",
-            screenshots: [
-                "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1381&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1469&auto=format&fit=crop"
-            ],
+            screenshots: IMG.gymapp.screenshots,
             details: {
                 currentFeatures: [
                     "Login seguro con Auth0",
@@ -193,13 +220,9 @@ export const PORTFOLIO = {
             solution: "Implementación de un Data Warehouse multidimensional para mejorar la toma de decisiones y calidad de servicios.",
             tech: "SQL, ETL, PowerBI, Data Warehousing",
             result: "Visión integral y análisis de impacto 360°.",
-            image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
+            image: IMG.datawarehouse.cover,
             presentationUrl: "docs/work/data_warehouse_final.pdf",
-            screenshots: [
-                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1470&auto=format&fit=crop",
-                "https://datablog.zeus.vision/wp-content/uploads/2017/05/datawarehouse.jpg",
-                "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=1470&auto=format&fit=crop"
-            ],
+            screenshots: IMG.datawarehouse.screenshots,
             details: {
                 currentFeatures: [
                     "Enfoque multidimensional (Dimensiones y medidas)",
@@ -221,14 +244,10 @@ export const PORTFOLIO = {
             solution: "App de Flutter captura los sensores del dispositivo móvil y envía los datos al servidor en C, que renderiza la animación en tiempo real.",
             tech: "C, OpenGL, Flutter, Dart, Sockets TCP/IP",
             result: "Sincronización en tiempo real.",
-            image: "https://images.unsplash.com/photo-1617791160505-6f00504e3519?q=80&w=1470&auto=format&fit=crop",
+            image: IMG.c_animation.cover,
             videoUrl: "https://youtu.be/0tyqM-I_Pr8?si=UrBlcPtQ-MtfW9RI",
             repoUrl: "https://github.com/FrancoGL20/Animacion-con-C-desde-Celular",
-            screenshots: [
-                "https://images.unsplash.com/photo-1617791160505-6f00504e3519?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1470&auto=format&fit=crop"
-            ],
+            screenshots: IMG.c_animation.screenshots,
             details: {
                 currentFeatures: [
                     "Captura de movimiento del celular mediante sensores Flutter",
@@ -244,13 +263,10 @@ export const PORTFOLIO = {
             solution: "Backend en Node.js (Glitch) y base de datos PostgreSQL en ElephantSQL.",
             tech: "Swift, Node.js, PostgreSQL, Glitch",
             result: "Experiencia de compra completa.",
-            image: "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg", repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
+            image: IMG.ios_store.cover,
+            repoUrl: "https://github.com/bryanvrgsc/swift_proyecto_final_apps",
             presentationUrl: "docs/work/ios_store_presentation.pdf",
-            screenshots: [
-                "https://muchosnegociosrentables.com/wp-content/uploads/2020/05/monta-tu-propia-tienda-online.jpg",
-                "https://splitmetrics.com/wp-content/uploads/2017/06/apple-app-store-1-1-1024x498.png",
-                "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1470&auto=format&fit=crop"
-            ],
+            screenshots: IMG.ios_store.screenshots,
             details: {
                 currentFeatures: [
                     "Registro de usuario",
@@ -273,14 +289,11 @@ export const PORTFOLIO = {
             solution: "Solución integral con Flutter, Firebase, y QR Scanner, ideal para gestión de servicios y acceso mediante QR.",
             tech: "Flutter, Dart, Firebase, QR Scanner",
             result: "Gestión eficiente de citas y accesos.",
-            image: "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop", repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
+            image: IMG.appointment_app.cover,
+            repoUrl: "https://github.com/bryanvrgsc/flutter_proyecto_final_apps",
             videoUrl: "https://drive.google.com/file/d/1VYnOJINVIiF5S1bowKk9b6_3pj_YH1JV/preview",
             presentationUrl: "docs/work/appointment_app_presentation.pdf",
-            screenshots: [
-                "https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1468&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1595078475328-1ab05d0a6a0e?q=80&w=1374&auto=format&fit=crop"
-            ],
+            screenshots: IMG.appointment_app.screenshots,
             details: {
                 currentFeatures: [
                     "Autenticación segura con Firebase Auth",
@@ -304,12 +317,8 @@ export const PORTFOLIO = {
             solution: "Algoritmos en Python para predicción de demanda estacional.",
             tech: "Python, Pandas, Scitkit-learn",
             result: "Optimización de inventario en un 25%.",
-            image: "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop",
-            screenshots: [
-                "https://images.unsplash.com/photo-1551033406-611cf9a28f67?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1470&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1415&auto=format&fit=crop"
-            ]
+            image: IMG.predictive_analysis.cover,
+            screenshots: IMG.predictive_analysis.screenshots
         }
     ]
 };
