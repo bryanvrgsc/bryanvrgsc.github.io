@@ -148,8 +148,8 @@ export const PDFPreviewModal: React.FC<PDFPreviewModalProps> = ({
                     <button
                         onClick={() => setShowInfo(!showInfo)}
                         className={`flex-shrink-0 p-2 md:p-2.5 rounded-xl transition-all duration-300 border ${showInfo
-                                ? 'bg-[var(--dock-item-bg)] text-[var(--text-primary)] border-[var(--card-border)]'
-                                : 'bg-[var(--input-bg)] hover:bg-[var(--dock-item-bg)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border-[var(--card-border)]'
+                            ? 'bg-[var(--dock-item-bg)] text-[var(--text-primary)] border-[var(--card-border)]'
+                            : 'bg-[var(--input-bg)] hover:bg-[var(--dock-item-bg)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border-[var(--card-border)]'
                             }`}
                         title="Toggle info panel"
                     >
@@ -184,26 +184,33 @@ export const PDFPreviewModal: React.FC<PDFPreviewModalProps> = ({
                             </div>
                         )}
 
-                        {/* PDF iframe - optimized for performance */}
-                        <iframe
-                            src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1&view=Fit`}
+                        {/* PDF object - better compatibility than iframe */}
+                        <object
+                            data={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1&view=Fit`}
+                            type="application/pdf"
                             className="w-full h-full border-0"
                             title={title}
                             onLoad={() => setIsLoading(false)}
-                            loading="lazy"
                             style={{
                                 backgroundColor: 'white',
                                 willChange: 'transform',
                                 transform: 'translateZ(0)'
                             }}
-                        />
+                        >
+                            {/* Fallback for browsers that don't support object */}
+                            <embed
+                                src={`${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1&view=Fit`}
+                                type="application/pdf"
+                                className="w-full h-full"
+                            />
+                        </object>
                     </div>
 
                     {/* Right Side Panel - Info */}
                     <div
                         className={`absolute right-0 top-0 bottom-0 w-full md:w-[320px] lg:w-[380px] bg-[var(--card-bg)] border-l border-[var(--card-border)] flex flex-col transform transition-all duration-300 ${showInfo
-                                ? 'translate-x-0 opacity-100'
-                                : 'translate-x-full opacity-0 pointer-events-none'
+                            ? 'translate-x-0 opacity-100'
+                            : 'translate-x-full opacity-0 pointer-events-none'
                             }`}
                     >
                         {/* Panel Header - Mobile close */}
