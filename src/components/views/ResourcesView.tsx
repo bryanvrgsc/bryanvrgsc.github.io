@@ -7,7 +7,6 @@ import { DOCUMENTS } from '../../constants/resources';
 import type { Document } from '../../constants/resources';
 import { DYNAMIC_COLORS } from '../../constants/colors';
 import { PDFPreviewModal } from '../common/PDFPreviewModal';
-import { PDFThumbnail } from '../common/PDFThumbnail';
 import { useMousePosition } from '../../utils/helpers';
 
 /**
@@ -103,13 +102,15 @@ export const ResourcesView = () => {
                                 aria-label={`${doc.title[lang]} - ${lang === 'en' ? 'View Document' : 'Ver Documento'}`}
                                 className="bento-card rounded-[2rem] md:rounded-[2.5rem] overflow-hidden group p-0 border-0 cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]"
                             >
-                                {/* Background Preview - usando el path del PDF como preview */}
+                                {/* Background Preview - Image */}
                                 <div className="h-[300px] md:h-[350px] overflow-hidden relative bg-[var(--input-bg)]">
-                                    {/* PDF Thumbnail */}
+                                    {/* Document Cover Image */}
                                     <div className="absolute inset-0 z-0">
-                                        <PDFThumbnail
-                                            url={doc.path}
+                                        <img
+                                            src={doc.image}
+                                            alt={doc.title[lang]}
                                             className="w-full h-full object-cover transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"
+                                            loading="lazy"
                                         />
                                     </div>
 
@@ -198,9 +199,10 @@ export const ResourcesView = () => {
                     pdfUrl={previewDoc.path}
                     title={previewDoc.title[lang]}
                     filename={previewDoc.filename}
-                    description={previewDoc.description[lang]}
+                    description={previewDoc.detailedDescription[lang]}
                     category={previewDoc.category[lang]}
                     type={previewDoc.type}
+                    lang={lang}
                 />
             )}
         </>
