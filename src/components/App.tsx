@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Suspense, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { settings, checkPerformance, initThemeListener } from '../store';
-import { CanvasBackground, Header, Dock, ScrollToTop } from './layout';
+import { CanvasBackground, Header, Dock, ScrollToTop, ShowDockButton } from './layout';
 import { ThemeToggle, LanguageToggle } from './ui';
 import { HomeViewSkeleton, PortfolioViewSkeleton, ContactViewSkeleton, ViewSkeleton } from './common';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -141,6 +141,7 @@ export default function App() {
 
             <Dock currentPath={path} />
             <ScrollToTop />
+            <ShowDockButton />
             <SpeedInsights />
             <Analytics />
         </div>
