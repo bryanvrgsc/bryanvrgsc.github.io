@@ -1,6 +1,6 @@
-import React, { useLayoutEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useLayoutEffect, useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { settings } from '../../store';
+import { settings, dockState, hideDock, showDock } from '../../store';
 import { Icons } from '../Icons';
 import { UI_TEXT } from '../../constants';
 import { DOCK_COLORS, SEMANTIC_COLORS, DYNAMIC_COLORS } from '../../constants/colors';
@@ -56,12 +56,53 @@ DockItem.displayName = 'DockItem';
 
 export const Dock = React.memo(({ currentPath }: { currentPath: string }) => {
     const { lang } = useStore(settings);
+    const { hidden: isDockHidden } = useStore(dockState);
     const t = UI_TEXT[lang].nav;
     const itemRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
     const containerRef = useRef<HTMLDivElement>(null);
     const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, height: 0, opacity: 0 });
     const isFirstRender = useRef(true);
     const updateTimerRef = useRef<number | undefined>(undefined);
+    const lastScrollY = useRef(0);
+
+    // Scroll detection - hide dock when scrolling down, show on scroll up
+    useEffect(() => {
+        let ticking = false;
+        let scrollVelocity = 0;
+        const velocityDecay = 0.8;
+
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY;
+                    const scrollDelta = currentScrollY - lastScrollY.current;
+
+                    // Update velocity with decay for smoother detection
+                    scrollVelocity = scrollVelocity * velocityDecay + scrollDelta * (1 - velocityDecay);
+
+                    // Always show dock when near top of page
+                    if (currentScrollY < 100) {
+                        if (isDockHidden) showDock();
+                    }
+                    // Hide dock when scrolling down fast and past 150px from top
+                    else if (scrollVelocity > 15 && currentScrollY > 150 && !isDockHidden) {
+                        hideDock();
+                    }
+                    // Show dock immediately on ANY upward scroll
+                    else if (scrollDelta < -5 && isDockHidden) {
+                        showDock();
+                    }
+
+                    lastScrollY.current = currentScrollY;
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isDockHidden]);
 
     const activeId = useMemo(() => {
         if (currentPath === '/') return 'home';
@@ -83,26 +124,30 @@ export const Dock = React.memo(({ currentPath }: { currentPath: string }) => {
         navigateTo(href);
     }, []);
 
-    // Update indicator position when active item changes - useLayoutEffect for synchronous DOM reads
-    useLayoutEffect(() => {
-        const updateIndicator = () => {
-            // Hide indicator if activeId is contact (it's a separate button)
-            if (activeId === 'contact') {
-                setIndicatorStyle(prev => ({ ...prev, opacity: 0 }));
-                return;
-            }
+    // Ref to track if we need to skip transition on next update
+    const skipTransitionRef = useRef(false);
 
-            const activeElement = itemRefs.current[activeId];
-            const container = containerRef.current;
+    // Function to recalculate indicator position
+    const updateIndicator = useCallback(() => {
+        // Hide indicator if activeId is contact (it's a separate button)
+        if (activeId === 'contact') {
+            setIndicatorStyle(prev => ({ ...prev, opacity: 0 }));
+            return;
+        }
 
-            if (activeElement && container) {
-                const containerRect = container.getBoundingClientRect();
-                const activeRect = activeElement.getBoundingClientRect();
+        const activeElement = itemRefs.current[activeId];
+        const container = containerRef.current;
 
-                // Only update if we have valid dimensions
-                if (activeRect.width > 0 && activeRect.height > 0) {
-                    const left = activeRect.left - containerRect.left;
+        if (activeElement && container) {
+            const containerRect = container.getBoundingClientRect();
+            const activeRect = activeElement.getBoundingClientRect();
 
+            // Only update if we have valid, reasonable dimensions
+            if (activeRect.width > 10 && activeRect.height > 10) {
+                const left = activeRect.left - containerRect.left;
+
+                // Only update if left position is reasonable (not negative or too large)
+                if (left >= 0 && left < containerRect.width) {
                     setIndicatorStyle({
                         left,
                         width: activeRect.width,
@@ -114,19 +159,50 @@ export const Dock = React.memo(({ currentPath }: { currentPath: string }) => {
                     if (isFirstRender.current) {
                         setTimeout(() => {
                             isFirstRender.current = false;
-                        }, 200);
+                        }, 100);
                     }
                 }
             }
-        };
+        }
+    }, [activeId]);
 
+    // Hide indicator immediately when dock hides
+    useEffect(() => {
+        if (isDockHidden) {
+            // Hide indicator when dock is hidden
+            setIndicatorStyle(prev => ({ ...prev, opacity: 0 }));
+            // Next time we update, skip transition
+            skipTransitionRef.current = true;
+        }
+    }, [isDockHidden]);
+
+    // Update indicator when dock becomes visible or active item changes
+    useLayoutEffect(() => {
         // Clear any pending timer
         if (updateTimerRef.current) {
             clearTimeout(updateTimerRef.current);
         }
 
-        // Single delayed update instead of multiple timeouts
-        updateTimerRef.current = window.setTimeout(updateIndicator, 100);
+        // Don't calculate if dock is hidden
+        if (isDockHidden) {
+            return;
+        }
+
+        // If dock just became visible, wait for CSS transition to complete
+        // then update without animation
+        if (skipTransitionRef.current) {
+            // Wait for dock slide animation to complete
+            updateTimerRef.current = window.setTimeout(() => {
+                updateIndicator();
+                // Re-enable transitions after a frame
+                requestAnimationFrame(() => {
+                    skipTransitionRef.current = false;
+                });
+            }, 520);
+        } else {
+            // Normal update with small delay
+            updateTimerRef.current = window.setTimeout(updateIndicator, 50);
+        }
 
         const handleResize = () => {
             if (updateTimerRef.current) {
@@ -142,14 +218,15 @@ export const Dock = React.memo(({ currentPath }: { currentPath: string }) => {
             }
             window.removeEventListener('resize', handleResize);
         };
-    }, [activeId]);
+    }, [activeId, isDockHidden, updateIndicator]);
 
-    const indicatorTransition = useMemo(() =>
-        isFirstRender.current
-            ? 'none'
-            : 'left 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease',
-        [isFirstRender.current]
-    );
+    // Dynamic transition - no transition when repositioning after dock reappears
+    const indicatorTransition = useMemo(() => {
+        if (isFirstRender.current || skipTransitionRef.current) {
+            return 'none';
+        }
+        return 'left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease';
+    }, []);
 
     return (
         <>
@@ -169,7 +246,15 @@ export const Dock = React.memo(({ currentPath }: { currentPath: string }) => {
                 </defs>
             </svg>
 
-            <nav className="fixed left-1/2 -translate-x-1/2 z-50 flex flex-col items-center select-none bottom-[calc(0.25rem+env(safe-area-inset-bottom))] md:bottom-[calc(0.5rem+env(safe-area-inset-bottom))]" aria-label="Main Navigation">
+            <nav
+                className={`fixed z-50 flex flex-col items-center select-none left-1/2 -translate-x-1/2 will-change-transform
+                    bottom-[calc(0.25rem+env(safe-area-inset-bottom))] md:bottom-[calc(0.5rem+env(safe-area-inset-bottom))]
+                    transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]
+                    ${isDockHidden
+                        ? 'translate-y-[120%] opacity-0 pointer-events-none'
+                        : 'translate-y-0 opacity-100'}`}
+                aria-label="Main Navigation"
+            >
                 <GlassDock>
                     <div ref={containerRef} className="relative flex items-center gap-2 md:gap-3">
                         {/* Animated Sliding Liquid Indicator */}

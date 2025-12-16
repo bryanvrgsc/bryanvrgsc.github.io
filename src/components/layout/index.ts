@@ -9,3 +9,4 @@ export { Header } from './Header';
 export { Dock } from './Dock';
 export { CanvasBackground } from './CanvasBackground';
 export { ScrollToTop } from './ScrollToTop';
+export { ShowDockButton } from './ShowDockButton';

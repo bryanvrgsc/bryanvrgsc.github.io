@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useCallback, useEffect } from 'react';
 
 /**
  * GlassElement - A glass morphism container component
@@ -80,35 +80,61 @@ export const GlassElement: React.FC<GlassElementProps> = ({
 export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
     const [size, setSize] = useState({ width: 0, height: 0 });
     const hiddenRef = useRef<HTMLDivElement>(null);
+    // Keep track of last valid size to prevent flash when dock reappears
+    const lastValidSize = useRef({ width: 0, height: 0 });
+    const hasInitialized = useRef(false);
+
+    // Force measure function - can be called anytime
+    const measureSize = useCallback(() => {
+        if (hiddenRef.current) {
+            const newWidth = hiddenRef.current.offsetWidth;
+            const newHeight = hiddenRef.current.offsetHeight;
+            if (newWidth > 0 && newHeight > 0) {
+                lastValidSize.current = { width: newWidth, height: newHeight };
+                setSize({ width: newWidth, height: newHeight });
+                hasInitialized.current = true;
+                return true;
+            }
+        }
+        return false;
+    }, []);
 
     useLayoutEffect(() => {
         if (!hiddenRef.current) return;
 
+        // Initial measurement with retry for timing issues
+        const initMeasure = () => {
+            if (!measureSize()) {
+                // Retry after a short delay if initial measure fails
+                setTimeout(measureSize, 50);
+            }
+        };
+
+        initMeasure();
+
         // Compatibility check for older browsers (e.g., iOS < 13.4)
         if (typeof ResizeObserver === 'undefined') {
-            // Fallback: Set size once and don't observe changes
-            if (hiddenRef.current) {
-                setSize({
-                    width: hiddenRef.current.offsetWidth,
-                    height: hiddenRef.current.offsetHeight
-                });
-            }
             return;
         }
 
-        const obs = new ResizeObserver((entries) => {
-            for (const _ of entries) {
-                if (hiddenRef.current) {
-                    setSize({
-                        width: hiddenRef.current.offsetWidth,
-                        height: hiddenRef.current.offsetHeight
-                    });
-                }
-            }
+        const obs = new ResizeObserver(() => {
+            measureSize();
         });
         obs.observe(hiddenRef.current);
+
         return () => obs.disconnect();
-    }, [children]);
+    }, [children, measureSize]);
+
+    // Additional effect to ensure size is captured when dock becomes visible
+    useEffect(() => {
+        // Fallback: measure again after component is definitely mounted
+        const timer = setTimeout(measureSize, 100);
+        return () => clearTimeout(timer);
+    }, [measureSize]);
+
+    // Use last valid size if current size is zero (dock hidden/reappearing)
+    const displaySize = size.width > 0 ? size : lastValidSize.current;
+    const hasValidSize = displaySize.width > 0 || hasInitialized.current;
 
     return (
         <div className="relative flex justify-center items-end pb-2">
@@ -124,13 +150,13 @@ export const GlassDock = ({ children }: { children?: React.ReactNode }) => {
 
             {/* Actual Visible Glass Element */}
             <div
-                className="transition-opacity duration-500"
-                style={{ opacity: size.width > 0 ? 1 : 0 }}
+                className="transition-opacity duration-300"
+                style={{ opacity: hasValidSize ? 1 : 0 }}
             >
                 <GlassElement
-                    width={size.width}
-                    height={size.height}
-                    radius={size.height / 2}
+                    width={displaySize.width || 300}
+                    height={displaySize.height || 60}
+                    radius={(displaySize.height || 60) / 2}
                     className="flex items-center gap-2 md:gap-3 p-1.5 md:p-2"
                 >
                     {children}
